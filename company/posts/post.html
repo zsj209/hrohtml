@@ -1,0 +1,806 @@
+<script type="text/javascript" src="../js/errordefine/company.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$("#tg_post_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_post_funcode").val($("#tg_cur_funcode_temp").val());
+
+		//省市区获取树结构
+		var treeparams = {
+			_mt : "organization.queryTreeOrgList",
+			companyId : $("#tg_cur_company").val()
+		};
+		getInfo_comm_treeCity(treeparams, "UserLogin");
+
+
+		var oH = $("#rPane").height() - 205;
+		var oW = $("#rPane").width() - 240;
+
+		$("#tree_post_list").css("height",
+				($("#rPane").height() - 82) + "px");
+		
+		
+		/* var oH = $("#rPane").height() - 175;
+		var oW = $("#rPane").width() - 40 */
+
+		var ss = {
+			_mt : "post.getPostByPage"
+		};
+		getData(ss);
+		function getData(requestData) {
+
+			jQuery("#tab_post").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ '编号', '公司ID', '岗位名称', '所属组织','创建日期',
+								'终止日期', '操作角色', '用户绑定', '岗位状态', '是否全数据' ],
+						colModel : [ {
+							name : 'id',
+							index : 'id',
+							width : 0,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'companyId',
+							index : 'companyId',
+							width : 0,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'postName',
+							index : 'postName',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postOrgidName',
+							index : 'postOrgidName',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						},{
+							name : 'postStarttime',
+							index : 'postStarttime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postEndtime',
+							index : 'postEndtime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postRoleName',
+							index : 'postRole',
+							width : 70,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postUserName',
+							index : 'postUser',
+							width : 70,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postStateDesc',
+							index : 'postState',
+							width : 60,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postDataDesc',
+							index : 'postData',
+							width : 75,
+							align : "left",
+							sorttype : "text"
+						} ],
+
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							if(com_error(xhr)){
+								return true;
+							}else{
+								alertMsg(xhr,"company_code_desc");
+								return false;
+							}
+						},
+						jsonReader : {
+							/*content中的响应*/
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 20,
+						rowList : [ 20, 50, 100 ],
+						pager : '#pager1_post',
+						height : oH,
+						width : oW,
+						shrinkToFit : false,
+						forceFit : true,
+						sortorder : "desc",
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+
+					});
+			jQuery("#tab_post").jqGrid('navGrid', '#pager1_post', {
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			});
+
+		}
+
+		/*--------加载表格 end------*/
+		/*----------新增 保存-----------*/
+		//新增点击事件
+		$("#add_post").click(function() {
+
+			postDialog("新增岗位信息", "add");
+
+			getSelectDataTypeList({
+				"postState" : "pubstatus",
+				"postData" : "yesno"
+			});
+		})
+
+		function postDialog(pagetitle, meth) {
+
+			var type = "post";
+			var url = "../company/posts/addPost.html";
+			var s = $("<DIV ID=\"add_menu_" + type + "\"></DIV>");
+			$(s).load(url + "?tsid=" + new Date().getTime(), function() {
+				$("#companyId").val($("#tg_cur_company").val());
+			}).dialog({
+
+				autoOpen : true,
+				closeOnEscape : true,
+				bgiframe : true,
+				title : pagetitle,
+				height : 500,
+				width : 900,
+				resizable : false,
+				modal : true,
+				buttons : {
+					
+					"保存" : function() {
+						//验证参数
+						if(!validataPost()){
+							return;
+						}
+						
+						
+						//获取参数
+						requestData = serach("post.addorupdate", "addPost");
+						delete requestData.postOrgidName;
+						delete requestData.postUserName;
+						delete requestData.postRoleName;
+						//调用方法
+						addOrupdate(requestData, "UserLogin", meth);
+					},
+					"取消" : function() {
+
+						$(this).dialog("close");
+					}
+				},
+				close : function(event, ui) {
+					$(this).remove();
+				}
+			})
+		}
+
+		/*---------新增保存 end --------*/
+		/*---------修改 ---------*/
+		//1.点击修改按钮加载选中的行的数据到修改页面
+		//点击修改第一层
+		$("#upd_post").click(function() {
+			var ids = $('#tab_post').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else if (ids.length > 1) {
+				comAlert("一次只能修改一条数据");
+				return;
+			}
+			//加载修改页面
+			postDialog("修改岗位信息", "upd");
+
+			//加载用户信息
+			var updateInfo = {
+				_mt : "post.selectById",
+				id : ids
+			};
+
+			getSelectDataTypeList({
+				"postState" : "pubstatus",
+				"postData" : "yesno"
+			});
+
+			getUpdatePost(updateInfo, "UserLogin");
+
+		})
+
+		//获取要修改的用户的信息
+		function getUpdatePost(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "GET",
+				url : pubsources.pub_getlink,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					if(com_error(result)){
+					//给修改页面的input框赋值
+					data = result.content["0"];
+					setData(data, "addPost");
+					var companyId=$("#tg_cur_company").val();
+					$("#companyId").val(companyId);
+					}else{
+					alertMsg(result,"company_code_desc");
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+				}
+			});
+		}
+
+		/*----------删除--------*/
+		$("#del_post").click(function() {
+			var ids = $('#tab_post').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "post.deleteBatchById",
+						ids : ids
+					};
+					deletePost(del, "UserLogin");
+				}
+			}
+		})
+
+		function deletePost(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							if(com_error(result)){
+							//TODO　判断删除是否成功
+							console.log(result);
+							jQuery("#tab_post").trigger("reloadGrid");
+							}else{
+								alertMsg(result,"company_code_desc");
+								comAlert(pubprompt.del_failure);
+
+							}
+						},
+						error : function() {
+							comAlert(pubprompt.network_error);
+						}
+					});
+		}
+
+		/*-----------删除 end----------*/
+
+		
+		function getInfo_comm_treeCity(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "GET",
+						url : pubsources.pub_getlink,
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//给修改页面的input框赋值
+							data = result.content["0"].value;
+							//  comAlert(data[0].id)
+							var _arr = [];
+							_arr.push('<ul>');/**/
+							for ( var o in data) {
+								var data2 = data[o].list;
+								if (data2 != "") {
+									
+								
+								_arr
+										.push('<li class="pnode jqTreepnode sshows" style="background:none;border:0;">');/**/
+								_arr
+										.push('<a class="cityTrees"  snames="'
+												+ data[o].orgName
+												+ '" href="javascript:void(0)" onclick="showCity(this)" sid="'
+												+ data[o].id
+												+ '" gdid="1" fun="1603" value="'
+												+ data[o].id
+												+ '" gid="1" ><div><div class="treebackground" style="">'
+												+ data[o].orgName
+												+ '</div></div></a>');
+								}else{
+									_arr.push('<li class=" pnode jqTreepnode sshows" style="background:none;border:0;">');
+									_arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+											+ data[o].orgName
+											+ '" onclick="showCity(this)" gid="1" sid="'
+											+ data[o].id
+											+ '" value="'
+											+ data[o].id
+											+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+											+ data[o].orgName
+											+ '</div></div></a>');
+							_arr.push('</li>');
+								}
+								_arr.push('<ul class="jqTree child" >');
+								var data2 = data[o].list;
+								for ( var i in data2) {
+									data9=data2[i].list;
+									if (data9 != "") {
+									_arr.push('<li class="sshows">');
+									_arr
+											.push('<a  href="javascript:void(0)" class="cityTrees"   snames="'
+													+ data2[i].orgName
+													+ '" fun="1395" value="'
+													+ data2[i].id
+													+ '" sid="'
+													+ data2[i].id
+													+ '" gid="1" gdid="1" onclick="showCity(this)"><div><div class="treebackground">'
+													+ data2[i].orgName
+													+ '</div></div></a>');
+									}else{
+										_arr.push('<li class="sshows">');
+										_arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+												+ data2[i].orgName
+												+ '" onclick="showCity(this)" gid="1" sid="'
+												+ data2[i].id
+												+ '" value="'
+												+ data2[i].id
+												+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+												+ data2[i].orgName
+												+ '</div></div></a>');				
+									}
+									
+									_arr.push('<ul class="jqTree child" >');
+									var data3 = data2[i].list;
+				
+						 		if (data3 != "") {
+										for ( var j in data3) {
+											var data7=data3[j].list;
+											if(data7!=""){
+											_arr.push('<li class="sshows"  >');
+											_arr
+													.push('<a  href="javascript:void(0)" class="cityTrees"  snames="'
+															+ data3[j].orgName
+															+ '"  fun="1429" value="'
+															+ data3[j].id
+															+ '" sid="'
+															+ data3[j].id
+															+ '" gid="1" gid="1603" onclick="showCity(this)"  ><div><div class="treebackground" style="">'
+															+ data3[j].orgName
+															+ '</div></div></a>');
+											}else{
+												
+												_arr.push('<li class=" sshows">');
+										        _arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+												 		+ data3[j].orgName
+														+ '" onclick="showCity(this)" gid="1" sid="'
+														+ data3[j].id
+														+ '" value="'
+														+ data3[j].id
+														+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+														+ data3[j].orgName
+														+ '</div></div></a>');
+												
+												
+											}
+											_arr.push('<ul class="jqTree child" >');
+											var data4 = data3[j].list;
+											if (data3 != "") {
+												for ( var k in data4) {
+													_arr
+															.push('<li class=" sshows">');
+													_arr
+															.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+																	+ data4[k].orgName
+																	+ '" onclick="showCity(this)" gid="1" sid="'
+																	+ data4[k].id
+																	+ '" value="'
+																	+ data4[k].id
+																	+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+																	+ data4[k].orgName
+																	+ '</div></div></a>');
+													_arr.push('</li>');
+												}
+											}
+											_arr.push('</ul>');
+											_arr.push('</li>');
+										}
+									} 
+
+									_arr.push('</ul>');
+									_arr.push('</li>');
+								}
+								_arr.push('</ul>');
+								_arr.push('</li>');
+
+							}
+							_arr.push('</ul>');
+
+							$("#tree_post_list").html(_arr.join(""));
+							treeList();
+
+						},
+						error : function() {
+							comAlert(pubprompt.network_error);
+						}
+					});
+		}
+		
+		
+		
+		function treeList() {
+			$("#tree_post_list ul li").children("ul").hide();
+			$("#tree_post_list").find("li").not(":has(ul)").children("a")
+					.css({
+						textDecoration : "none",
+						color : "#333",
+						background : "none"
+					}).click(
+							function() {
+								$(this).get(0).location.href = "'"
+										+ $(this).attr("href") + "'";
+							});
+			$("#tree_post_list").find("li:has(ul)").children("a").addClass(
+					"pnode_closes").removeClass("pnode_opens")
+					.click(
+							function() {
+								//alert($(this).css("background"))
+								if ($(this).next("ul").is(":hidden")) {
+									$(this).next("ul").show();//slideDown("fast");
+									if ($(this).parent("li").siblings("li")
+											.children("ul").is(":visible")) {
+										$(this).parent("li").siblings("li")
+												.find("ul").hide();//slideUp("fast");
+										$(this).parent("li").siblings(
+												"li:has(ul)").children("a")
+												.addClass("pnode_closes")
+												.removeClass("pnode_opens")
+												.end().find("li:has(ul)")
+												.children("a").addClass(
+														"pnode_closes")
+												.removeClass("pnode_opens");
+
+									}
+									$(this).addClass("pnode_opens")
+											.removeClass("pnode_closes");
+									return false;
+								} else {
+									$(this).next("ul").hide();//slideUp("fast");
+									//不用toggle()的原因是为了在收缩菜单的时候同时也将该菜单的下级菜单以后的所有元素都隐藏
+									$(this).addClass("pnode_closes")
+											.removeClass("pnode_opens");
+									$(this).next("ul").children("li")
+											.find("ul").hide();//fadeOut("10");
+									$(this).next("ul").find("li:has(ul)")
+											.children("a").addClass(
+													"pnode_closes")
+											.removeClass("pnode_opens");
+									return false;
+								}
+							});
+		}
+		
+		
+
+		
+		
+		
+		
+		$("#tp_post_refresh").bind('click', function() {
+			//省市区获取树结构
+			var treeparams = {
+				_mt : "organization.queryTreeOrgList"
+			};
+			getInfo_comm_treeCity(treeparams, "UserLogin");
+		});
+		
+
+	})
+
+	//主页面的查询
+	$("#post_search_btn").bind('click', function() {
+
+		requestData = {
+			_mt : "post.selectByColuPage",
+			postName : $("#post_search").val()
+		};
+		$("#tab_post").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	})
+
+	function showCity(e) {
+		var id = $(e).attr("value");
+		$('.treebackground').each(function() {
+			$(this).removeClass("sclick");
+		});
+		
+		$(e).children("div").children("div").addClass("sclick");
+		var colmRequestDatass = {
+			_mt : "post.getPostByPageTree",
+			orgid : id
+		};
+		var payload = {
+			data : colmRequestDatass,
+			level : "UserLogin",
+		};
+		var data = encrypt(payload.level, payload.data);
+		$("#tab_post").setGridParam({
+			postData : data
+		}).trigger("reloadGrid", [ {
+			page : 1
+		} ]);
+	}
+
+
+	function queryPosts(state) {
+	    requestData = {
+	        _mt: "post.selectByColuPage",
+	        postState: state
+	    };
+	    $("#tab_post").jqGrid('setGridParam', {
+	        postData: requestData, //发送数据
+	        page: 1
+	    }).trigger("reloadGrid");
+	}
+	
+	
+	
+	
+	
+	
+	function validataPost(){
+		var flag=true;
+		var postName = $.trim($("#postName").val());
+		var postOrgid = $.trim($("#postOrgid").val());
+		var postStarttime = $.trim($("#postStarttime").val());
+		var postEndtime = $.trim($("#postEndtime").val());
+		var postRole = $.trim($("#postRole").val());
+		var postUser = $.trim($("#postUser").val());
+		var postState = $.trim($("#postState").val());
+		var postData = $.trim($("#postData").val());
+		
+		if(postName == ""){
+			comAlert("请输入岗位名称");
+			flag = false;
+			return;
+		}
+		
+		if(postOrgid == ""){
+			comAlert("请选择所属组织");
+			flag = false;
+			return
+		}
+		
+		if(postStarttime == ""){
+			comAlert("请选择开始时间");
+			flag = false;
+			return
+		}
+		
+		
+		if(postRole == ""){
+			comAlert("请选择角色");
+			flag = false;
+			return
+		}
+		
+		
+		if(postUser == ""){
+			comAlert("请选择绑定用户");
+			flag = false;
+			return
+		}
+	
+		
+		if(postData == ""){
+			comAlert("请选择是否全数据");
+			flag = false;
+			return
+		}
+		
+		
+		return flag;
+	
+	}
+	
+	/*修改状态 */
+	function updateStatePosts(state) {
+		var ids = $('#tab_post').jqGrid('getGridParam', 'selarrrow');
+		if (ids.length == 0) {
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		} else {
+			var type = ""
+			if (state == "02valid") {
+				type = "生效"
+			} else if (state =="03invalid") {
+				type = "失效/终止"
+			} else if (state =="01draft") {
+				type = "退回"
+			}
+			if (confirm("您确定要" + type + "所选中的数据？")) {
+				var updatestate = {
+					_mt : "post.updateStateBatchById",
+					ids : ids,
+					state : state
+				};
+				updatestates(updatestate, "UserLogin", type);
+			}
+		}
+	}
+
+	function updatestates(requestData, level, type) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$
+				.ajax({
+					type : "POST",
+					url : pubsources.pub_getlink,
+					contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+					crossDomain : true,
+					dataType : "json",
+					xhrFields : {
+						withCredentials : true
+					},
+					data : serialize(data),
+					success : function(result) {
+						//TODO　判断删除是否成功
+						console.log(result);
+						if (getStatus(result)) {
+							comAlert(type+"成功");
+							jQuery("#tab_post").trigger("reloadGrid");
+						} else {
+							comAlert(type+"失败");
+						}
+
+					},
+					error : function() {
+						comAlert(pubprompt.network_error);
+					}
+				});
+	}	
+		
+	
+	
+</script>
+<style>
+input[type=radio] {
+	width: 15px;
+	height: 15px;
+}
+
+/* 按钮样式 */
+.buttonz {
+	height:20px;
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+}
+
+.buttonz:hover {
+	background: #0089db;
+	color: #fff;
+}
+</style>
+
+<div id="rPane_d" class="jq_top_div">
+	<div class="ctleft" style="width: 200px;">
+		<div>
+			<input id="tp_post_refresh" class="btclasscs" value="刷新"
+				type="button">
+		</div>
+		<div id="tree_post_list" style="overflow-x: hidden; overflow-y: scroll; border-bottom: 1px solid #C7DEEC;"></div>
+	</div>
+
+
+	<div class="ctright">
+
+		<div class="rPane_d_menu">
+			<span> <input type="button" id="add_post"
+				value="&nbsp;新增&nbsp;"><input type="button"
+				id="upd_post" value="&nbsp;修改&nbsp;"><input
+				type="button" id="del_post" value="&nbsp;删除&nbsp;"><input type="button" id="effect_company"
+				onclick="javascript:updateStatePosts('02valid')"
+				value="&nbsp;生效&nbsp;"><input type="button"
+				onclick="javascript:updateStatePosts('03invalid')"
+				id="invalid_company" value="&nbsp;失效&nbsp; "><input
+				type="button" id="back_company" value="&nbsp;退回&nbsp;"
+				onclick="javascript:updateStatePosts('01draft')">
+			</span>
+		</div>
+
+		<div class="rpane_status"><label><input type="radio"
+				id="editing" name="status" value="01draft"
+				onclick="javascript:queryPosts('01draft')" /> 编辑中</label> <label><input
+				type="radio" id="enabled" name="status" value="02valid"
+				onclick="javascript:queryPosts('02valid')" /> 生效</label> <label><input
+				type="radio" id="diabled" name="status" value="03invalid"
+				onclick="javascript:queryPosts('03invalid')" /> 失效/终止</label> <label><input
+				type="radio" id="allstatus" name="status" value="" checked="checked"
+				onclick="javascript:queryPosts('')" /> 全部</label> <br>
+		</div>
+
+
+
+		<div class=rpane_search>
+			<input type="text" id="post_search" name="post_search"
+				placeholder="请输入岗位名称">
+			<button id="post_search_btn" class="buttonz">查询</button>
+		</div>
+
+		<div class=rPane_dt>
+			<table id="tab_post"></table>
+			<div id="pager1_post"></div>
+		</div>
+
+	</div>
+</div>
+<input type="hidden" id="tg_post_funid" value="">
+<input type="hidden" id="tg_post_funcode" value="">
+
+

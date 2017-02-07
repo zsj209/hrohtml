@@ -1,0 +1,96 @@
+<!---------------------------------------------------------
+Coding:       zfy
+Create Date:   2017-01-10
+Desc:       参数类型信息
+update History:
+  date:        
+  coding:      
+  desc:        
+---------------------------------------------------------->
+
+<script type="text/javascript">
+	$(function() {
+		var cn = ['类型编码', '类型名称' ];
+		var cm = [ {
+			name : 'typeCode',
+			index : 'typeCode',
+			width : 200,
+			align : "left",
+			sorttype : "text"
+		},{
+			name : 'typeName',
+			index : 'typeName',
+			width : 200,
+			align : "left",
+			sorttype : "text"
+		} ];
+		jQuery("#tb_com_sel_paramtype2").jqGrid({
+			url : pubsources.pub_getlink,
+			datatype : "json",
+			mtype : "POST",
+			postData : {
+				_mt : "commparmtype.selectParamTypeByColumn"
+			},
+			mylevel : "UserLogin",
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			colNames : cn,
+			colModel : cm,
+			loadComplete : function(xhr) {
+				console.log(xhr);
+				return true;
+			},
+			jsonReader : {
+				root : "rows",
+				page : "page",
+				total : "total",
+				records : "records"
+			},
+			rowNum : 10,
+			rowList : [10, 20,50 ],
+			pager : '#pg_com_sel_paramtype2',
+			shrinkToFit : false,
+			forceFit : true,
+			sortname : 'id',
+			sortorder : "desc",
+			viewrecords : true,
+			rownumbers : true,
+			ondblClickRow : function(id) {
+			/* 	var rowData = jQuery("#tb_com_sel_paramtype2").getRowData(id);
+				var paramTypeName = rowData['typeName'];
+				var code = rowData['typeCode'];
+					$("#paramTypes").val(code);
+					$("#paramNames").val(paramTypeName); */
+					buttons = $('#com_sel_selparamtype_02').parent().find(".ui-dialog-buttonset").find("button");
+					$(buttons).find(":first").trigger("click");
+				
+			},
+			height : 300,
+			width : 650
+		});
+	});
+ 	$("#node_paramType_btn2").click(function(){
+		var paramtype=$("#node_parent_paramType2").val();
+		//comAlert(node_parent_search)
+		if(paramtype!=""){
+			var ss = {
+					_mt : "commparmtype.selectParamTypeByColumn",
+					typeName:paramtype
+				};
+				$("#tb_com_sel_paramtype2").setGridParam({postData:ss}).trigger("reloadGrid", [{page:1}]);
+		}
+	}); 
+</script>
+<div>
+ 类型名称 <input type="text" id="node_parent_paramType2">
+    <button id="node_paramType_btn2">查询</button>
+</div>
+<table id="tb_com_sel_paramtype2" class="scroll"></table>
+<div id="pg_com_sel_paramtype2" class="scroll" style="height: 30px"></div>

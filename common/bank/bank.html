@@ -1,0 +1,369 @@
+<script type="text/javascript">
+	$(function() {
+		$("#tg_bank_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_bank_funcode").val($("#tg_cur_funcode_temp").val());
+		var oH = $("#rPane").height() - 175;
+		var oW = $("#rPane").width() - 40;
+
+		var ss = {
+			_mt : "bankInstitution.selectBanks"
+		//deleteFlag:0
+		};
+		getPeriodData(ss);
+		function getPeriodData(requestData) {
+			jQuery("#list_comm_bank").jqGrid({
+				url : pubsources.pub_getlink,
+				datatype : "json",
+				mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+				postData : requestData,
+				mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"UserLogin","None"
+				prmNames : {
+					page : "page",
+					rows : "rows",
+					sort : null,
+					order : null,
+					search : null,
+					nd : null,
+					npage : null
+				},//去除多余的参数
+				colNames : [ '编号', '银行名称', '银行简称' ],
+				colModel : [ {
+					name : 'id',
+					index : 'id',
+					width : 100,
+					align : "left",
+					sorttype : "text",
+					hidden : true
+				}, {
+					name : 'bankName',
+					index : 'bankName',
+					width : 100,
+					align : "left",
+					sorttype : "text"
+				}, {
+					name : 'bankCname',
+					index : 'bankCname',
+					width : 70,
+					align : "left",
+					sorttype : "text"
+				} ],
+				loadComplete : function(xhr) {
+					console.log(xhr);
+					//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+					return true;
+				},
+				jsonReader : {
+					/*content中的响应*/
+					root : "rows",//表格中的数据
+					page : "page",//当前页码
+					total : "total",//总页数
+					records : "records"//总行数
+				},
+				rowNum : 20,
+				rowList : [ 20, 50, 100 ],
+				pager : '#pager_comm_bank',
+				height : oH,
+				width : oW,
+				shrinkToFit : false,
+				forceFit : true,
+
+				sortorder : "desc",
+				viewrecords : true,
+				multiselect : true,
+				rownumbers : true,
+
+			}).navGrid("#pager_comm_bank", {
+				refresh : false,
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			}).navButtonAdd("#pager_comm_bank", {
+				title : "refresh",
+				caption : "",
+				buttonicon : "ui-icon-refresh",
+				onClickButton : function() {
+					refCashData_data()
+				},
+				position : "last"
+			});
+			//jQuery("#list_comm_bank").jqGrid('navGrid','#pager_comm_bank',{edit:false,add:false,del:false,search:false});
+
+		}
+
+		/*--------加载表格 end------*/
+		/*----------新增 保存-----------*/
+		//新增点击事件
+		$("#add_comm_bank").click(function() {
+			addOrUpdateBank("新增银行机构信息", "bankInstitution.insertBank", "add");
+		});
+
+		/*---------新增保存 end --------*/
+		/*---------修改 ---------*/
+		//1.点击修改按钮加载选中的行的数据到修改页面
+		//点击修改第一层
+		$("#upd_comm_bank").click(function() {
+			var ids = $('#list_comm_bank').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else if (ids.length > 1) {
+				comAlert(pubprompt.upd_onedata);
+				return;
+			}
+			//加载修改页面
+			addOrUpdateBank("修改银行机构信息", "bankInstitution.updateBank", "upd");
+			//2.加载要修改的数据
+			var updateBankInfo = {
+				_mt : "bankInstitution.selectByBankId",
+				id : ids
+			};
+			getUpdatePeriod(updateBankInfo, "UserLogin");
+		});
+
+		/*---------修改保存 end---------*/
+		/*----------删除--------*/
+		$("#del_comm_bank").click(function() {
+			var ids = $('#list_comm_bank').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert("请选择要删除的信息");
+				return;
+			} else {
+				if (confirm("您确定要删除选中的" + ids.length + "条记录吗？")) {
+					var del = {
+						_mt : "bankInstitution.deleteBatchByIds",
+						idList : ids
+					};
+					deleteBank(del, "UserLogin");
+				}
+			}
+		})
+		$('#bankNames').bind('keypress', function(event) {
+			if (event.keyCode == "13") {
+				bank_quick();
+			}
+		});
+		//模糊查询
+		$("#search_comm_bankNames").click(function() {
+			bank_quick();
+		});
+
+	})
+	//快速筛选
+	function bank_quick() {
+		var bankNames = $("#bankNames").val();
+
+		//if(paramNames!=""){
+		var requestData = {
+			_mt : "bankInstitution.selectBanks",
+			bankName : bankNames
+		};
+		//	$("#list_comm_bank").setGridParam({postData:ss}).trigger("reloadGrid", [{page:1}]);
+		//}
+		$("#list_comm_bank").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	}
+	//获取新增或者修改界面
+
+	function addOrUpdateBank(pagetitle, mt, stype) {
+		var s = $("<DIV ID=\"add_upd_button\"></DIV>");
+		$(s).load("../common/bank/editBank.html?tsid=" + new Date().getTime())
+				.dialog({
+					autoOpen : true,
+					closeOnEscape : true,
+					bgiframe : true,
+					title : pagetitle,
+					height : 500,
+					width : 900,
+					resizable : false,
+					modal : true,
+					buttons : {
+						"保存" : function() {
+							//获取参数
+							requestData = saveBank(mt);
+							//调用方法
+							if (requestData) {
+								addPeriod(requestData, "UserLogin", stype);
+							}
+						},
+						"取消" : function() {
+							$(this).dialog("close");
+						},
+					},
+					close : function(event, ui) {
+						$(this).remove();
+					}
+				});
+	}
+
+	//获取参数类型信息
+	function saveBank(mt) {
+		var bankName = $("#bankName").val();
+		var bankCname = $("#bankCname").val();
+		var comment = $("#comment").val();
+		var id = $("#id").val();
+		var companyId=$("#tg_cur_company").val();
+		if (val_isnull(bankName)) {
+			comAlert("银行名称不能为空！");
+			return;
+		} else if (val_isnull(bankCname)) {
+			comAlert("银行简称不能为空");
+			return;
+		}
+		var params = {
+			"id" : id,
+			"bankName" : bankName,
+			"bankCname" : bankCname,
+			"companyId" : companyId,
+			"comment" : comment
+		};
+		var data = JSON.stringify(params);
+		var requestData = {};
+		requestData = {
+			"_mt" : mt,
+			"data" : data
+		};
+		return requestData;
+
+	}
+	//添加或修改
+	function addPeriod(requestData, level, stype) {
+		var payload = {
+			data : requestData,
+			level : level,
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//alert(commonStatus(result,"common_code_desc"))
+				if (commonStatus(result, "common_code_desc")) {
+					//网关和dubbo服务都没有问题时
+					if (stype == "add") {
+						comAlert(pubprompt.ins_succ);
+					} else if (stype == "upd") {
+						comAlert(pubprompt.upd_succ);
+					} else {
+						comAlert(pubprompt.save_succ);
+					}
+				}
+				$("#add_upd_button").dialog("close");
+				jQuery("#list_comm_bank").trigger("reloadGrid");
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+
+	//获取要修改的参数类型的信息
+	function getUpdatePeriod(requestData, level) {
+		var payload = {
+			data : requestData,
+			level : level,
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//给修改页面的input框赋值
+				data = result.content["0"];
+				selectPeriodById(data);
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+
+	/*---------修改保存 end---------*/
+	function selectPeriodById(updateData) {
+
+		$("#bankName").val(updateData.bankName);
+		$("#bankCname").val(updateData.bankCname);
+		$("#comment").val(updateData.comment);
+		$("#id").val(updateData.id);
+	}
+	//删除参数类型信息
+
+	function deleteBank(requestData, level) {
+		var payload = {
+			data : requestData,
+			level : level,
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+
+				if (result.content["0"].value > 0) {
+					comAlert(pubprompt.del_succ);
+				} else {
+					comAlert(pubprompt.del_failure);
+				}
+				jQuery("#list_comm_bank").trigger("reloadGrid");
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+
+	function refCashData_data() {
+		var requestData = {
+			_mt : "bankInstitution.selectBanks",
+			bankName : ""
+		};
+		$("#list_comm_bank").setGridParam({
+			postData : requestData
+		}).trigger("reloadGrid", [ {
+			page : 1
+		} ]);
+	}
+</script>
+
+
+<!-- 12 -->
+<div class="rPane_d_menu">
+	<span> <input type="button" id="add_comm_bank"
+		value="&nbsp;新增&nbsp;"><input type="button"
+		id="upd_comm_bank" value="&nbsp;修改&nbsp;"><input
+		type="button" id="del_comm_bank" value="&nbsp;删除&nbsp;">
+	</span>
+</div>
+<div class="rpane_search">
+	<input type="text" id="bankNames" placeholder="请输入银行名称"><input
+		type="button" id="search_comm_bankNames" value="&nbsp;查询&nbsp;">
+</div>
+<div class="rPane_dt">
+	<table id="list_comm_bank"></table>
+	<div id="pager_comm_bank"></div>
+</div>
+<input type="hidden" id="tg_bank_funid" value="">
+<input type="hidden" id="tg_bank_funcode" value="">

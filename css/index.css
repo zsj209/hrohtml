@@ -1,0 +1,35 @@
+/*重置样式*/
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,input,textarea,p,th,td,span{margin:0;padding:0;}
+body{font-family:"微软雅黑";-moz-user-select: none; /*火狐*/
+    -webkit-user-select: none; /*webkit浏览器*/
+    -ms-user-select: none; /*IE10*/
+    -khtml-user-select: none; /*早期浏览器*/
+    user-select: none;}
+body,html{width:100%;height:100%;}
+h1,h2,h3,h4,h5,h6{font-weight:normal;}
+img{border-style:none;}
+li{list-style:none;}
+a{text-decoration:none;}
+/*main*/
+#outer{width:100%;height:100%;}
+#inner{width:508px;height:354px;position:fixed;top:50%;left:50%;margin-top:-177px;margin-left:-254px;}
+#inner h1{width:508px;height:54px;}
+#inner h1 span{color:#0188dd;font-size:30px;margin-right:10px;float:left;margin-top:7px;}
+#inner h1 em{font-style:normal;font-size:18px;color:#656565;float:left;margin-top:18px;}
+#innermain{width:492px;height:252px;border-left:8px solid #0089dd;border-right:8px solid #0089dd;border-top:8px solid #0089dd;}
+#innermainleft{width:288px;height:252px;float:left;}
+#innermainleft ul{margin-top:25px;}
+#innermainleft li{width:240px;margin:0 auto;margin-bottom:16px;color:#656565;font-size:12px;height:30px;}
+#innermainleft li span{float:left;width:60px;height:30px;line-height:30px;text-align:right;}
+#innermainleft input{float:right;height:28px;width:172px;outline:none;border:1px solid #cfcfcf;padding-left:6px;line-height:30px;text-align:left;}
+#innermainleft #leftone{margin-bottom:4px;}
+#innermainleft #lefttwo{color:#f00;margin-bottom:4px;visibility:hidden;height:14px;line-height:14px;text-align:center;}
+#innermainleft #lefttwo b{float:right;}
+#innermainleft #leftthree{margin-bottom:12px;}
+#innermainleft #leftthree button{background:#0089dd;width:180px;height:30px;font-size:20px;color:#fff;float:right;border:none}
+#innermainleft #leftfour{margin-bottom:0;height:14px;}
+#innermainleft #leftfour a{color:#656565;float:right;}
+#innermainright{width:204px;height:252px;float:left;}
+#innermainright img{margin:26px 26px 0 12px}
+#inner h2{width:508px;height:40px;line-height:40px;text-align:center;background:#0089dd;font-size:10px;color:#fff;}
+

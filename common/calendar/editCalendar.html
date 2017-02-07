@@ -1,0 +1,83 @@
+<script type="text/javascript">
+$(function(){
+	$("#calDate").datepicker();
+	$("#select_Period").click(
+			function() {
+				var selpara = {seltype:"selperiod", seltitle:"选择期间", rtnvalobj:"calCode", rtndisobj:"calCodeName", discol:1, flparams:"companyId", flparamvs:$("#tg_cur_company").val()};
+				comsel(selpara);
+	}) 
+})
+function cancelcalCodeName(){
+	if($("#calCodeName").val()!=""){
+		if (confirm("确定要清除期间编码吗")) {
+			$("#calCodeName").val("");
+			$("#calCode").val("");
+		}
+	}
+}
+</script>
+<style type="text/css">
+	.ui-form-bspcs{
+		color: red;
+		padding-right:10px;
+		float: right;
+		font-weight: bold;
+	}
+</style>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addParamType" class="ui-form-table jqForm" cellpadding="5" border='0'
+		style="width: 100%;">
+		
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="calCode"><label>期间编码</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="calCodeName" name="calCodeName" ondblclick="cancelcalCodeName()" readonly="readonly" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+				<span id="select_Period" class="ui-form-sbtnew ui-form-sel" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="calDate"><label>日期</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="calDate" name="calDate" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+			</td>
+
+		</tr>
+			<tr>
+			
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="calType"><label>日期类型</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td  style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+				<select id="calType" class="ui-form-value"></select>
+				</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+			
+			
+		</tr>
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="comment"><label>备注</label>
+			</td>
+			<td colspan="3" style="width:85%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+				<textarea class="ui-form-textarea ui-form-value" id="comment" name="comment"  ismust="0"
+					></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+		
+	</table>
+	<input id="id" type="hidden">
+	<input id="calCode" type="hidden">

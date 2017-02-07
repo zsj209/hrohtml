@@ -1,0 +1,739 @@
+<script type="text/javascript" src="../js/errordefine/company.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$("#tg_company_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_company_funcode").val($("#tg_cur_funcode_temp").val());
+
+	//	var companycompanyId = $("#tg_cur_company").val();
+		
+
+		// 省市区获取树结构
+		var treeparams = {
+			_mt : "commoncity.queryTreeCityList"
+		};
+		getInfo_comm_treeCompany(treeparams, "UserLogin");
+
+		var oH = $("#rPane").height() - 205;
+		var oW = $("#rPane").width() - 240;
+		$("#tree_company_list").css("height",
+				($("#rPane").height() - 82) + "px");
+
+		var ss = {
+			_mt : "company.getCompanyByPage"
+		};
+		getData(ss);
+		function getData(requestData) {
+
+			jQuery("#tab_company").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ '编号', '公司名称', '公司类型', '地区名称', '详细地址',
+								'创建日期', '终止日期', '管理员', '公司状态' ],
+						colModel : [ {
+							name : 'id',
+							index : 'id',
+							width : 0,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'compName',
+							index : 'compName',
+							width : 0,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compTypeDesc',
+							index : 'compTypeDesc',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compDistrictName',
+							index : 'compDistrictName',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compAddr',
+							index : 'compAddr',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compStarttime',
+							index : 'compStarttime',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compEndtime',
+							index : 'compEndtime',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compControllerName',
+							index : 'compControllerName',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compStateDesc',
+							index : 'compStateDesc',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						} ],
+
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							if (com_error(xhr)) {
+								return true;
+							} else {
+								alertMsg(xhr, "company_code_desc");
+								return false;
+							}
+							//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+						},
+						jsonReader : {
+							/*content中的响应*/
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 20,
+						rowList : [ 20, 50, 100 ],
+						pager : '#pager1_company',
+						height : oH,
+						width : oW,
+						shrinkToFit : false,
+						forceFit : true,
+						sortname : 'id',
+						sortorder : "desc",
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+
+					});
+
+			jQuery("#tab_company").jqGrid('navGrid', '#pager1_company', {
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			});
+
+		}
+
+		$("#add_company").click(function() {
+			companyDialog("新增Hro公司台帐信息");
+			getSelectDataTypeList({
+				"compType" : "comptype",
+				"compState" : "pubstatus"
+			});
+		})
+
+		function companyDialog(pagetitle) {
+			var s = $("<DIV ID=\"add_upd_company\"></DIV>");
+
+			var ids = $('#tab_company').jqGrid('getGridParam', 'selarrrow');
+
+			//加载新增页面
+			$(s).load(
+					"../company/companytree/companybase.html?tsid="
+							+ new Date().getTime(), function() {
+						if (pagetitle == "修改Hro公司台帐信息") {
+							$("#companyidid").val(ids);
+							$("#companycompanyId").val($("#tg_cur_company").val());
+						}else{
+							$("#companyId").val($("#tg_cur_company").val());
+						}
+
+					
+
+					}).dialog({
+				autoOpen : true,
+				closeOnEscape : true,
+				bgiframe : true,
+				title : pagetitle,
+				height : 600,
+				width : 1000,
+				resizable : false,
+				modal : true,
+				close : function(event, ui) {
+					$(this).remove();
+				}
+			})
+
+		}
+
+		//点击修改第一层
+		$("#upd_company").click(function() {
+			var ids = $('#tab_company').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else if (ids.length > 1) {
+				comAlert("一次只能修改一条数据");
+				return;
+			}
+
+			companyDialog("修改Hro公司台帐信息");
+
+			getSelectDataTypeList({
+				"compType" : "comptype",
+				"compState" : "pubstatus"
+			});
+
+			//加载用户信息
+			var updateInfo = {
+				_mt : "company.selectById",
+				id : ids
+			};
+			getUpdateCompany(updateInfo, "UserLogin");
+
+		})
+
+		//获取要修改的用户的信息
+		function getUpdateCompany(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "POST",
+				url : pubsources.pub_getlink,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					if (com_error(result)) {
+						//给修改页面的input框赋值
+						data = result.content["0"];
+						setData(data, "addCompany");
+						$("#companyId").val($("#tg_cur_company").val());
+					} else {
+						alertMsg(result, "company_code_desc");
+						return false;
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+				}
+			});
+		}
+		/*---------修改保存 end---------*/
+
+		$("#del_company").click(function() {
+			var ids = $('#tab_company').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "company.deleteBatchById",
+						ids : ids
+					};
+					deleteCompany(del, "UserLogin");
+				}
+			}
+		})
+
+		function deleteCompany(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							console.log(result);
+							if (com_error(result)) {
+								comAlert(pubprompt.del_succ);
+								jQuery("#tab_company").trigger("reloadGrid");
+							} else {
+								comAlert(pubprompt.del_failure);
+								alertMsg(result, "company_code_desc");
+
+							}
+
+						},
+						error : function() {
+							comAlert(pubprompt.network_error);
+						}
+					});
+		}
+
+		/***
+		 * 获取左边城市类别
+		 */
+		function getInfo_comm_treeCompany(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "GET",
+						url : pubsources.pub_getlink,
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//给修改页面的input框赋值
+							data = result.content["0"].value;
+							//  alert(data[0].id)
+							var _arr = [];
+							_arr.push('<ul>');/**/
+							for ( var o in data) {
+								var data2 = data[o].list;
+								if (data2 != "") {
+									_arr
+											.push('<li class="pnodes jqTreepnode sshows" style="background:none;border:0;padding:0;">');/**/
+									_arr
+											.push('<a class="cityTrees" snames="'
+													+ data[0].cityName
+													+ '" href="javascript:void(0)" onclick="showCompany(this)" sid="'
+													+ data[0].id
+													+ '" gdid="1" fun="1603" value="'
+													+ data[0].id
+													+ '" gid="1" ><div class="treeLevel"><div class="treebackground" style="padding-left:0;">'
+													+ data[0].cityName
+													+ '</div></div></a>');
+
+								} else {
+									_arr.push('<li class=" sshows">');
+									_arr
+											.push('<a class="cityTrees" snames="'
+													+ data[0].cityName
+													+ '" href="javascript:void(0)" onclick="showCompany(this)" sid="'
+													+ data[0].id
+													+ '" gdid="1" fun="1603" value="'
+													+ data[0].id
+													+ '" gid="1" ><div class="pnodestates"><div class="treebackground" style="">'
+													+ data[0].cityName
+													+ '</div></div></a>');
+								}
+								_arr.push('<ul class="jqTree child" >');
+								for ( var i in data2) {
+									var data3 = data2[i].list;
+									if (data3 != "") {
+										_arr.push('<li class="sshows">');
+										_arr
+												.push('<a  href="javascript:void(0)" class="cityTrees"   snames="'
+														+ data2[i].cityName
+														+ '" fun="1395" value="'
+														+ data2[i].id
+														+ '" sid="'
+														+ data2[i].id
+														+ '" gid="1" gdid="1" onclick="showCompany(this)"><div class="treeLevel"><div class="treebackground">'
+														+ data2[i].cityName
+														+ '</div></div></a>');
+									} else {
+										_arr.push('<li class=" sshows">');
+										_arr
+												.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+														+ data2[i].cityName
+														+ '" onclick="showCompany(this)" gid="1" sid="'
+														+ data2[i].id
+														+ '" value="'
+														+ data2[i].id
+														+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+														+ data2[i].cityName
+														+ '</div></div></a>');
+									}
+
+									_arr.push('<ul class="jqTree child" >');
+
+									if (data3 != "") {
+										for ( var j in data3) {
+											var data4 = data3[j].list;
+											if (data4 != "") {
+												_arr
+														.push('<li class="sshows"  >');
+												_arr
+														.push('<a  href="javascript:void(0)" class="cityTrees"  snames="'
+																+ data3[j].cityName
+																+ '"  fun="1429" value="'
+																+ data3[j].id
+																+ '" sid="'
+																+ data3[j].id
+																+ '" gid="1" gid="1603" onclick="showCompany(this)"  ><div class="treeLevel"><div class="treebackground" style="">'
+																+ data3[j].cityName
+																+ '</div></div></a>');
+
+											} else {
+												_arr
+														.push('<li class=" sshows">');
+												_arr
+														.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+																+ data3[j].cityName
+																+ '" onclick="showCompany(this)" gid="1" sid="'
+																+ data3[j].id
+																+ '" value="'
+																+ data3[j].id
+																+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+																+ data3[j].cityName
+																+ '</div></div></a>');
+											}
+											_arr
+													.push('<ul class="jqTree child" >');
+
+											if (data3 != "") {
+												for ( var k in data4) {
+													_arr
+															.push('<li class=" sshows">');
+													_arr
+															.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+																	+ data4[k].cityName
+																	+ '" onclick="showCompany(this)" gid="1" sid="'
+																	+ data4[k].id
+																	+ '" value="'
+																	+ data4[k].id
+																	+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+																	+ data4[k].cityName
+																	+ '</div></div></a>');
+													_arr.push('</li>');
+												}
+											}
+											_arr.push('</ul>');
+											_arr.push('</li>');
+										}
+									}
+
+									_arr.push('</ul>');
+									_arr.push('</li>');
+								}
+								_arr.push('</ul>');
+								_arr.push('</li>');
+
+							}
+							_arr.push('</ul>');
+
+							$("#tree_company_list").html(_arr.join(""));
+							treeListCompany();
+						},
+						error : function() {
+							comAlert(pubprompt.network_error);
+						}
+					});
+		}
+
+		function treeListCompany() {
+			$("#tree_company_list ul li").children("ul").hide();
+			$("#tree_company_list").find("li").not(":has(ul)").children("a")
+					.css({
+						textDecoration : "none",
+						color : "#333",
+						background : "none"
+					}).click(
+							function() {
+								$(this).get(0).location.href = "'"
+										+ $(this).attr("href") + "'";
+							});
+			$("#tree_company_list").find("li:has(ul)").children("a").addClass(
+					"pnode_closes").removeClass("pnode_opens")
+					.click(
+							function() {
+								//alert($(this).css("background"))
+								if ($(this).next("ul").is(":hidden")) {
+									$(this).next("ul").show();//slideDown("fast");
+									if ($(this).parent("li").siblings("li")
+											.children("ul").is(":visible")) {
+										$(this).parent("li").siblings("li")
+												.find("ul").hide();//slideUp("fast");
+										$(this).parent("li").siblings(
+												"li:has(ul)").children("a")
+												.addClass("pnode_closes")
+												.removeClass("pnode_opens")
+												.end().find("li:has(ul)")
+												.children("a").addClass(
+														"pnode_closes")
+												.removeClass("pnode_opens");
+
+									}
+									$(this).addClass("pnode_opens")
+											.removeClass("pnode_closes");
+									return false;
+								} else {
+									$(this).next("ul").hide();//slideUp("fast");
+									//不用toggle()的原因是为了在收缩菜单的时候同时也将该菜单的下级菜单以后的所有元素都隐藏
+									$(this).addClass("pnode_closes")
+											.removeClass("pnode_opens");
+									$(this).next("ul").children("li")
+											.find("ul").hide();//fadeOut("10");
+									$(this).next("ul").find("li:has(ul)")
+											.children("a").addClass(
+													"pnode_closes")
+											.removeClass("pnode_opens");
+									return false;
+								}
+							});
+		}
+
+		$("#tp_company_refresh").bind('click', function() {
+			//省市区获取树结构
+			var treeparams = {
+				_mt : "commoncity.queryTreeCityList"
+			};
+			getInfo_comm_treeCompany(treeparams, "UserLogin");
+		});
+
+	})
+
+	function showCompany(e) {
+		var cityId = $(e).attr("value");
+
+		$('.treebackground').each(function() {
+			$(this).removeClass("sclick");
+		});
+
+		$(e).children("div").children("div").addClass("sclick");
+
+		var colmRequestDatass = {
+			_mt : "company.getCompanyByPageTree",
+			cityid : cityId
+		};
+		var payload = {
+			data : colmRequestDatass,
+			level : "UserLogin",
+		};
+		var data = encrypt(payload.level, payload.data);
+		$("#tab_company").setGridParam({
+			postData : data
+		}).trigger("reloadGrid", [ {
+			page : 1
+		} ]);
+	}
+
+	//主页面的查询
+	$("#companys_search_btn").bind('click', function() {
+		//TODO 查询
+		requestData = {
+			_mt : "company.selectByColuPage",
+			compName : $("#company_search").val()
+		};
+		$("#tab_company").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	});
+
+	function queryCompany(state) {
+		if (state == "") {
+			/* $("#add_company").attr("disabled", true); 
+			$("#add_company").css({"background-color":"#ccc","color":"#999999","cursor":"default"});
+			
+			$("#del_company").attr("disabled", true); 
+			$("#del_company").css({"background-color":"#ccc","color":"#999999","cursor":"default"});
+			
+			$("#upd_company").attr("disabled", true); 
+			$("#upd_company").css({"background-color":"#ccc","color":"#999999","cursor":"default"});
+			
+			$("#effect_company").attr("disabled", true); 
+			$("#effect_company").css({"background-color":"#ccc","color":"#999999","cursor":"default"});
+			
+			$("#invalid_company").attr("disabled", true); 
+			$("#invalid_company").css({"background-color":"#ccc","color":"#999999","cursor":"default"});
+			
+			$("#back_company").attr("disabled", true); 
+			$("#back_company").css({"background-color":"#ccc","color":"#999999","cursor":"default"}); */
+
+		} else if (state == "01draft") {
+
+		} else if (state == "02valid") {
+
+		} else if (state == "03invalid") {//失效中
+
+		}
+
+		requestData = {
+			_mt : "company.selectByColuPage",
+			compState : state
+		};
+		$("#tab_company").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	}
+
+	/*修改状态 */
+	function updateStateCompany(state) {
+		var ids = $('#tab_company').jqGrid('getGridParam', 'selarrrow');
+		if (ids.length == 0) {
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		} else {
+			var type = ""
+			if (state == "02valid") {
+				type = "生效"
+			} else if (state == "03invalid") {
+				type = "失效/终止"
+			} else if (state == "01draft") {
+				type = "退回"
+			}
+			if (confirm("您确定要" + type + "所选中的数据？")) {
+				var updatestate = {
+					_mt : "company.updateStateBatchById",
+					ids : ids,
+					state : state
+				};
+				updatestates(updatestate, "UserLogin", type);
+			}
+		}
+	}
+
+	function updatestates(requestData, level, type) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+
+				//TODO　判断删除是否成功
+				console.log(result);
+				if (com_error(result)) {
+					comAlert(type + "成功");
+					jQuery("#tab_company").trigger("reloadGrid");
+				} else {
+					comAlert(type + "失败");
+					alertMsg(result, "company_code_desc");
+
+				}
+
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+</script>
+<style>
+
+/* 按钮样式 */
+.buttonz {
+	height: 20px;
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+	background: #ccc;
+}
+
+.buttonz:hover {
+	background: #0089db;
+	color: #fff;
+}
+
+.fff {
+	color: #999999;
+	cursor: default;
+}
+</style>
+
+<div id="rPane_d" class="jq_top_div">
+	<div class="ctleft">
+		<div>
+			<input id="tp_company_refresh" class="btclasscs" value="刷新"
+				type="button">
+		</div>
+		<div id="tree_company_list"
+			style="overflow-x: hidden; overflow-y: scroll; border-bottom: 1px solid #C7DEEC;"></div>
+	</div>
+
+
+	<div class="ctright">
+
+		<div class="rPane_d_menu">
+			<span> <input type="button" id="add_company"
+				value="&nbsp;新增&nbsp;"><input type="button" id="upd_company"
+				value="&nbsp;修改&nbsp;"><input type="button" id="del_company"
+				value="&nbsp;删除&nbsp;"><input type="button"
+				id="effect_company"
+				onclick="javascript:updateStateCompany('02valid')"
+				value="&nbsp;生效&nbsp;"><input type="button"
+				onclick="javascript:updateStateCompany('03invalid')"
+				id="invalid_company" value="&nbsp;失效&nbsp; "><input
+				type="button" id="back_company" value="&nbsp;退回&nbsp;"
+				onclick="javascript:updateStateCompany('01draft')">
+			</span>
+		</div>
+
+
+
+		<div class="rpane_status">
+			<label><input type="radio" id="editing" name="status"
+				value="01draft" onclick="javascript:queryCompany('01draft')" /> 编辑中
+			</label> <label><input type="radio" id="enabled" name="status"
+				value="02valid" onclick="javascript:queryCompany('02valid')" /> 生效
+			</label> <label><input type="radio" id="diabled" name="status"
+				value="03invalid" onclick="javascript:queryCompany('03invalid')" />
+				失效/终止 </label> <label><input type="radio" id="allstatus"
+				name="status" value="" checked="checked"
+				onclick="javascript:queryCompany('')" /> 全部 </label> <br>
+		</div>
+		<div class="rpane_search">
+			<input type="text" id="company_search" name="company_search"
+				placeholder="请输入公司名称">
+			<button id="companys_search_btn" class="buttonz">查询</button>
+		</div>
+		<div class=rPane_dt>
+			<table id="tab_company"></table>
+			<div id="pager1_company"></div>
+		</div>
+	</div>
+</div>
+<!-- 12 -->
+<input type="hidden" id="tg_company_funid" value="">
+<input type="hidden" id="tg_company_funcode" value="">
+

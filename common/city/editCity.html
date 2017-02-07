@@ -1,0 +1,64 @@
+<script type="text/javascript">
+$(function(){
+	$("#cityPidShow").val(cityPidShow);
+	$("#cityPid").val(cityPid);
+	$("#cityPid_select").click(
+			function() {
+				var selpara = {seltype:"selallcity", seltitle:"选择城市", rtnvalobj:"cityPid", rtndisobj:"cityPidShow", discol:1, flparams:"", flparamvs:""};
+				comsel(selpara);
+	}) 
+})
+	
+
+function cancelcityPidShow(){
+	if($("#cityPidShow").val()!=""){
+		if (confirm("确定要清除所属上级吗")) {
+			$("#cityPidShow").val("");
+			$("#cityPid").val("");
+		}
+	}
+}
+</script>
+<style type="text/css">
+	.ui-form-bspcs{
+		color: red;
+		padding-right:10px;
+		float: right;
+		font-weight: bold;
+		padding-top: 3px;
+	}
+</style>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<DIV ID="form_jq_comm_city"  CLASS="" TITLE="信息维护">
+			<div id="jq_comm_city_addinfoarea">
+				<table id='jq_comm_city_addinfoarea' class='ui-form-table jqForm'  border='0' style='width: 100%;'>
+				<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="cityCode"><label>城市编码</label><span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="cityCode" name="cityCode" type="text" class="ui-form-value" layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="citytype"><label>城市类型</label><span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"> <select name="citytype" id="cityType" class="ui-form-value" layout="1" maxlength="50" >
+						
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="cityPidShow"><label>所属上级</label><span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="cityPidShow" name="cityPidShow"  ondblclick="cancelcityPidShow()" readonly="readonly" type="text" class="ui-form-value" layout="1" maxlength="50"></span><span id="cityPid_select" class="ui-form-sbtnew ui-form-sel" >&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="cityName"><label>城市名称</label><span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"> <input id="cityName" name="cityName" type="text" class="ui-form-value" layout="1" maxlength="50">
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+		
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="comment"><label>备注</label></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;" colspan="3"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"> <textarea class="ui-form-textarea ui-form-value" id="comment" name="comment" type="text"
+						layout="1" maxlength="50"></textarea></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+					<input class="add_input" type="hidden" value="" id="cityPid" isck="1" readonly="readonly" titl="所属上级">
+					<input class="add_input" type="hidden" value="" id="id" readonly="readonly" titl="id">
+				</table>
+			</div>
+		</DIV>
+</div>

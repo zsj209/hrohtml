@@ -1,0 +1,145 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script type="text/javascript" src="../js/hosfpolicy.js"></script>
+<script type="text/javascript" src="../js/policy_base.js"></script>
+<link rel="stylesheet" href="../css/jqTree.css">
+<style>
+#jq_hosf_policy_basave {
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+}
+
+#jq_hosf_policy_basave:hover {
+	background: #0089db;
+	color: #fff;
+}
+</style>
+
+<script>
+	
+</script>
+
+
+<div id="rPane_d" class="jq_top_div">
+	<div class="ctleft" id="tree_hosfpolicy_list"></div>
+	<div class="ctright">
+		<div id="bn_hosf_policy" class="jq_top_button"></div>
+		<div id="se_hosf_policy" class="jq_top_quick">
+			<input type="text" class="" value="请输入政策名称" id="se_hosf_policy_name" />
+			<input type="button" value="查询" id="hosf_policy_bseach" />
+		</div>
+		<div id="form_jq_hosf_policy" style="display: none;" TITLE="信息维护">
+			<!-- overflow:auto;position:relative; -->
+			<div class="div_left">
+				<div id="jq_lf_policy_base" class="oncursor">基本信息</div>
+				<div id="jq_lf_policy_one" class="oncursor" style="margin-top: 10px">公积金政策</div>
+				<div style="display: none">
+					<input type="hidden" id="jq_lf_policy_pid" values="0" />
+				</div>
+			</div>
+			<DIV CLASS="jqForm div_center" id="form_jq_hosf_policy_base"
+				style="display: none;">
+				<div id="jq_hosf_policy_addinfoarea">
+					<table id='jq_hosf_policy_addinfoarea' class='ui-form-table'
+						border='0' style='width: 100%;'>
+						<tr>
+							<td style="text-align: left"><input
+								id="jq_hosf_policy_basave" type="button" value="保存" /></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+
+
+						<tr>
+							<td class="add_lfspan"><span>所属公司<em
+									class='add_fwid_rd'>*</em></span></td>
+							<td class="add_rtspan"><input class="add_input_name"
+								style="width: 80%" type="text" value="" id="companyName"
+								isck="1" titl="所属公司"> <input type="hidden"
+								class="add_input" id="companyId"> <span
+								id="company_Name" class="add_fwid">...</span></td>
+							<td class="add_lfspan"><span>政策名称<em
+									class='add_fwid_rd'>*</em></span></td>
+							<td class="add_rtspan"><input class="add_input" type="text"
+								value="" id="policyName" isck="1" titl="政策名称"></td>
+						</tr>
+
+
+
+
+
+						<tr>
+							<td class="add_lfspan"><span>地区名称<em
+									class='add_fwid_rd'>*</em></span></td>
+							<td class="add_rtspan"><input class="add_input_name"
+								style="width: 80%" type="text" value="" id="policyProName"
+								isck="1" titl="地区名称"> <input type="hidden"
+								class="add_input" id="policyPro"> <span
+								id="policyPro_Name" class="add_fwid">...</span></td>
+
+							<td class="add_lfspan"><span>开始时间<em
+									class='add_fwid_rd'>*</em></span></td>
+							<td class="add_rtspan"><input class="add_input" type="text"
+								value="" id="policyStarttime" isck="1" titl="开始时间"></td>
+						</tr>
+
+
+
+
+
+						<tr>
+							<td class="add_lfspan"><span>结束时间<em
+									class='add_fwid_rd'>*</em></span></td>
+							<td class="add_rtspan"><input class="add_input" type="text"
+								style="width: 80%" value="" id="policyEndtime" isck="1"
+								titl="结束时间"></td>
+							<td class="add_lfspan"><span>报增日<em
+									class='add_fwid_rd'>*</em></span></td>
+							<td class="add_rtspan"><select class="add_select"
+								id="policyAdday" name="taxtype" isck="1" titl="公积金报增日"><option
+										value="0">请选择</option></select></td>
+						</tr>
+
+
+
+						<tr>
+							<td class="add_lfspan"><span>报减日<em
+									class='add_fwid_rd'>*</em></span></td>
+
+							<td class="add_rtspan"><select class="add_select"
+								id="policyMinusday" name="policyMinusday" isck="1" titl="公积金报减日"><option
+										value="0">请选择</option></select></td>
+
+							<td class="add_lfspan"><span>是否有效<em
+									class='add_fwid_rd'>*</em></span></td>
+
+							<td class="add_rtspan"><input class="add_check"
+								type="checkbox" value="" id="policyValid" titl="是否有效"></td>
+
+							<!-- <td class="add_rtspan"><input class="add_input" type="text"
+							value="" id="policyValid" isck="1" titl="是否有效"></td> -->
+						</tr>
+
+
+						<tr>
+							<td class="add_lfspan"><span>备注</span></td>
+							<td class="add_rtspan_texa" colspan="3"><textarea
+									class="add_texa" id="policyNote"></textarea></td>
+							<td></td>
+							<td></td>
+						</tr>
+
+
+					</table>
+				</div>
+			</DIV>
+		</div>
+		<div id="rPane_dt">
+			<table id="jq_hosf_policy" class="jqgridtable"></table>
+			<div id="page_hosf_policy"></div>
+		</div>
+	</div>
+</div>

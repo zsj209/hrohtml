@@ -1,0 +1,87 @@
+<!---------------------------------------------------------
+Coding:        darren
+Create Date:   2017-01-09
+Desc:          通用选择功能结点页面
+update History:
+  date:        
+  coding:      
+  desc:        
+---------------------------------------------------------->
+
+<script type="text/javascript">
+	//comAlert("selcompany.html" + pubsources.pub_getlink);
+	$(function() {
+		var cn = [ '用户名称','电话','邮箱'];
+		var cm = [ {
+			name : 'name',
+			index : 'name',
+			width :80,
+			align : "left",
+			sorttype : "text"
+		},{
+			name : 'mobileNo',
+			index : 'mobileNo',
+			width : 90,
+			align : "left",
+			sorttype : "text"
+		},{
+			name : 'email',
+			index : 'email',
+			width : 150,
+			align : "left",
+			sorttype : "text"
+		}];
+		jQuery("#tb_com_sel_user").jqGrid(
+				{
+					url : pubsources.pub_getlink,
+					datatype : "json",
+					mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+					postData : {
+						_mt : "usrmgmt.userpage"
+					},
+					mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"UserLogin","None"
+					prmNames : {
+						page : "page",
+						rows : "rows",
+						sort : null,
+						order : null,
+						search : null,
+						nd : null,
+						npage : null
+					},//去除多余的参数
+					colNames : cn,
+					colModel : cm,
+					loadComplete : function(xhr) {
+						console.log(xhr);
+						//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+						return true;
+					},
+					jsonReader : {
+						/*content中的响应*/
+						root : "rows",//表格中的数据
+						page : "page",//当前页码
+						total : "total",//总页数
+						records : "records"//总行数
+					},
+					rowNum : 10,
+					rowList : [ 10, 20, 50 ],
+					pager : '#pg_com_sel_user',
+					shrinkToFit : false,
+					forceFit : true,
+					sortname : 'id',
+					sortorder : "desc",
+					viewrecords : true,
+					rownumbers : true,
+					ondblClickRow : function(id) {
+						//buttons = $('#tb_com_sel_user').dialog('option','buttons');
+						//$(buttons + ":last").trigger("click");
+						buttons = $('#com_sel_seluser').parent().find(".ui-dialog-buttonset").find("button");
+						$(buttons).find(":first").trigger("click");
+					},
+					height : 300,
+					width : 650
+				});
+	});
+</script>
+<table id="tb_com_sel_user" class="scroll"></table>
+<div id="pg_com_sel_user" class="scroll" style="height: 30px"></div>

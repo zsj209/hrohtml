@@ -1,0 +1,296 @@
+<script type="text/javascript">
+	$("#insStarttime").datepicker();
+	$("#insEndtime").datepicker();
+
+	/* 新增或修改 */
+	function addorupdateDateInsurance(requestData, level, meth) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encryptNew(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//TODO 根据条件刷新
+				if (com_error(result)) {
+					if (meth == "add") {
+						comAlert(pubprompt.ins_succ);
+					} else {
+						comAlert(pubprompt.upd_succ);
+					}
+					$("#add_upd_insruance").dialog("close");
+					jQuery("#tab_insurance").trigger("reloadGrid");
+				} else {
+
+					if (meth == "add") {
+						alertMsg(result, "hosf_code_desc");
+						comAlert(pubprompt.ins_failure);
+					} else {
+						alertMsg(result, "hosf_code_desc");
+						comAlert(pubprompt.upd_failure);
+					}
+
+				}
+
+			},
+			error : function() {
+				comAlert(pubsources.network_error);
+			}
+		});
+	}
+</script>
+
+
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addInsurance" class="ui-form-table" cellpadding="5"
+		border='0' style="width: 100%;">
+		<tr>
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>险种归属:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select name="insBelongid" id="insBelongid" class="ui-form-value"
+					layout="1" maxlength="40" typeCode="seldays">
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>险种名称:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insName" name="insName" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+		</tr>
+
+
+
+
+		<tr>
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>起始时间:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insStarttime" name="insStarttime" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>终止时间:</label></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insEndtime" name="insEndtime" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+		</tr>
+
+
+
+		<tr>
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>公积金最高基数:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insMaxbase" name="insMaxbase" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>公积金最低基数:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insMinbase" name="insMinbase" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+
+		<tr>
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>企缴比例:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insCompratio" name="insCompratio" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>企缴小数规则:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select name="insComprule" id="insComprule" class="ui-form-value"
+					layout="1" maxlength="40" typeCode="seldays">
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+		<tr>
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>个缴比例:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insPerratio" name="insPerratio" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>个缴小数规则:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select name="insPerule" id="insPerule" class="ui-form-value"
+					layout="1" maxlength="40" typeCode="seldays">
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+		<tr>
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>企业附加金额:</label></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insCompatt" name="insCompatt" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>个人附加金额:</label></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insPeratt" name="insPeratt" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+
+		<tr>
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>是否补缴:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select name="insIspay" id="insIspay" class="ui-form-value"
+					layout="1" maxlength="40" typeCode="seldays">
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>支付频率:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select name="insRate" id="insRate" class="ui-form-value"
+					layout="1" maxlength="40" typeCode="seldays">
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+
+		<tr>
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>企业支付比例:</label></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insComppayratio" name="insComppayratio" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>个人支付比例:</label></td>
+			<td
+				style="width: 30%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="insPerpayratio" name="insPerpayratio" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+		<tr>
+			<td
+				style="width: 17%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>备注:</label></td>
+			<td style="background: #FFFFFF; padding-top: 3px;" colspan="3"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<textarea
+						style="width: 604px; height: 72px; max-width: 604px; max-height: 72px;"
+						id="insNote" name="insNote" type="text" class="ui-form-value"
+						layout="1" maxlength="50"></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+		<!--隐藏的属性用户类型-->
+
+		<input id="id" name="id" type="hidden" value="">
+		<input type="hidden" id="insPolicyid" />
+	</table>
+
+
+</div>

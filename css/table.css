@@ -1,0 +1,67 @@
+/* 左边树样式 */
+.updleft {
+	float: left;
+	width: 17%;
+	border: 1px solid #999999;
+	height: 100%;
+	
+}
+
+/* 右边样式 */
+.updright {
+	float: left;
+	width: 80%;
+	height: 100%;
+	margin-left:8px;
+}
+
+
+/* 主表树样式 */
+.baseinfo {
+	height: 30px;
+	line-height: 30px;
+	font-size: 14px;
+	width: 100%;
+	text-align: left;
+	cursor: pointer;
+}
+
+
+/* 子表树样式 */
+.childinfo {
+	height: 30px;
+	line-height: 30px;
+	font-size: 14px;
+	width: 100%;
+	text-align: left;
+	cursor: pointer;
+}
+
+/* 小图标样式 */
+.img {
+	float: left;
+	margin-top: 8px;
+	padding-left: 8px;
+}
+
+/* 按钮样式 */
+.topbutton input{
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+	height:20px;
+	margin-right:8px;
+	margin-bottom: 8px;
+}
+
+.topbutton input:hover {
+	background: #0089db;
+	color: #fff;
+}
+
+.divspan{
+	float: left;
+}
+
+

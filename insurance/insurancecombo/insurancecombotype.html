@@ -1,0 +1,270 @@
+<script type="text/javascript">
+    $(function () {
+        var oH = 360;
+        var oW = 650;
+        var ss = {
+            _mt: "insurance.querypit",
+            querystr: "ic_id=" + $("#id").val(),
+            withitname: true,
+            withittypeName: true
+        };
+        getData(ss);
+        function getData(requestData) {
+            jQuery("#tab_pit").jqGrid({
+                url: pubsources.pub_getlink,
+                datatype: "json",
+                mtype: "POST",//向后台请求数据的ajax的类型。可选post,get
+                postData: requestData,
+                mylevel: "UserLogin",//自定义字段表示访问方法的安全等级"UserLogin","None"
+                prmNames: {
+                    page: "page",
+                    rows: "rows",
+                    sort: null,
+                    order: null,
+                    search: null,
+                    nd: null,
+                    npage: null
+                },//去除多余的参数
+                colNames: ['itId', '险种名称', '险种类型', '生效时间', '终止时间'],
+                colModel: [{
+                    name: 'itId',
+                    index: 'itId',
+                    width: 100,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'itName',
+                    index: 'itName',
+                    width: 100,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'itTypeName',
+                    index: 'itTypeName',
+                    width: 100,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'fromTime',
+                    index: 'fromTime',
+                    width: 90,
+                    align: "left",
+                    sorttype: "text",
+                    formatter: function (cellvalue) {
+                        if (cellvalue != null && cellvalue != -999999999)
+                            return dateFormat(new Date(cellvalue));
+                        return "";
+                    }
+                }, {
+                    name: 'toTime',
+                    index: 'toTime',
+                    width: 75,
+                    align: "left",
+                    sorttype: "text",
+                    formatter: function (cellvalue) {
+                        if (cellvalue != null && cellvalue != -999999999)
+                            return dateFormat(new Date(cellvalue));
+                        return "";
+                    }
+                }],
+                loadComplete: function (xhr) {
+                    console.log(xhr);
+                    //TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+                    if (com_error(xhr)) {
+                        return true;
+                    } else {
+                        alertMsg(xhr, "insurance_error_define");
+                        return false;
+                    }
+                },
+                jsonReader: {
+                    /*content中的响应*/
+                    root: "rows",//表格中的数据
+                    page: "page",//当前页码
+                    total: "total",//总页数
+                    records: "records"//总行数
+                },
+                rowNum: 10,
+                rowList: [10, 20, 50],
+                pager: '#pager_pit',
+                height: oH,
+                width: oW,
+                shrinkToFit: false,
+                forceFit: true,
+                sortname: 'id',
+                sortorder: "desc",
+                viewrecords: true,
+                multiselect: true,
+                rownumbers: true
+
+            });
+            jQuery("#tab_pit").jqGrid('navGrid', '#pager_pit', {
+                edit: false,
+                add: false,
+                del: false,
+                search: false
+            });
+        }
+
+        /*--------加载表格 end------*/
+        /*----------新增 保存-----------*/
+        //新增点击事件
+        $("#add_pit").click(function () {
+            //加载新增页面
+            addOrUpdate("选择商保套餐险种");
+
+        })
+
+        function addOrUpdate(pageTitle) {
+            var s = $("<DIV ID=\"add_upd_insurancecombotype\"></DIV>");
+
+            $(s).load("../insurance/insurancecombo/addorupdatetype.html?tsid=" + new Date().getTime());
+
+            $(s).dialog({
+                autoOpen: true,
+                closeOnEscape: true,
+                bgiframe: true,
+                height: 420,
+                width: 795,
+                title: pageTitle,
+                resizable: false,
+                modal: true,
+                buttons: {
+                    "确定": function () {
+                        var selectedIcit = jQuery("#tab_insurancetypeselect").jqGrid('getGridParam', 'selrow');
+                        if (selectedIcit == null || selectedIcit == undefined || selectedIcit == '') {
+                            comAlert("请选择商保险种");
+                            return;
+                        }
+                        //获取参数
+                        requestData = addinsurancecombotypePar();
+                        //调用方法
+                        if (requestData) {
+                            addOrUpdateinsurancecombotype(requestData, "UserLogin");
+                        }
+                    },
+                    "关闭": function () {
+                        $(this).dialog("close");
+                    },
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                }
+            })
+
+        }
+
+        function addinsurancecombotypePar() {
+            var icId = $.trim($("#id").val());
+            var params = {
+                "icId": icId,
+                "itId": $.trim(jQuery("#tab_insurancetypeselect").jqGrid('getGridParam', 'selrow'))
+            };
+            var data = JSON.stringify(params);
+            //comAlert(data);
+
+            var requestData;
+
+            requestData = {
+                "_mt": "insurance.addpackageit",
+                "data": data
+            }
+
+
+            return requestData;
+        }
+
+        function addOrUpdateinsurancecombotype(requestData, level) {
+            var params = {
+                data: requestData,
+                level: level
+            };
+            data = encrypt(params.level, params.data);
+            console.log(data);
+            $.ajax({
+                type: "POST",
+                url: pubsources.pub_getlink,
+                crossDomain: true,
+                dataType: "json",
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: serialize(data),
+                success: function (result) {
+                    if (getStatus(result)) {
+
+                        comAlert("商保套餐险种新增成功");
+
+//                        关闭dialog
+                        $("#add_upd_insurancecombotype").dialog("close");
+                        //刷新grid
+                        jQuery("#tab_pit").trigger("reloadGrid");
+
+                    }
+                },
+                error: function () {
+                    comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+                }
+            });
+        }
+
+        /*----------删除--------*/
+        $("#del_pit").click(function () {
+            var ids = $('#tab_pit').jqGrid('getGridParam', 'selarrrow');
+            if (ids.length == 0) {
+                comAlert("请选择要删除的信息");
+                return;
+            } else {
+                if (confirm("您确定要删除选中的信息？")) {
+                    var del = {
+                        _mt: "insurance.deletepitbyids",
+                        ids: ids
+                    };
+                    deletepackageit(del, "UserLogin");
+                }
+            }
+        })
+
+        function deletepackageit(requestData, level) {
+            var payload = {
+                data: requestData,
+                level: level
+            };
+            data = encrypt(payload.level, payload.data);
+            console.log(data);
+            $
+                .ajax({
+                    type: "POST",
+                    url: pubsources.pub_getlink,
+                    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                    crossDomain: true,
+                    dataType: "json",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: serialize(data),
+                    success: function (result) {
+                        //TODO　判断删除是否成功
+                        console.log(result);
+                        jQuery("#tab_pit").trigger("reloadGrid");
+                    },
+                    error: function () {
+                        comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+                    }
+                });
+        }
+
+    })
+</script>
+
+<!-- grid -->
+<div class="rPane_d_menu">
+		<span>
+            <input type="button" id="add_pit" value="&nbsp;新增&nbsp;">&nbsp;&nbsp;
+            <input type="button" id="del_pit" value="&nbsp;删除&nbsp;">&nbsp;&nbsp;
+		</span>
+</div>
+<div class=rPane_dt>
+    <table id="tab_pit"></table>
+    <div id="pager_pit"></div>
+</div>

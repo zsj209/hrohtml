@@ -1,0 +1,579 @@
+<script type="text/javascript">
+	$(function() {
+		var policyid = $("#policyidid").val();
+
+		var ss = {
+			_mt : "hosfinsurance.selectByPolicyid",
+			policyid : policyid
+		};
+		getData(ss);
+		function getData(requestData) {
+
+			jQuery("#tab_insurance").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ 'id', '险种政策', '险种名称', '险种类型', '起始时间',
+								'终止时间', '公积金最高基数', '公积金最低基数', '企业比缴', '企缴小数规则',
+								'个缴比例', '个缴小数规则', '企业附加金额', '个人附加金额', '是否补缴',
+								'支付频率', '企业支付比例', '个人支付比例' ],
+						colModel : [ {
+							name : 'id',
+							index : 'id',
+							width : 0,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'insPolicyName',
+							index : 'insPolicyName',
+							width : 80,
+							align : "left",
+							sorttype : "text",
+						    hidden : true
+						}, {
+							name : 'insName',
+							index : 'insName',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insBelongidDesc',
+							index : 'insBelongidDesc',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insStarttime',
+							index : 'insStarttime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insEndtime',
+							index : 'insEndtime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insMaxbase',
+							index : 'insMaxbase',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insMinbase',
+							index : 'insMinbase',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insCompratio',
+							index : 'insCompratio',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insCompruleDesc',
+							index : 'insCompruleDesc',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insPerratio',
+							index : 'insPerratio',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insPeruleDesc',
+							index : 'insPeruleDesc',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insCompatt',
+							index : 'insCompatt',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insPeratt',
+							index : 'insPeratt',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insIspayDesc',
+							index : 'insIspayDesc',
+							width : 60,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insRateDesc',
+							index : 'insRateDesc',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insComppayratio',
+							index : 'insComppayratio',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'insPerpayratio',
+							index : 'insPerpayratio',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						} ],
+
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							
+							if (com_error(xhr)) {
+								return true;
+							} else {
+								alertMsg(xhr, "hosf_code_desc");
+								return false;
+							}
+				
+						},
+						jsonReader : {
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 10,
+						rowList : [ 20, 50, 100 ],
+						pager : '#pager1_insurance',
+
+						shrinkToFit : false,
+						forceFit : true,
+						sortname : 'id',
+						sortorder : "desc",
+						height : 468,
+						width : 796,
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+
+					});
+			
+			jQuery("#tab_insurance").jqGrid('navGrid', '#pager1_insurance',
+					{
+						edit : false,
+						add : false,
+						del : false,
+						search : false
+					});
+
+		}
+
+		/*---------修改保存 end---------*/
+
+		$("#del_insurance").click(function() {
+			var ids = $('#tab_insurance').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "hosfinsurance.deleteBatchByIds",
+						delIds : ids
+					};
+					deleteInsurance(del, "UserLogin");
+				}
+			}
+		})
+
+		function deleteInsurance(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							console.log(result);
+							if (com_error(result)) {
+								comAlert(pubprompt.del_succ);
+								jQuery("#tab_insurance").trigger("reloadGrid");
+							} else {
+								comAlert(pubprompt.del_failure);
+								alertMsg(result, "hosf_code_desc");
+							}
+
+						},
+						error : function() {
+							comAlert(pubsources.network_error);
+						}
+					});
+		}
+
+	})
+
+	$("#add_insruance").click(function() {
+		insruanceDialog("新增险种信息", "add");
+
+		getSelectDataTypeList({
+			"insBelongid" : "hosfinstype",
+			"insComprule" : "decimalRule",
+			"insPerule" : "decimalRule",
+			"insRate" : "szfrequency",
+			"insIspay" : "yesno"
+		});
+	})
+
+	$("#upd_insruance").click(function() {
+		var ids = $('#tab_insurance').jqGrid('getGridParam', 'selarrrow');
+
+		if (ids.length == 0) {
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		} else if (ids.length > 1) {
+			comAlert("一次只能修改一条数据");
+			return;
+		}
+
+		insruanceDialog("修改险种信息", "upd");
+
+		getSelectDataTypeList({
+			"insBelongid" : "hosfinstype",
+			"insComprule" : "decimalRule",
+			"insPerule" : "decimalRule",
+			"insRate" : "szfrequency",
+			"insIspay" : "yesno"
+		});
+
+		//加载用户信息
+		var updateInfo = {
+			_mt : "hosfinsurance.selectById",
+			id : ids
+		};
+		getUpdateInsurance(updateInfo, "UserLogin");
+	})
+
+	function getUpdateInsurance(requestData, level) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				
+				
+				if (com_error(result)) {
+				//给修改页面的input框赋值
+				data = result.content["0"];
+				setData(data, "addInsurance");
+				}else{
+					alertMsg(result, "hosf_code_desc");
+				}
+			},
+			error : function() {
+				comAlert(pubsources.network_error);
+			}
+		});
+	}
+
+	function insruanceDialog(pagetitle, meth) {
+		var s = $("<DIV ID=\"add_upd_insruance\"></DIV>");
+
+		//加载新增页面
+		$(s).load(
+				"../hosf/hosfpolicytree/addInsurance.html?tsid="
+						+ new Date().getTime(), function() {
+					//加载下拉框
+					/* getSelectDataTypeList({
+						"insBelongid" : "hosfinstype",
+						"insComprule" : "decimalRule",
+						"insPerule" : "decimalRule",
+						"insRate" : "szfrequency",
+						"insIspay" : "yesno"
+					}); */
+					if (meth == "add") {
+						$("#insPolicyid").val($("#policyidid").val())
+					}
+
+				}).dialog(
+				{
+					autoOpen : true,
+					closeOnEscape : true,
+					bgiframe : true,
+					title : pagetitle,
+					height : 500,
+					width : 900,
+					resizable : false,
+					modal : true,
+					buttons : {
+						"保存" : function() {
+							
+							//验证参数
+							if(!validataInsurance()){
+								return;
+							}
+							//获取参数
+							requestData = serach("hosfinsurance.addorupdate",
+									"addInsurance");
+							//调用方法
+							addorupdateDateInsurance(requestData, "UserLogin",
+									meth);
+						},
+						"取消" : function() {
+
+							$(this).dialog("close");
+						}
+
+					},
+					close : function(event, ui) {
+						$(this).remove();
+					}
+				})
+
+	}
+
+	
+	
+	function validataInsurance(){
+		var flag=true;
+		var insBelongid = $.trim($("#insBelongid").val());
+		var insName = $.trim($("#insName").val());
+		var insStarttime = $.trim($("#insStarttime").val());
+		var insEndtime = $.trim($("#insEndtime").val());
+		var insMaxbase = $.trim($("#insMaxbase").val());
+		var insMinbase = $.trim($("#insMinbase").val());
+		var insCompratio = $.trim($("#insCompratio").val());
+		
+		var insComprule = $.trim($("#insComprule").val());
+		var insPerratio = $.trim($("#insPerratio").val());
+		var insPerule = $.trim($("#insPerule").val());
+		var insCompatt = $.trim($("#insCompatt").val());
+		var insPeratt = $.trim($("#insPeratt").val());
+		
+		var insIspay = $.trim($("#insIspay").val());
+		var insRate = $.trim($("#insRate").val());
+		var insComppayratio = $.trim($("#insComppayratio").val());
+		var insPerpayratio = $.trim($("#insPerpayratio").val());
+		
+		if(insBelongid == ""){
+			comAlert("请选择险种归属");
+			flag = false;
+			return;
+		}
+		
+		
+		if(insName == ""){
+			comAlert("请输入险种名称");
+			flag = false;
+			return;
+		}
+		
+		if(insStarttime == ""){
+			comAlert("请选择开始时间");
+			flag = false;
+			return
+		}
+		
+		
+		var now = new Date().getTime();//当前时间戳
+		var time_1 = new Date(insStarttime).getTime();//开始时间戳
+		if(insEndtime != ""){
+			var time_2 = new Date(insEndtime).getTime();//结束时间戳
+			if(time_1>time_2){
+				comAlert("开始时间需要小于结束时间");
+				flag = false;
+				return
+			}
+		}
+		
+		
+		//正整数
+		var intt= /^[0-9]*[1-9][0-9]*$/　        
+		//浮点
+		var f=/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/
+		
+		if(insMaxbase == ""){
+			comAlert("请输入公积金最高基数");
+			flag = false;
+			return
+		}
+		
+		if(isNaN(insMaxbase)){
+			comAlert("请输入正确的公积金最高基数");
+			flag = false;
+			return
+		}
+		
+		if(insMinbase == ""){
+			comAlert("请输入公积金最低基数");
+			flag = false;
+			return
+		}
+		
+		if(isNaN(insMinbase)){
+			comAlert("请输入正确的公积金最低基数");
+			flag = false;
+			return
+		}
+		
+		
+		if(insCompratio==""){
+			comAlert("请输入企缴比例");
+			flag = false;
+			return
+		}
+		
+		if(isNaN(insCompratio)){
+			comAlert("请输入正确的企缴比例");
+			flag = false;
+			return
+		}
+		
+		
+		if(insComprule == ""){
+			comAlert("请选择企缴小数规则");
+			flag = false;
+			return
+		}
+		
+		
+
+		  if(insPerratio!=""){
+			  if(isNaN(insPerratio)){
+					comAlert("请输入正确的个缴比例");
+					flag = false;
+					return
+				}
+			}
+		
+
+		if(insPerule == ""){
+			comAlert("请选择个缴小数规则");
+			flag = false;
+			return
+		}
+		
+		
+		
+		
+		if(insCompatt != ""){
+			if(isNaN(insCompatt)){
+				comAlert("请输入正确的企业附加金额");
+				flag = false;
+				return
+			}
+		}
+		
+		
+		if(insPeratt != ""){
+			if(isNaN(insPeratt)){
+				comAlert("请输入正确的个人附加金额");
+				flag = false;
+				return
+			}
+		}
+		
+
+		
+		if(insIspay == ""){
+			comAlert("请选择是否补缴");
+			flag = false;
+			return
+		}
+		
+		if(insRate == ""){
+			comAlert("请选择支付频率");
+			flag = false;
+			return
+		}
+		
+		
+		 
+		if(insComppayratio != ""){
+			 if(isNaN(insComppayratio)){
+				 comAlert("请输入正确的企业支付比例");
+					flag = false;
+					return 
+			 }
+			
+		}
+		
+		
+		
+		if(insPerpayratio != ""){
+			if(isNaN(insPerpayratio)){
+				comAlert("请输入正确的个人支付比例");
+				flag = false;
+				return
+			 }
+		}
+		
+	
+		 
+		
+		
+		return flag;
+	
+	}
+
+	
+	
+	
+</script>
+
+
+<link rel="stylesheet" href="../css/table.css">
+<div class="topbutton">
+	<span> <input type="button" id="add_insruance"
+		value="&nbsp;新增&nbsp;"><input type="button"
+		id="upd_insruance" value="&nbsp;修改&nbsp;"><input type="button"
+		id="del_insurance" value="&nbsp;删除&nbsp;">
+	</span>
+</div>
+
+<div class="rPane_dt" style="padding-left: 0px;">
+	<table id="tab_insurance"></table>
+	<div id="pager1_insurance"></div>
+
+</div>
+
+
+<!-- 12 -->

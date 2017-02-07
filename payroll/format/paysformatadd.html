@@ -1,0 +1,199 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script>
+var addgdid_fmat="form_jq_pays_format";//新增 修改 显示数据的div
+var pkid=$("#pay_format_adduppk").val();//updateTag
+var gdid_fmat="jq_pays_format";//显示数据的div
+var upinfointerface_fmat="payrollFormat.updateData";//修改数据的接口
+var ininfointerface_fmat="payrollFormat.insertData";//新增数据的接口
+var bn_div_fmat="bn_pays_format";//按钮div的id
+var _mt="payrollFormat.selectDataByIds";//updateTag
+var gdid="form_jq_pays_format_base";//updateTag
+var level="UserLogin";//updateTag
+var fmatAry = new customDictionary();
+var fmatUp=0;
+
+$(document).ready(function(){
+	$("#jq_lf_format_pid").val(pkid);
+	$("#jq_lf_format_base").css("background","#b7ddff");
+	$("#jq_lf_format_one").css("background","#fff");
+
+	$("#"+addgdid_fmat+"_one").remove();
+	$("#form_jq_pays_fmatpro").remove(); 
+	
+	$("#jq_lf_format_base").bind("click",{type:1,addgdid:addgdid_fmat},mainchildDisplay_fmat);//新增页面 主信息点击事件
+	$("#jq_lf_format_one").bind("click",{type:2,addgdid:addgdid_fmat},mainchildDisplay_fmat);//新增页面 子信息点击事件
+	$("#jq_pays_format_basave").bind("click",{addgdid:addgdid_fmat,gdid:gdid_fmat,ininfointerface:ininfointerface_fmat,upinfointerface:upinfointerface_fmat,bn_div:bn_div_fmat},addupSave_paysformatmain);//新增页面 子单据新增按钮保存事件
+	if(pkid!="0"){
+		updatePosrSetval_paysformat();
+	}
+});
+/*
+ * 主子表点击事件
+ * */
+function mainchildDisplay_fmat(e){
+	if(e.data.type=="1"){
+		//主节点单击事件
+		var grdis=$('#'+e.data.addgdid+"_base").css('display');
+		$("#jq_lf_format_base").css("background","#b7ddff");
+		$("#jq_lf_format_one").css("background","#fff");
+		if(grdis=="block"){return;}
+		else{
+			$("#"+e.data.addgdid+"_base").show();
+			$("#"+e.data.addgdid+"_one").remove(); 
+			$("#form_jq_pays_fmatpro").remove(); 
+			
+		}
+	}else if(e.data.type=="2"){
+		var pkid=$("#jq_lf_format_pid").val();
+		if(pkid=="" || pkid=="0"){
+			comAlert(pubprompt.pub_savebase);
+			return;
+		}
+		fmatUp=ckValuesIsup(fmatAry,addgdid_fmat);
+		if(fmatUp>0){
+			comAlert(pubprompt.pub_upnosv);
+			return;
+		}
+		$("#jq_lf_format_one").css("background","#b7ddff");
+		$("#jq_lf_format_base").css("background","#fff");
+		//子节点单击事件
+		var grdis=$('#'+e.data.addgdid+"_one").css('display');
+		if(grdis=="block"){return;}
+		else{
+			$("#"+e.data.addgdid+"_base").hide();
+			$("#"+e.data.addgdid+"_one").remove();
+			$("#form_jq_pays_fmatpro").remove(); 
+			var fone='<DIV CLASS="div_center"  id="'+e.data.addgdid+'_one" style=""></div>';
+			$("#"+e.data.addgdid+"_base").after(fone);
+			//$("#"+e.data.addgdid+"_one").show();
+			$("#"+e.data.addgdid+"_one").load('../payroll/format/payfmatpro.html');
+		}
+	}
+}
+function addupSave_paysformatmain(e){
+	var rtNb=bn_addupSave_main(gdid_fmat+"_addinfoarea",e,"jq_lf_format_pid");
+	//返回值为1的时候表示保存成功
+	if(rtNb==1){
+		//清空集合、标记
+		fmatUp=0;
+		fmatAry=ckValuesUpset(addgdid_fmat);
+	}
+}
+//updateTag
+function updatePosrSetval_paysformat(){
+	var clnrequestData = {_mt:_mt,selIds:pkid};
+	var payload = {
+		    data: clnrequestData,
+		    level: level,
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "GET",
+			url : serversname,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials:true
+			},
+			data : serialize(data),
+			success : function(result) {
+				var data = result.content["0"].value;
+				lineJson = JSON.stringify(data[0]);
+                updateJson = eval('(' + lineJson + ')'); //Json
+                //获得key
+                var updateKey=new Array();
+                for (var o in updateJson){
+                	fmatAry.put(o,updateJson[o]);
+                    updateKey.push(o);
+                };
+                $('#'+gdid).find('.add_input').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_inputdis').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_texa').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_check').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$("#"+id).attr("checked", true);
+                        	}else{
+                        		$("#"+id).attr("checked", false);
+                        	}
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_select').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+		}
+		});
+}
+</script>
+<style>
+#jq_pays_format_basave{background:#ccc;border:none;color:#0089db;cursor:pointer;}
+#jq_pays_format_basave:hover{background:#0089db;color:#fff;}
+</style>
+<div id="form_jq_pays_format" style="height: 99%;">
+	<div class="div_left" style="height: 99%;">
+		<div style="border: 1px solid #cccccc;width: 98%;height: 99%;" id="pays_format_hg">
+			<div class="oncursor" id="jq_lf_format_base"><img class="oncursorimg" src="../css/images/com/collapsed.gif"><span style="float:left;">基本信息</span></div>
+			<div class="oncursor" id="jq_lf_format_one"><img class="oncursorimg" src="../css/images/com/collapsed.gif"><span style="float:left;">报税内容</span></div>
+			<div style="display: none"><input type="hidden" id="jq_lf_format_pid" values="0"/></div>
+		</div>
+	</div>
+	<DIV CLASS="div_center"  id="form_jq_pays_format_base">
+	<div class="margin_left16"><input id="jq_pays_format_basave" type="button" value="保存" class="bn_sv_base"/></div>
+		<div id="jq_pays_format_addinfoarea" class="margin_left16">
+			<table id='jq_pays_format_addinfoarea' class='ui-form-table'  border='0' style='width: 100%;margin-top: 8px;'>
+			 
+				<tr>
+					<td class="add_lfspan"><label>格式名称<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="formatName" isck="1" titl="格式名称"></td>
+					<td></td><td ></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>备注</label></td>
+					<td class="add_rtspan_texa" colspan="3"><textarea class="add_texa" id="formatNote"></textarea></td>
+					<td></td><td></td>
+				</tr>
+			</table>
+		</div>
+	</DIV>
+</div>

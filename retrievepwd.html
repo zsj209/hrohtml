@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>仁云天弓平台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" src="js/jquery1.7.2.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.24.js"></script>
+<script type="text/javascript" src="js/md5.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/pub_source.js"></script>
+<script type="text/javascript" src="js/retrievepwd.js"></script>
+<script type="text/javascript" src="js/com_validate.js"></script>
+<script type="text/javascript" src="js/errordefine/com_error.js"></script>
+<script type="text/javascript" src="js/errordefine/usermgmt.js"></script>
+
+
+<style type="text/css">
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, input, textarea, p, th, td, span,#back span {
+    margin: 0;
+    padding: 0;
+}
+a{text-decoration: none;}
+span,i,input{
+	font-size: 12px;
+	font-family: "微软雅黑";
+	color:#767676;
+}
+
+
+body, html {
+	width: 100%;
+	height: 100%;
+}
+
+#top {
+	width: 100%;
+	height: 70px;
+}
+
+#center {
+	width: 100% px;
+	height: 640px;
+	background-color: #f5f5f5;
+	margin: 0 auto;
+	position: relative;
+}
+
+#bottom {
+	width: 100%;
+	height: 33px;
+	line-height: 33px;
+	text-align: center;
+	background-color: #f5f5f5;
+}
+
+#centerall {
+	width: 1000px;
+	height: 338px;
+	clear: both;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -500px;
+	margin-top: -200px;
+}
+
+#bottom span {
+	font-size: 12px;
+	font-family: "微软雅黑";
+	color: #6d6d6d
+}
+
+#registerBody {
+	width: 100%;
+	height: 100%;
+}
+
+#cecter-left {
+	float: left;
+	margin: 1px 27px 1px 0;
+}
+
+#center-register {
+	width: 1000px;
+	height: 600px;
+	background-color: #ffffff;
+	position: absolute;
+	top:30px;
+	left:50%;
+	margin-left: -500px;
+}
+
+#registerbtn {
+	background: #0089dd;
+	width: 266px;
+	height: 46px;
+	font-size: 16px;
+	color: #fff;
+	border: none;
+	margin-left:133px; 
+}
+
+
+
+#forgotPwd {color: #767676;
+    font-size: 12px;
+    position: absolute;
+    text-decoration: none;
+    top:12px;
+    right: 0;}
+
+#top span {
+	color: #0188dd;
+	font-size: 35px;
+	line-height: 70px;
+	text-align: center;
+	margin-left: 218px;
+}
+
+
+.ui-register-div{
+	clear: both;
+	width: 800px;
+	height: 36px;
+	margin-top: 18px;
+	margin-right: 24px;
+	margin-left: 23px;
+	text-align: right;
+}
+.ui-register-explain{
+	width: 800px;
+	height: 15px;
+	margin-top: 10px;
+	margin-button: 10px;
+	margin-right: 24px;
+	margin-left: 23px;
+}
+
+.register-checkbox{
+vertical-align: middle;
+	margin-right: 5px;
+	margin-left:133px; 
+}
+.checkout-text{
+	font-size: 10px;
+	font-family: "微软雅黑";
+	color:#767676;
+	text-decoration: none;
+}
+.ui-register-btn{
+	width: 600px;
+	height: 46px;
+	margin-top: 15px;
+	margin-right: 24px;
+	margin-left: 23px;
+}
+
+.register-input{
+	border: none;
+	border: 1px solid #ccc;
+	height: 34px;
+	width: 259px;
+	margin: 0;
+	padding-left: 7px;
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+}
+
+.register-valid {
+	border: none;
+	border: 1px solid #ccc;
+	height: 34px;
+	width: 157px;
+	margin: 0;
+	padding-left: 10px;
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+}
+
+.validImg {
+	border: 0;
+	width: 92px;
+	height: 34px;
+	margin-left: 5px;
+	vertical-align: middle;
+}
+
+.ver-code {
+	border: none;
+	width: 94px;
+	height: 36px;
+	margin-left: 5px;
+	background: #0089dd;
+	font-size: 14px;
+	color: #fff;
+	
+}
+
+
+
+
+
+.ui-register-div > span {
+	font-size: 12px;
+	font-family: "微软雅黑";
+	display: inline-block;
+	height: 36px;
+	width: 100px;
+	line-height: 36px;
+	text-align: right;
+	margin: 0;
+}
+
+i {
+	display: inline-block;
+	height: 8px;
+	width: 8px;
+	background: url(css/images/asterisk.png) no-repeat;
+	margin: 2px 4px;
+}
+
+em {
+	display: inline-block;
+	margin: 0 4px;
+	font-style: normal;
+}
+
+.top-text{padding-top: 28px;font-size: 16px;font-family: "微软雅黑";color:#0089dd;}
+.register-other{position: relative;}
+#register:HOVER {
+	color: #0089dd;
+	text-decoration: underline;
+}
+#registerbtn:HOVER {
+	background:  ##049eff;
+}
+#forgotPwd:HOVER {
+	color: #0089dd;
+	text-decoration: underline;
+}
+.tips{float: right;width: 400px;height: 15px;margin-top: 11px;}
+.tips p{
+	font-size: 12px;
+	font-family: "微软雅黑";
+	height: 15px;
+	width: 80%;
+	line-height: 15px;
+	text-align: left;
+    padding-left: 10px;
+	}
+
+.ui-back{height:36px;width: auto;position:relative;}
+.ui-back-one{width: 55px;height: 17px;position: absolute;left:900px;bottom: 0;}
+.ui-back-one span{margin-right: 8px;color: #0089dd}
+
+.ui-register{width:600px;margin: 0 auto;}
+.tips .icon_succ, 
+.tips .icon_del{
+    background-image: url("css/images/reg_ico.png");
+    background-repeat: no-repeat;
+    float: left;
+    height: 15px;
+    margin-left: 18px;
+    margin-right: 8px;
+    width: 15px;
+}
+.tips .icon_del {
+    background-position: -60px 0;
+}
+.tips .icon_succ {
+    background-position: -30px 0;
+}
+.tips p{
+	font-size: 10px;
+	font-family: "微软雅黑";
+	color : #ff6749;
+}
+#registerbtn:HOVER {
+	background: #049eff;
+}
+.ver-code:HOVER {
+	background: #049eff;
+}
+</style>
+</head>
+<body>
+
+	<div id="top">
+		<span>HROCloud</span>
+	</div>
+	<div id="center">
+	
+			<div id="center-register">
+				<div class="ui-back">
+					<div class="ui-back-one"><a href="#" id="back"><span >返回</span><img src="css/images/reback.png"></img></a></div>
+				</div>
+				<!-- 验证码的值，前端验证使用 -->
+				<input type="hidden" name="captchaCodeValue" id="captchaCodeValue" value=""> 
+			<div class="ui-register" id="ui-register">
+				<!-- 隐藏的图形验证码的UUID -->
+				<input type="hidden" name="captid" id="captid" > 
+				
+				<input type="hidden" name="verifyid" id="verifyid" > 
+				
+				<div class="ui-register-div">
+					<span>手机号码<em>:</em><i></i></span><input class="register-input" type="text" id="loginCode" name="loginCode" placeholder="请输入手机号"><div class="tips loginCode" ></div>
+				</div>
+				<div class="ui-register-div ">
+					<span>图形验证码<em>:</em><i></i></span><input value="" class="register-valid" type="text" id="captchaCode" name="captchaCode" placeholder="图形验证码"><img class="validImg" onclick="getCaptchaCode()" id="validImg" /><div class="tips captchaCode" ></div>
+				</div>
+				<div class="ui-register-div ">
+					<span>手机验证码<em>:</em><i></i></span><input class="register-valid" type="text" id="verifyCode" name="verifyCode" placeholder="手机验证码"><button  id="veriCode" class="ver-code">获取验证码</button><div class="tips verifyCode" ></div>
+				</div>
+				<div class="ui-register-div ">
+					<span>密码<em>:</em><i></i></span><input class="register-input" type="password" id="newpwd1" name="newpwd1" placeholder="请输入密码"><div class="tips newpwd1" ></div>
+				</div>
+				<div class="ui-register-div ">
+					<span>确认密码<em>:</em><i></i></span><input class="register-input" type="password" id="newpwd2" name="newpwd2" placeholder="请输入再次输入密码"><div class="tips newpwd2" ></div>
+				</div>
+				<div class="ui-register-btn ">
+					<button id="registerbtn" onclick="getBackPwd()">重置密码</button>
+				</div>
+				</div>
+			</div>
+		</div>
+	<div id="bottom">
+		<span>Powered&nbsp;&nbsp;&nbsp;&nbsp;By&nbsp;&nbsp;&nbsp;&nbsp;HROCloud.com</span>
+	</div>
+</body>
+</html>

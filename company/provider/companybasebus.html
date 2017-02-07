@@ -1,0 +1,416 @@
+<script type="text/javascript">
+	$("#compStarttime").datepicker();
+	$("#companyinfo").css("background", "rgb(183, 221, 255)")
+	$("#contactsinfo").css("background", "white")
+	$("#attainfo").css("background", "white")
+
+	$("#compController_Name").click(function() {
+		var selpara = {
+				seltype : "seluser",
+				seltitle : "管理员",
+				rtnvalobj : "compController",
+				rtndisobj : "compControllerName",
+				discol : 0
+			};
+			comsel(selpara);
+	})
+
+	$("#compDistrict_Name").click(function() {
+		var selpara = {
+				seltype : "selcity",
+				seltitle : "选择城市",
+				rtnvalobj : "compDistrict",
+				rtndisobj : "compDistrictName",
+				discol : 1,
+				flparams : "",
+				flparamvs : "",
+				vlck : "taxaccTmtid"
+			};
+			comsel(selpara);
+	})
+	
+	$("#compDistrictName").dblclick(function() {
+		if (confirm("确定要清除地区名称吗")) {
+			$("#compDistrictName").val("");
+			$("#compDistrict").val("");
+		}
+	});
+
+	
+	$("#compControllerName").dblclick(function() {
+		if (confirm("确定要清除管理员吗")) {
+			$("#compControllerName").val("");
+			$("#compDistrict").val("");
+		}
+	});
+	//新增或者修改
+	function addorupdateDate(requestData, level, meth) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encryptNew(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//TODO 根据条件刷新
+				if(com_error(result)){
+					if (meth == "add") {
+						comAlert(pubprompt.ins_succ);
+						//新增之后将id的值反馈回来
+						data = result.content["0"].value;
+						//将id的值放到companyidid内
+						$("#companyidid").val(data);
+					} else {
+						comAlert(pubprompt.upd_succ);
+					}
+					//$("#add_upd_policy").dialog("close");
+					jQuery("#tab_companypro").trigger("reloadGrid");
+				} else {
+					if (meth == "add") {
+						comAlert(pubprompt.ins_failure);
+					} else {
+						comAlert(pubprompt.upd_failure);
+					}
+					alertMsg(result,"company_code_desc");
+				}
+
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+
+	//点击子表联系人
+	$("#contactsinfo").click(function() {
+		var id = $("#companyidid").val();
+		if (id == '' || id == null) {
+			comAlert("请先保存主表信息");
+			return;
+		}
+		//将子表样式改变
+		$("#contactsinfo").css("background", "rgb(183, 221, 255)")
+		$("#companyinfo").css("background", "white")
+		$("#attainfo").css("background", "white")
+		//加载子表联系人信息
+		$("#updright").load("../company/provider/contactsbus.html");
+	})
+
+	//点击子表附件信息
+	$("#attainfo").click(function() {
+		var id = $("#companyidid").val();
+		if (id == '' || id == null) {
+			comAlert("请先保存主表信息");
+			return;
+		}
+		//将子表样式改变
+		$("#contactsinfo").css("background", "white")
+		$("#companyinfo").css("background", "white")
+		$("#attainfo").css("background", "rgb(183, 221, 255)")
+		//加载子表联系人信息
+		$("#updright").load("../company/provider/attachmentbus.html");
+	})
+
+	//点击基本信息里面的保存按钮
+	$("#save_company").click(function() {
+		
+		if(!validataCompany()){
+			return;
+		}
+		
+		//获取参数值
+		requestData = serach("company.addorupdate", "addCompany");
+		//将不需要的参数删除
+		delete requestData.compControllerName;
+		delete requestData.compDistrictName;
+
+		//调用方法
+		var com = $("#companyidid").val();
+		if (com != null && com != '') {
+			var meth = "upd";
+		} else {
+			var meth = "add";
+		}
+		//通过网关调用insert方法
+		addorupdateDate(requestData, "UserLogin", meth);
+	})
+
+	//点击基本信息
+	$("#companyinfo").click(function() {
+		//基本信息样式变化，其余子表变白
+		$("#companyinfo").css("background", "rgb(183, 221, 255)")
+		$("#contactsinfo").css("background", "white")
+		$("#attainfo").css("background", "white")
+
+		//获取主表id
+		var id = $("#companyidid").val();
+		//加载新增页面
+		$("#updright").load("../company/provider/addCompanybus.html");
+		//调用selectById方法，显示在文本框内
+		var updateInfos = {
+			_mt : "company.selectById",
+			id : id
+		};
+		getUpdateCompanyInfo(updateInfos, "UserLogin");
+
+		//下拉框方法
+		getSelectDataTypeList({
+			"compState" : "pubstatus"
+		})
+	})
+
+	//获取要修改的公司信息并且赋值到文本框内
+	function getUpdateCompanyInfo(requestData, level) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				if(com_error(result)){
+				//给修改页面的input框赋值
+				data = result.content["0"];
+				setData(data, "addCompany");
+				$("#companyId").val($("#providercompanyId").val());
+				}else{
+					alertMsg(result,"company_code_desc");
+				}
+
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+	
+	
+	function validataCompany(){
+		var flag=true;
+		var compName = $.trim($("#compName").val());
+		var compType = $.trim($("#compType").val());
+		var compDistrict = $.trim($("#compDistrict").val());
+		var compStarttime = $.trim($("#compStarttime").val());
+		var compEndtime = $.trim($("#compEndtime").val());
+		var compController= $.trim($("#compController").val());
+		var compState = $.trim($("#compState").val());
+		var compAddr = $.trim($("#compAddr").val());
+		
+		if(compName == ""){
+			comAlert("请输入公司名称");
+			flag = false;
+			return;
+		}
+		
+		
+		if(compDistrict == ""){
+			comAlert("请选择地区");
+			flag = false;
+			return
+		}
+		
+		if(compStarttime == ""){
+			comAlert("请选择开始时间");
+			flag = false;
+			return
+		}
+	
+		
+		if(compController == ""){
+			comAlert("请选择管理员");
+			flag = false;
+			return
+		}
+		
+	
+		
+		if(compAddr == ""){
+			comAlert("请选择详细地址");
+			flag = false;
+			return
+		}
+		
+		
+		return flag;
+	
+	}
+	
+	
+</script>
+
+<link rel="stylesheet" href="../css/table.css">
+
+<div style="height: 98%;margin-top:6px;">
+	<div id="updleft" class="updleft">
+		<div class="baseinfo" id="companyinfo">
+			<img class="img" src="../css/images/tree/fuhao.gif"><span
+				class="divspan">基本信息</span>
+		</div>
+		<input id="companyidid" name="companyidid" type="hidden" value="">
+		<input id="providercompanyId" name="providercompanyId" type="hidden" value="">
+		<div class="childinfo" id="contactsinfo">
+			<img class="img" src="../css/images/tree/fuhao.gif"><span
+				class="divspan">联系人信息</span>
+		</div>
+		<div class="childinfo" id="attainfo">
+			<img class="img" src="../css/images/tree/fuhao.gif"><span
+				class="divspan">附件信息</span>
+		</div>
+	</div>
+	<div id="updright" class="updright">
+
+		<div class="topbutton">
+			<input type="button" id="save_company" value="&nbsp;保存&nbsp;">
+		</div>
+		<div class="jqForm  ui-widget-content" style="border: 0px;">
+			<table id="addCompany" class="ui-form-table" cellpadding="5"
+				border='0' style="width: 100%;">
+				<tr>
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>公司名称:</label><span
+						class="ui-form-bspcs">*</span></td>
+					<td style="width: 30%; background: #FFFFFF; padding-top: 3px;"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+							id="compName" name="compName" type="text" class="ui-form-value"
+							layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>公司类型:</label><span
+						class="ui-form-bspcs">*</span></td>
+					<td style="width: 30%; background: #FFFFFF; padding-top: 3px;"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left">
+							<select name="compType" id="compType" class="ui-form-value"
+							layout="1" maxlength="40">
+								<option value="05hrovend" selected=selected>HRO供应商</option>
+						</select>
+					</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+				</tr>
+
+
+				<tr>
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>地区名称:</label><span
+						class="ui-form-bspcs">*</span></td>
+					<td style="width: 30%; background: #FFFFFF; padding-top: 3px;"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+							id="compDistrictName" name="compDistrictName" type="text"
+							class="ui-form-value" layout="1" maxlength="50"
+							onfocus="this.blur()"></span> <span id="compDistrict_Name"
+						class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span> <span
+						class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>创建日期:</label><span
+						class="ui-form-bspcs">*</span></td>
+					<td style="width: 30%; background: #FFFFFF; padding-top: 3px;"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+							id="compStarttime" name="compStarttime" type="text"
+							class="ui-form-value" layout="1" maxlength="50"></span> <span
+						class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+				</tr>
+
+				<tr>
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>终止日期:</label></td>
+					<td style="width: 30%; background: #FFFFFF; padding-top: 3px;"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+							id="compEndtime" name="compEndtime" type="text"
+							class="ui-form-value" layout="1" maxlength="50" onfocus="this.blur()"></span> <span
+						class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>管理员:</label><span
+						class="ui-form-bspcs">*</span></td>
+					<td style="width: 30%; background: #FFFFFF; padding-top: 3px;"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+							id="compControllerName" name="compControllerName" type="text"
+							class="ui-form-value" layout="1" maxlength="50" onfocus="this.blur()"></span>
+						<span id="compController_Name" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						<span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+				</tr>
+
+
+				<tr>
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>公司状态:</label></td>
+					<td style="width: 30%; background: #FFFFFF; padding-top: 3px;"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left">
+							<select name="compState" id="compState" class="ui-form-value"
+							disabled="true" layout="1" maxlength="40">
+						</select>
+					</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+				</tr>
+
+
+
+				<tr>
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>详细地址:</label></td>
+					<td style="background: #FFFFFF; padding-top: 3px;" colspan="3"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left">
+							<textarea
+								style="width: 567px; height: 72px; max-width: 567px; max-height: 72px;"
+								id="compAddr" name="compAddr" type="text" class="ui-form-value"
+								layout="1" maxlength="50"></textarea>
+					</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+				</tr>
+
+
+				<tr>
+					<td style="width: 17%; background: rgb(231, 245, 254);"
+						class="ui-form_tddisp" name="serp_svc_code"><label>备注:</label></td>
+					<td style="background: #FFFFFF; padding-top: 3px;" colspan="3"><span
+						class="ui-form-spc">&nbsp;</span> <span style="float: left">
+							<textarea
+								style="width: 567px; height: 72px; max-width: 567px; max-height: 72px;"
+								id="compNote" name="compNote" type="text" class="ui-form-value"
+								layout="1" maxlength="50"></textarea>
+					</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+				</tr>
+
+
+				<!--隐藏的属性用户类型-->
+				<!-- 角色id -->
+				<input id="id" name="id" type="hidden" value="">
+				<!-- 所属公司id -->
+				<input type="hidden" id='compController' />
+				<input type="hidden" id='compDistrict' />
+				<input type="hidden" id='companyId' />
+			</table>
+
+
+		</div>
+
+
+
+
+	</div>
+</div>

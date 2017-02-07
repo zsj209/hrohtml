@@ -1,0 +1,404 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script type="text/javascript" src="../js/payroll_base.js"></script>
+<script>
+var serversname=pubsources.pub_getlink;//网关接口
+var gdid_ssecacc="jq_ssec_account";//显示数据的div
+var pageid_ssecacc="#page_ssec_account";//分页div
+$(function(){
+	$("#tg_account_funid").val($("#tg_cur_funid_temp").val());
+	$("#tg_account_funcode").val($("#tg_cur_funcode_temp").val());
+	
+	var clmreqData_ssecacc={_mt:"socialSsecaccount.selectDataSsecaccount"};//获取数据的接口
+	var addgdid_ssecacc="form_jq_ssec_account";//新增 修改 显示数据的div
+	var updinterface_ssecacc="socialSsecaccount.selectDataByIds";//修改时根据id获取数据的接口
+	var upinfointerface_ssecacc="socialSsecaccount.updateData";//修改数据的接口
+	var ininfointerface_ssecacc="socialSsecaccount.insertData";//新增数据的接口
+	var dlinfointerface_ssecacc="socialSsecaccount.batchDeleteByid";//批量删除接口
+	var bn_div_ssecacc="bn_ssec_account";//按钮div的id
+	var None="UserLogin";//安全等级
+	var bnsuffix_ssecacc="_ssec_account";//按钮后缀
+	
+	$('#se_ssec_account_name').bind('keypress',function(event){
+        if(event.keyCode == "13"){ssec_account_bseach();}
+    });
+	//省市区获取树结构刷新
+	$("#city_refresh_account").bind("click",city_refresh_account);
+	
+	function city_refresh_account(){
+		//省市区获取树结构
+		var treeparams = {_mt:"commoncity.queryTreeCityList"};
+		getInfo_comm_treeCityssaccount(treeparams, "UserLogin");
+	}
+	$("#city_ssec_account").css("height",($("#rPane").height() - 84)+"px");
+	/*--------加载表格------*/
+	//获取按钮
+	gettablebninfo_ssecaccount(bn_div_ssecacc, None);
+	function gettablebninfo_ssecaccount(bndivid, level) {
+		var bnnames = eval("([{code:'bn_add',name:'新增'},{code:'bn_upd',name:'修改'},{code:'bn_del',name:'删除'}])");
+		//获取按钮信息
+		getButtonInfo_ssecaccount(bndivid,bnnames);
+	}
+	/*拼接按钮模块div*/
+	function getButtonInfo_ssecaccount(bndivid,bnnames){
+		var _arr = [];
+		for(var i=0;i<bnnames.length;i++){
+			//此处需要修改  为了区分，按钮后缀改为自己的
+			_arr.push('<input type="button" id="'+bnnames[i].code+bnsuffix_ssecacc+'" value="&nbsp;'+bnnames[i].name+'&nbsp;">&nbsp;');
+		}
+		$("#"+bndivid).html(_arr.join(""));
+		//获取jqgrid数据
+		gettableHead_ssecaccount();
+	} 
+	/*获得jqgrid表头*/
+	function gettableHead_ssecaccount() {
+		var data=[];
+		data.push("id,账户名称,地区名称,社保登记号,缴费专用卡,UK编号,UK密码");
+		data.push("[{name:'id'},{name:'accuName',width:'100'},{name:'accuCityDis',width:'100'},{name:'accuCode',width:'100'},{name:'accuCard',width:'100'},"
+		+ "{name:'accuUkcode',width:'100'},{name:'accuPassword',width:'100'}]");
+		disjQgridTable_ssecaccount(data[0],data[1]);
+	}
+
+	/*获取jqgrid数据*/
+	function disjQgridTable_ssecaccount(colNames,colModel) {
+		var colnms = colNames.split(",");
+		var colmdsJson= eval('('+  colModel+ ')');
+		  
+		//清空jqgrid中的数据
+		$('#'+gdid_ssecacc).jqGrid('clearGridData');
+	  var payload = {data: clmreqData_ssecacc,level: None};
+	  //var data = encrypt(payload.level, payload.data);
+	  
+	  $("#"+gdid_ssecacc).jqGrid({
+			url:serversname,
+			datatype: "json",
+			mtype: "POST",
+			postData: payload.data,
+			mylevel : None,
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+			colNames: colnms,
+		   	colModel: colmdsJson,
+		   	rowNum : 20, 
+			forceFit : true, 
+			rownumbers : true,
+		   	autowidth: false,
+		   	shrinkToFit:false,
+		   	rowList: [20,50,100],
+		   	pager : pageid_ssecacc,
+		   	sortname: 'id',
+		    viewrecords: true,
+		    rownumWidth: 20,
+		    gridview: true, 
+		    multiselect: true, 
+		    multiselectWidth:20,
+		    sortorder: "desc",
+		    height: pgoH,
+		    width: pgoWTree,
+	 	 	ondblClickRow: function(id) {
+				 
+			}
+		}).navGrid("#page_ssec_account",{refresh: false, edit: false, add: false, del: false, search: false})
+		.navButtonAdd("#page_ssec_account",{title:"refresh",caption:"",buttonicon:"ui-icon-refresh",
+			onClickButton:function(){
+				var colmRequestDatas = {_mt:"socialSsecaccount.selectDataSsecaccount",accuCity:"1000",accuName:""};
+				reloadGridData(colmRequestDatas,gdid_ssecacc,pageid_ssecacc);
+			},position:"last"});
+	  jQuery("#"+gdid_ssecacc).setGridParam().hideCol("id").trigger("reloadGrid");
+		//此处需要修改 此处注意 因为无法动态拼接方法，所以只能这样绑定 
+		$("#bn_add"+bnsuffix_ssecacc).bind("click",{bntype:"add",addgdid:addgdid_ssecacc,gdid:gdid_ssecacc,ininfointerface:ininfointerface_ssecacc,bn_div:bn_div_ssecacc},addinfo_Generatedivts_ssecaccount);//新增方法名请改成自己的
+		//此处需要修改 修改按钮 参数说明：jqgrid的id，修改标识，获取修改数据的接口，修改的div拼接页面的div，修改的div的外层id（用于显示隐藏界面）
+		$("#bn_upd"+bnsuffix_ssecacc).bind("click",{bntype:"upd",addgdid:addgdid_ssecacc,gdid:gdid_ssecacc,upinfointerface:upinfointerface_ssecacc,updinterface:updinterface_ssecacc,bn_div:bn_div_ssecacc},addinfo_Generatedivts_ssecaccount);//新增方法名请改成自己的
+		
+		//此处需要修改 删除按钮  参数说明：jqgrid的id，删除数据接口
+		$("#bn_del"+bnsuffix_ssecacc).bind("click",{gdid:gdid_ssecacc,delinterface:dlinfointerface_ssecacc},bn_del_pub_ssecaccount);
+		$("#ssec_account_bseach").bind("click",{},ssec_account_bseach);
+		 
+		
+		/***
+		 * 获取左边城市类别
+		 */
+		var cityrequestData={_mt:"commoncity.queryTreeCityList"};
+		var level="UserLogin";
+		getInfo_comm_treeCityssaccount(cityrequestData,level);
+	}
+	/*--------加载表格 end------*/
+
+	/*
+	 * 新增方法
+	 * */
+	function addinfo_Generatedivts_ssecaccount(e){
+		var pkid="0";
+		if(e.data.bntype=="upd"){
+			if(getSledRowsNumber(e.data.gdid)){return;}
+			var r = $("#"+e.data.gdid).getGridParam('selrow');
+			pkid=$("#"+e.data.gdid).getCell(r,2);
+			if(pkid==null){
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			}
+		}
+		$("#ssec_account_adduppk").val(pkid);
+		var tilStr=getAddOrUp(pkid,"社保账户");
+		var s = $("<DIV ID='"+gdid_ssecacc+"_addinfoarea_dlg'></DIV>");
+		var btns = {
+				'保存':function() {bn_addupSave(gdid_ssecacc+"_addinfoarea",e,pkid,s);},
+				'取消':function() {$(this).dialog('close');$("#touming").hide();}
+			};
+		$(s).load("../ssec/account/ssecaccountadd.html?tsid="+ new Date().getTime()).dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			title : tilStr,
+			height : dipgoHo,
+			width : dipgoWo,
+			resizable : false,
+			modal : true,
+			buttons :btns,
+			close : function(event, ui) {
+				$(this).remove();
+			}
+		});
+		//gettableSelectval(e,pkid);
+		//$("#"+e.data.addgdid).show();
+		//显示透明层
+		$("#touming").show();
+	}
+	function bn_del_pub_ssecaccount(e){
+		var gdid=e.data.gdid,delinterface=e.data.delinterface;
+		var rows = $("#"+gdid).getGridParam('selarrrow'),rl="";
+		var dsum=0;
+		$.each(rows, function(i,n){
+			rl += $("#"+gdid).getCell(n,2) + ",";
+			dsum=dsum+1;
+		});
+		if(rows.length >= 1) {rl=rl.substring(0,rl.length-1);}
+		if(rl==""){
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		}
+		if(confirm("您确定删除选中的 "+dsum+" 条记录吗？")) {
+			delDataInfo(gdid,delinterface,None,rl);
+		}
+	}
+	/*快速查询按钮事件*/
+	function ssec_account_bseach(){
+		var taxCode=Trim($("#se_ssec_account_name").val());
+		//清空jqgrid中的数据
+		$("#"+gdid_ssecacc).jqGrid('clearGridData');
+		var colmRequestDatas = {_mt:"socialSsecaccount.selectDataSsecaccount",accuCity:"1000",accuName:taxCode};
+		reloadGridData(colmRequestDatas,gdid_ssecacc,pageid_ssecacc);
+	}
+
+});
+function getInfo_comm_treeCityssaccount(cityrequestData, level){
+	var payload = {
+	          data: cityrequestData,
+	          level: level,
+	      };
+	      data = encrypt(payload.level, payload.data);
+	      console.log(data);
+	         $.ajax({
+	             type : "GET",
+	             url : pubsources.pub_getlink,
+	             crossDomain : true,
+	             dataType : "json",
+	             xhrFields : {
+	                     withCredentials:true
+	             },
+	             data : serialize(data),
+	             success : function(result) {
+	               //给修改页面的input框赋值
+	                data = result.content["0"].value;
+	              //  alert(data[0].id)
+	                var _arr=[];
+	    			_arr.push('<ul>');/**/
+	    			for(var o in data){
+	    				var data2=data[o].list;
+	    				if(data2!=""){
+	    					_arr.push('<li class="pnodes jqTreepnode sshows" style="background:none;border:0;padding:0;">');/**/
+			    			_arr.push('<a class="cityTrees" snames="'+data[0].cityName+'" href="javascript:void(0)" onclick="showSsecacc(this)" sid="'+data[0].id+'" gdid="1" fun="1603" value="'+data[0].id+'" gid="1" ><div class="treeLevel"><div class="treebackground" style="padding-left:0;">'+data[0].cityName+'</div></div></a>');
+			    			
+	    				}else{
+	    					_arr.push('<li class=" sshows">');
+  						_arr.push('<a class="cityTrees" snames="'+data[0].cityName+'" href="javascript:void(0)" onclick="showSsecacc(this)" sid="'+data[0].id+'" gdid="1" fun="1603" value="'+data[0].id+'" gid="1" ><div class="pnodestates"><div class="treebackground" style="">'+data[0].cityName+'</div></div></a>');
+	    				}
+		    			_arr.push('<ul class="jqTree child" >');
+		    			for(var i in data2){
+		    				var data3=data2[i].list;
+		    				if(data3!=""){
+		    					_arr.push('<li class="sshows">');
+			    				_arr.push('<a  href="javascript:void(0)" class="cityTrees"   snames="'+data2[i].cityName+'" fun="1395" value="'+data2[i].id+'" sid="'+data2[i].id+'" gid="1" gdid="1" onclick="showSsecacc(this)"><div class="treeLevel"><div class="treebackground">'+data2[i].cityName+'</div></div></a>');
+		    				}else{
+		    					_arr.push('<li class=" sshows">');
+	    						_arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'+data2[i].cityName+'" onclick="showSsecacc(this)" gid="1" sid="'+data2[i].id+'" value="'+data2[i].id+'" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'+data2[i].cityName+'</div></div></a>');
+		    				}
+		    			
+		    				_arr.push('<ul class="jqTree child" >');
+		    				
+		    				if(data3!=""){
+		    					for(var j in data3){
+		    						var data4=data3[j].list;
+		    						if(data4!=""){
+		    							_arr.push('<li class="sshows"  >');
+				    					_arr.push('<a  href="javascript:void(0)" class="cityTrees"  snames="'+data3[j].cityName+'"  fun="1429" value="'+data3[j].id+'" sid="'+data3[j].id+'" gid="1" gid="1603" onclick="showSsecacc(this)"  ><div class="treeLevel"><div class="treebackground" style="">'+data3[j].cityName+'</div></div></a>');
+				    					
+		    						}else{
+		    							_arr.push('<li class=" sshows">');
+			    						_arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'+data3[j].cityName+'" onclick="showSsecacc(this)" gid="1" sid="'+data3[j].id+'" value="'+data3[j].id+'" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'+data3[j].cityName+'</div></div></a>');
+		    						}
+			    					_arr.push('<ul class="jqTree child" >');
+			    					
+			    					if(data3!=""){
+			    						for(var k in data4){
+				    						_arr.push('<li class=" sshows">');
+				    						_arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'+data4[k].cityName+'" onclick="showSsecacc(this)" gid="1" sid="'+data4[k].id+'" value="'+data4[k].id+'" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'+data4[k].cityName+'</div></div></a>');
+				    						_arr.push('</li>');
+				    					}
+			    					}
+			    					_arr.push('</ul>');
+			    					_arr.push('</li>');
+			    				}
+		    				}
+		    				
+		    				_arr.push('</ul>');
+		    				_arr.push('</li>');
+		    			}
+		    			_arr.push('</ul>');
+		    			_arr.push('</li>');
+		    			
+		             }
+	    			_arr.push('</ul>');
+	              
+	    			 $("#city_ssec_account").html(_arr.join(""));
+		                treeListSsecacc();
+	             },
+	             error : function() {
+	                     alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+	             }
+	     });
+	
+}
+ 
+
+function showSsecacc(e){
+	var cityId=$(e).attr("value");
+	var cityName=$(e).attr("snames");
+	$("#ssec_account_city").val(cityId);
+	$("#ssec_account_citydis").val(cityName);
+	$('.treebackground').each(function() {
+		$(this).removeClass("sclick");
+	});
+	$(e).children("div").children("div").addClass("sclick");
+	var colmRequestDatas = {_mt:"socialSsecaccount.selectDataSsecaccount",accuCity:cityId,accuName:""};
+	reloadGridData(colmRequestDatas,gdid_ssecacc,pageid_ssecacc);
+ 
+}
+
+function treeListSsecacc(){
+	$("#city_ssec_account ul li").children("ul").hide();
+	$("#city_ssec_account").find("li").not(":has(ul)").children("a").css(
+			{
+				textDecoration : "none",
+				color : "#333",
+				background : "none"
+			}).click(
+			function() {
+				$(this).get(0).location.href = "'"
+						+ $(this).attr("href") + "'";
+				});
+		$("#city_ssec_account")
+			.find("li:has(ul)")
+			.children("a")
+			.addClass("pnode_closes").removeClass("pnode_opens")
+			.click(
+					function() {
+						//alert($(this).css("background"))
+						if ($(this).next("ul")
+								.is(":hidden")) {
+							$(this).next("ul").show();//slideDown("fast");
+							if ($(this).parent("li")
+									.siblings("li")
+									.children("ul").is(
+											":visible")) {
+								$(this).parent("li")
+										.siblings("li")
+										.find("ul")
+										.hide();//slideUp("fast");
+								$(this)
+										.parent("li")
+										.siblings(
+												"li:has(ul)")
+										.children("a")
+										.addClass("pnode_closes")
+										.removeClass("pnode_opens")
+										.end()
+										.find("li:has(ul)")
+										.children("a")
+										.addClass("pnode_closes")
+										.removeClass("pnode_opens");
+										
+							}
+							$(this).addClass("pnode_opens").removeClass("pnode_closes");
+							return false;
+						} else {
+							$(this).next("ul").hide();//slideUp("fast");
+							//不用toggle()的原因是为了在收缩菜单的时候同时也将该菜单的下级菜单以后的所有元素都隐藏
+							$(this).addClass("pnode_closes").removeClass("pnode_opens");
+							$(this).next("ul").children(
+									"li").find("ul")
+									.hide();//fadeOut("10");
+							$(this)
+									.next("ul")
+									.find("li:has(ul)")
+									.children("a").addClass("pnode_closes").removeClass("pnode_opens");
+							return false;
+						}
+					});
+}
+</script>
+
+<div class="rPane_d jq_top_div">
+	<div style="display: none;">
+		<input type="hidden" value="" id="ssec_account_adduppk"/>
+		<input type="hidden" id="ssec_account_city" value=""/>
+		<input type="hidden" id="ssec_account_citydis" value=""/>
+		<input type="hidden" id="tg_account_funid" value="">
+		<input type="hidden" id="tg_account_funcode" value="">
+	</div>
+	<div style="width: 100%">
+		<div class="ctleft">
+			<div>
+				<input id="city_refresh_account" class="btclasscs" value="刷新" type="button">
+			</div>
+			<div id="city_ssec_account"  style="overflow-x:hidden;overflow-y:scroll; border-bottom: 1px solid #C7DEEC;">
+			</div> 
+		</div>
+		<div class="ctright">
+			<div id="bn_ssec_account" class="jq_top_button">
+			</div>
+			<div id="se_ssec_account" class="jq_top_quick">
+				<input type="text" class="" placeholder="请输入账户名称" id="se_ssec_account_name"/>
+				<input type="button" value="查询" id="ssec_account_bseach" class="margin_left8"/>
+			</div>
+			<div class="rPane_dt">
+				<table id="jq_ssec_account" class="jqgridtable"></table> 
+				<div id="page_ssec_account"></div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,103 @@
+<script type="text/javascript">
+$(function(){
+	$("#startTime").datepicker();
+	$("#endTime").datepicker();
+	/* $("#select_hroPeriodcompanyId").click(
+			function() {
+				comsel("selcompany", "上级节点", "companyId", "companyIdDis", 0);
+	})  */
+})
+</script>
+<style type="text/css">
+	.ui-form-bspcs{
+		color: red;
+		padding-right:10px;
+		float: right;
+		font-weight: bold;
+	}
+</style>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addHroPeriods" class="ui-form-table" cellpadding="5" border='0'
+		style="width: 100%;">
+		
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="periodCode"><label>期间编码</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="periodCode" name="periodCode" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+			</td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="periodYear"><label>期间年份</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="periodYear" name="periodYear" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+			</td>
+
+		</tr>
+			<tr>
+			
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="periodMonth"><label>期间月份</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td  style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+				<select id="periodMonth" class="ui-form-value"></select>
+				</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+			
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="startTime"><label>开始日期</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td  style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="startTime" name="startTime" type="text" class="ui-form-value" ismust="0"
+					></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+		<tr>
+			
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="endTime"><label>结束日期</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width:35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="endTime" name="endTime" type="text" class="ui-form-value" ismust="0"
+					></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+			<!-- <td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="companyIdDis"><label>所属公司</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="companyIdDis" name="companyIdDis" readonly="readonly" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+				<span id="select_hroPeriodcompanyId" class="ui-form-sbtnew ui-form-sel" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td> -->
+			
+		</tr>
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="comment"><label>备注</label>
+			</td>
+			<td colspan="3" style="width:85%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+				<textarea id="comment" name="comment"  ismust="0"
+					class="ui-form-textarea ui-form-value"></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+		
+	</table>
+	<input id="id" type="hidden">

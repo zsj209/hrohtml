@@ -1,0 +1,26 @@
+<script type="text/javascript">
+	$("#company_btn").click(function() {
+		var company_search = $("#company_search").val();
+		//comAlert(node_parent_search)
+		if (city_search != "") {
+			var ss = {
+				_mt : "commparmtype.selectParamTypeByColumn",
+				paramName : node_parent_search
+			};
+			$("#company_parent").setGridParam({
+				postData : ss
+			}).trigger("reloadGrid", [ {
+				page : 1
+			} ]);
+		}
+	});
+</script>
+<div>
+	公司名称： <input type="text" id="company_search">
+	<button id="company_btn">查询</button>
+</div>
+
+<div>
+	<table id="company_parent"></table>
+	<div id="pager_company_parent"></div>
+</div>

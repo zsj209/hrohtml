@@ -1,0 +1,54 @@
+<style>
+.rPane_Permission_ui {height: 30px;clear: both;}
+.rPane_Permission_li {height: 20px;border: solid 1px red;float: left;}
+</style>
+<script type="text/javascript">
+	$(function() {
+		$("#roleName").text($("#permiss_roleName").val());
+		$("#tabs_node_button").bind('click', function() {
+			roleNode()
+			$("#tabs_node").css({
+				display : "block"
+			});
+			$("#tabs_button").css({
+				display : "none"
+			});
+		});
+		$("#tabs_button_button").bind('click', function() {
+			roleButton();
+			$("#tabs_node").css({
+				display : "none"
+			});
+			$("#tabs_button").css({
+				display : "block"
+			});
+		});
+		
+		$("#tabs_node_button").trigger("click");
+	});
+
+	function roleNode() {
+		$("#tabs_node").load("../usermgmt/role/setpermissionnode.html?tsid="+ new Date().getTime(),function() {
+			getRoleTree($("#permiss_roleId").val());
+		});
+	};
+	
+	function roleButton() {
+		$("#tabs_button").load("../usermgmt/role/setpermissionbutton.html?tsid="+ new Date().getTime(), function() {
+			getRoleTreeButton($("#permiss_roleId").val());
+		});
+	};
+</script>
+<div>
+	角色名称：<span id="roleName"></span><input type="hidden" id="permiss_nodeId" />
+</div>
+<div id="rPane_role_node_button">
+	<div class="rPane_d_menu" style="padding-left:0px;">
+		<span>
+			<input type="button" id="tabs_node_button"value="&nbsp;分配节点&nbsp;">&nbsp;
+			<input type="button" id="tabs_button_button" value="&nbsp;分配按钮&nbsp;">
+		</span>
+	</div>
+	<div id="tabs_node"></div>
+	<div id="tabs_button" style="display: none;"></div>
+</div>

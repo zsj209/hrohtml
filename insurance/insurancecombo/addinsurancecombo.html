@@ -1,0 +1,282 @@
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $("#fromTime").datepicker();
+        $("#toTime").datepicker();
+        //商保公司
+        $("#company_Name").click(function () {
+            var selpara = {
+                seltype: "selcompany",
+                seltitle: "选择商保公司",
+                rtnvalobj: "companyId",
+                rtndisobj: "companyName",
+                discol: 0,
+                flparams: "0",
+                flparamvs: "0"
+            };
+            comsel(selpara);
+        });
+
+
+        $("#jq_lf_ic_base").css("background", "#b7ddff");
+        $("#jq_lf_ic_item1").css("background", "#fff");
+
+        var addOrUpdateTag = $("#insurance_add_or_update_flag").val();//1 - add 2 - update
+        var item1Loaded = "";
+        var id = $("#id").val();
+        var addgrid_ic = "form_jq_insurance_combo";//新增 修改 显示数据的div
+
+        $("#jq_lf_ic_base").bind("click", {type: 1, addgrid: addgrid_ic}, mainchildDisplay_ic);//新增页面 主信息点击事件
+        $("#jq_lf_ic_item1").bind("click", {type: 2, addgrid: addgrid_ic}, mainchildDisplay_ic);//新增页面 子信息点击事件
+
+
+        /*
+         * 主子表点击事件
+         * */
+        function mainchildDisplay_ic(e) {
+            var grids;
+            if (e.data.type == "1") {
+                //主节点单击事件
+                grids = $('#' + e.data.addgrid + "_base").css('display');
+                if (grids == "block") {
+                    return;
+                }
+                else {
+                    $("#jq_lf_ic_base").css("background", "#b7ddff");
+                    $("#jq_lf_ic_item1").css("background", "#fff");
+                    $("#" + e.data.addgrid + "_base").show();
+                    $("#" + e.data.addgrid + "_item1").hide();
+                }
+            } else if (e.data.type == "2") {
+                id = $("#id").val();
+                if (id == null || id == undefined || id == '') {
+                    comAlert("请先保存主数据");
+                    return;
+                }
+                if (item1Loaded != "true") {
+                    $("#" + e.data.addgrid + "_item1").load('../insurance/insurancecombo/insurancecombotype.html');
+                    $("#item1loaded").val("true");
+                    item1Loaded = "true";
+                    $("#jq_lf_ic_base").css("background", "#fff");
+                    $("#jq_lf_ic_item1").css("background", "#b7ddff");
+                    $("#" + e.data.addgrid + "_base").hide();
+                }
+                var grids = $("#" + e.data.addgrid + "_item1").css('display');
+                if (grids == "block") {
+                    return;
+                } else {
+
+                    $("#jq_lf_ic_base").css("background", "#fff");
+                    $("#jq_lf_ic_item1").css("background", "#b7ddff");
+
+                    $("#" + e.data.addgrid + "_base").hide();
+                    $("#" + e.data.addgrid + "_item1").show();
+
+                }
+
+
+            }
+        }
+
+        $("#jq_insurance_combo_basave").bind("click", function () {
+                //获取参数
+                requestData = addinsurancecomboPar(addOrUpdateTag);
+                //调用方法
+                if (requestData) {
+                    addOrUpdateinsurancecombo(requestData, "UserLogin", addOrUpdateTag);
+                    if (addOrUpdateTag = 1)
+                        addOrUpdateTag = 2;
+                }
+
+            }
+        )
+    })
+    ;
+
+</script>
+<style>
+    .oncursor {
+        cursor: pointer;
+        width: 99%;
+        color: #0f88cd;
+        height: 30px;
+        line-height: 30px;
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .oncursorimg {
+        float: left;
+        margin-top: 8px;
+        padding-left: 8px;
+    }
+
+    .div_left {
+        float: left;
+        width: 145px;
+    }
+
+    .div_center {
+        margin-left: 150px;
+    }
+</style>
+<div class="rPane_dt" id="content" id="form_jq_insurance_combo" title="信息维护" style="height: 99%;">
+    <div class="div_left" style="height: 99%;">
+        <div style="border: 1px solid #cccccc;width: 98%;height: 99%;" id="ssec_polcid_hg">
+            <div class="oncursor" id="jq_lf_ic_base"><img class="oncursorimg"
+                                                          src="../css/images/com/collapsed.gif"><span
+                    style="float:left;">基本信息</span></div>
+            <div class="oncursor" id="jq_lf_ic_item1"><img class="oncursorimg"
+                                                           src="../css/images/com/collapsed.gif"><span
+                    style="float:left;">商保险种</span></div>
+            <div style="display: none"></div>
+        </div>
+    </div>
+    <div class="div_center" id="form_jq_insurance_combo_base">
+        <div class="rPane_d_menu"><input id="jq_insurance_combo_basave" style="margin-top: 5px;margin-left: 3px"
+                                         type="button" value="&nbsp;保存&nbsp;" class="bn_sv_base"/></div>
+        <div class="jqForm ui-dialog-content ui-widget-content">
+            <table id="addInsuranceCombo" class="rPane_dt" cellpadding="5" border='0' style="width: 100%;">
+                <!--公司id-->
+                <input type="hidden" id='companyId' name="companyId"/>
+                <input type="hidden" id='id' name="id"/>
+                <tr>
+                    <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
+                        <label>套餐名称:</label><span
+                            class="ui-form-bspcs">*</span></td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+                            class="ui-form-spc">&nbsp;</span>
+                        <span
+                                style="float: left"><input id="name" name="name" type="text" class="ui-form-value"
+                                                           layout="1"
+                                                           size="27"
+                                                           maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    </td>
+                    <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
+                        <label>商保公司:</label></td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+                            class="ui-form-spc">&nbsp;</span>
+                        <span
+                                style="float: left"><input id="companyName" name="companyName" type="text"
+                                                           class="ui-form-value"
+                                                           layout="1" size="25" maxlength="50" readonly=""></span> <span
+                                id="company_Name"
+                                class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
+                        <label>报增日期:</label><span
+                            class="ui-form-bspcs">*</span>
+                    </td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+                            class="ui-form-spc">&nbsp;</span>
+                        <span
+                                style="float: left"><select id="addDay" name="addDay" type="text"
+                                                            class="ui-form-value" layout="1" maxlength="50"></select>
+            </span></td>
+                    <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
+                        <label>报减日期:</label><span
+                            class="ui-form-bspcs">*</span></td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+                            class="ui-form-spc">&nbsp;</span>
+                        <span
+                                style="float: left"> <select id="detractDay" name="detractDay" type="text"
+                                                             class="ui-form-value"
+                                                             layout="1"
+                                                             maxlength="50">
+
+			</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
+                        <label>收费频率:</label><span
+                            class="ui-form-bspcs">*</span></td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+                            class="ui-form-spc">&nbsp;</span>
+                        <span
+                                style="float: left"><select id="chargeFrequency" name="chargeFrequency" type="text"
+                                                            class="ui-form-value"
+                                                            layout="1" maxlength="50"></select></span>
+                    </td>
+                    <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
+                        <label>年收费月份:</label>
+                    </td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+                            class="ui-form-spc">&nbsp;</span>
+                        <span
+                                style="float: left"><select id="chargeMonth" name="chargeMonth" type="text"
+                                                            class="ui-form-value"
+                                                            layout="1" maxlength="50"></select></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
+                        <label>适合人群:</label>
+                    </td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;" colspan="3"><span
+                            class="ui-form-spc">&nbsp;</span> <span style="float: left"> <textarea
+                            style="width: 560px; height: 72px; max-width: 608px; max-height: 72px;" id="customer"
+                            name="customer"
+                            type="text" class="ui-form-value"
+                            layout="1" maxlength="50"></textarea></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; background: rgb(231, 245, 254);"
+                        class="ui-form_tddisp" name="serp_svc_code"><label>生效日期:</label>
+                        <span class="ui-form-bspcs">*</span></td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+                        <span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+                            id="fromTime" name="fromTime" type="text"
+                            class="ui-form-value" layout="1" size="27" maxlength="50"></span> <span
+                            class="ui-form-bspc">&nbsp;&nbsp;</span>
+                    </td>
+
+                    <td style="width: 15%; background: rgb(231, 245, 254);"
+                        class="ui-form_tddisp" name="serp_svc_code"><label>终止日期:</label>
+                    </td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+                        <span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+                            id="toTime" name="toTime" type="text"
+                            class="ui-form-value" layout="1" size="27" maxlength="50"></span> <span
+                            class="ui-form-bspc">&nbsp;&nbsp;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; background: rgb(231, 245, 254);"
+                        class="ui-form_tddisp" name="serp_svc_code"><label>状态:</label>
+                        <span class="ui-form-bspcs">*</span></td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+                            class="ui-form-spc">&nbsp;</span>
+                        <span
+                                style="float: left"><select id="status" name="status" type="text" disabled="disabled"
+                                                            class="ui-form-value"
+                                                            layout="1" maxlength="50"></select></span>
+                    </td>
+                    <td style="width: 15%;">
+
+                    </td>
+                    <td style="width: 35%;">
+
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
+                        <label>备注:</label>
+                    </td>
+                    <td style="width: 35%; background: #FFFFFF; padding-top: 3px;" colspan="3"><span
+                            class="ui-form-spc">&nbsp;</span> <span style="float: left"> <textarea
+                            style="width: 560px; height: 72px; max-width: 608px; max-height: 72px;" id="remark"
+                            name="remark"
+                            type="text" class="ui-form-value"
+                            layout="1" maxlength="50"></textarea></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="div_center" id="form_jq_insurance_combo_item1"/>
+</div>

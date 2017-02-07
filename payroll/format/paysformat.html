@@ -1,0 +1,235 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script type="text/javascript" src="../js/payroll_base.js"></script>
+<script>
+$(function(){
+	$("#tg_format_funid").val($("#tg_cur_funid_temp").val());
+	$("#tg_format_funcode").val($("#tg_cur_funcode_temp").val());
+	var serversname=pubsources.pub_getlink;//网关接口
+	var clmreqData_fmat={_mt:"payrollFormat.selectDataByFormat"};//获取数据的接口
+	var gdid_fmat="jq_pays_format";//显示数据的div
+	var addgdid_fmat="form_jq_pays_format";//新增 修改 显示数据的div
+	var updinterface_fmat="payrollFormat.selectDataByIds";//修改时根据id获取数据的接口
+	var upinfointerface_fmat="payrollFormat.updateData";//修改数据的接口
+	var ininfointerface_fmat="payrollFormat.insertData";//新增数据的接口
+	var dlinfointerface_fmat="payrollFormat.batchDeleteByid";//批量删除接口
+	var bn_div_fmat="bn_pays_format";//按钮div的id
+	var None="UserLogin";//安全等级
+	var bnsuffix_fmat="_paysformat";//按钮后缀
+	var pageid_fmat="#page_pays_format";//分页div
+	
+	
+	$('#se_pay_format_name').bind('keypress',function(event){
+        if(event.keyCode == "13"){pay_format_bseach();}
+    });
+
+	/*--------加载表格------*/
+	//获取按钮
+	gettablebninfo_format(bn_div_fmat, None);
+	function gettablebninfo_format(bndivid, level) {
+		var bnnames = eval("([{code:'bn_add',name:'新增'},{code:'bn_upd',name:'修改'},{code:'bn_del',name:'删除'}])");
+		//获取按钮信息
+		getButtonInfo_format(bndivid,bnnames);
+	}
+	/*拼接按钮模块div*/
+	function getButtonInfo_format(bndivid,bnnames){
+		var _arr = [];
+		for(var i=0;i<bnnames.length;i++){
+			//此处需要修改  为了区分，按钮后缀改为自己的
+			_arr.push('<input type="button" id="'+bnnames[i].code+bnsuffix_fmat+'" value="&nbsp;'+bnnames[i].name+'&nbsp;">&nbsp;');
+		}
+		$("#"+bndivid).html(_arr.join(""));
+		//获取jqgrid数据
+		gettableHead_format();
+	} 
+	/*获得jqgrid表头*/
+	function gettableHead_format() {
+		var data=[];
+		data.push("id,格式名称");
+		data.push("[{name:'id'},{name:'formatName',width:'100'}]");
+		disjQgridTable_format(data[0],data[1]);
+	}
+
+	/*获取jqgrid数据*/
+	function disjQgridTable_format(colNames,colModel) {
+		var colnms = colNames.split(",");
+		var colmdsJson= eval('('+  colModel+ ')');
+		  
+		//清空jqgrid中的数据
+		$('#'+gdid_fmat).jqGrid('clearGridData');
+	  var payload = {data: clmreqData_fmat,level: None};
+	  //var data = encrypt(payload.level, payload.data);
+	  
+	  $("#"+gdid_fmat).jqGrid({
+			url:serversname,
+			datatype: "json",
+			mtype: "POST",
+			postData: payload.data,
+			mylevel : None,
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+			colNames: colnms,
+		   	colModel: colmdsJson,
+		   	rowNum : 20, 
+			forceFit : true, 
+			rownumbers : true,
+		   	autowidth: false,
+		   	shrinkToFit:false,
+		   	rowList: [20,50,100],
+		   	pager : pageid_fmat,
+		   	sortname: 'id',
+		    viewrecords: true,
+		    rownumbers: true,
+		    rownumWidth: "30",
+		    gridview: true, 
+		    multiselect: true, 
+		    sortorder: "desc",
+		    height: pgoH,
+		    width: pgoW,
+	 	 	ondblClickRow: function(id) {
+				 
+			}
+		}).navGrid("#page_pays_format",{refresh: false, edit: false, add: false, del: false, search: false})
+		.navButtonAdd("#page_pays_format",{title:"refresh",caption:"",buttonicon:"ui-icon-refresh",
+			onClickButton:function(){
+				var colmRequestDatas = {_mt:"payrollFormat.selectDataByFormat",formatName:""};
+				reloadGridData(colmRequestDatas,gdid_fmat,pageid_fmat);
+			},position:"last"});
+	  jQuery("#"+gdid_fmat).setGridParam().hideCol("id").trigger("reloadGrid");
+		//此处需要修改 此处注意 因为无法动态拼接方法，所以只能这样绑定 
+		$("#bn_add"+bnsuffix_fmat).bind("click",{bntype:"add",addgdid:addgdid_fmat,gdid:gdid_fmat,ininfointerface:ininfointerface_fmat,upinfointerface:upinfointerface_fmat,bn_div:bn_div_fmat},addinfo_Generatedivts_format);//新增方法名请改成自己的
+		//此处需要修改 修改按钮 参数说明：jqgrid的id，修改标识，获取修改数据的接口，修改的div拼接页面的div，修改的div的外层id（用于显示隐藏界面）
+		$("#bn_upd"+bnsuffix_fmat).bind("click",{bntype:"upd",addgdid:addgdid_fmat,gdid:gdid_fmat,upinfointerface:upinfointerface_fmat,updinterface:updinterface_fmat,bn_div:bn_div_fmat},addinfo_Generatedivts_format);//新增方法名请改成自己的
+		
+		//此处需要修改 删除按钮  参数说明：jqgrid的id，删除数据接口
+		$("#bn_del"+bnsuffix_fmat).bind("click",{gdid:gdid_fmat,delinterface:dlinfointerface_fmat},bn_del_pub_format);
+		$("#pay_format_bseach").bind("click",{},pay_format_bseach);//快捷查询
+		
+	}
+	/*--------加载表格 end------*/
+	/*
+	 * 新增方法
+	 * */
+	function addinfo_Generatedivts_format(e){
+		var pkid="0";
+		if(e.data.bntype=="upd"){
+			if(getSledRowsNumber(e.data.gdid)){return;}
+			var r = $("#"+e.data.gdid).getGridParam('selrow');
+			pkid=$("#"+e.data.gdid).getCell(r,2);
+			if(pkid==null){
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			}
+		}
+		$("#pay_format_adduppk").val(pkid);
+		//$("#jq_lf_format_pid").val(pkid);
+		var tilStr=getAddOrUp(pkid,"报税格式");
+		var s = $("<DIV ID='"+addgdid_fmat+"_addinfoarea_dlg'></DIV>");
+		$(s).load("../payroll/format/paysformatadd.html?tsid="+ new Date().getTime()).dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			title : tilStr,
+			height : dipgoH,
+			width : dipgoW,
+			resizable : false,
+			modal : true,
+			buttons :[],
+			close : function(event, ui) {
+				$(this).remove();
+			}
+		});
+		//gettableSelectval(e,pkid);
+		//显示透明层
+		$("#touming").show();
+	}
+
+	function bn_del_pub_format(e){
+		var gdid=e.data.gdid,delinterface=e.data.delinterface;
+		var rows = $("#"+gdid).getGridParam('selarrrow'),rl="";
+		var dsum=0;
+		$.each(rows, function(i,n){
+			rl += $("#"+gdid).getCell(n,2) + ",";
+			dsum=dsum+1;
+		});
+		if(rows.length >= 1) {rl=rl.substring(0,rl.length-1);}
+		if(rl==""){
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		}
+		if(confirm("您确定删除选中的 "+dsum+" 条记录吗？")) {
+			delDataInfo(gdid,delinterface,None,rl);
+		}
+	}
+	/*快速查询按钮事件*/
+	function pay_format_bseach(){
+		var formatName=Trim($("#se_pay_format_name").val());
+		//清空jqgrid中的数据
+		$("#"+gdid_fmat).jqGrid('clearGridData');
+		var colmRequestDatas = {_mt:"payrollFormat.selectDataByFormat",formatName:formatName};
+	    var payload = {
+	       data: colmRequestDatas,
+	       level: None,
+	    };
+	     
+	    $("#"+gdid_fmat).jqGrid('setGridParam',{  
+	        datatype:'json',  
+	        postData:payload.data,
+	        mylevel : None,
+	        prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+			pager : pageid_fmat,
+	    }).trigger("reloadGrid"); 
+	}
+
+
+	});
+</script>
+<style>
+</style>
+
+<div class="rPane_d" class="jq_top_div">
+	<div id="bn_pays_format" class="jq_top_button">
+	</div>
+	<div id="se_pays_format" class="jq_top_quick">
+		<input type="text" class="" placeholder="请输入报税格式" id="se_pay_format_name"/>
+		<input type="button" value="查询" id="pay_format_bseach" class="margin_left8"/>
+	</div>
+	<div style="display: none;">
+		<input type="hidden" id="pay_format_adduppk" value=""/>
+		<input type="hidden" id="tg_format_funid" value="">
+		<input type="hidden" id="tg_format_funcode" value="">
+	</div>
+	<div class="rPane_dt">
+		<table id="jq_pays_format" class="jqgridtable"></table> 
+		<div id="page_pays_format"></div>
+	</div>
+</div>

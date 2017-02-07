@@ -1,0 +1,144 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script type="text/javascript">
+var pkid_ssacc=$("#ssec_account_adduppk").val();
+var _mt_ssacc="socialSsecaccount.selectDataByIds";
+var gdid_ssacc="form_jq_ssec_account";
+var level="UserLogin";
+
+$(document).ready(function(){
+	 if(pkid_ssacc!="0"){
+		 updatePosrSetval_ssecacc();
+	 }
+	 
+	$("#accuCity_sel").click(function() {
+		var selpara = {seltype:"selcity", seltitle:"选择城市", rtnvalobj:"accuCity", rtndisobj:"accuCityDis", discol:1, flparams:"", flparamvs:""};
+		comsel(selpara);
+	});
+	$("#accuCityDis").dblclick(function() {
+		if(confirm("确定要清除地区名称吗")){
+			$("#accuCity").val("");
+			$("#accuCityDis").val("");
+		}
+		 
+	});
+	var cityId=$("#ssec_account_city").val();
+	var cityName=$("#ssec_account_citydis").val();
+	if(cityId!="" && cityId!=1000){
+		$("#accuCity").val(cityId);
+		$("#accuCityDis").val(cityName);
+	}
+	
+});
+function updatePosrSetval_ssecacc(){
+	var clnrequestData = {_mt:_mt_ssacc,selIds:pkid_ssacc};
+	var payload = {
+		    data: clnrequestData,
+		    level: level,
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "GET",
+			url : serversname,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials:true
+			},
+			data : serialize(data),
+			success : function(result) {
+				var data = result.content["0"].value;
+				lineJson = JSON.stringify(data[0]);
+                updateJson = eval('(' + lineJson + ')'); //Json
+                //获得key
+                var updateKey=new Array();
+                for (var o in updateJson){
+                        updateKey.push(o);
+                };
+                $('#'+gdid_ssacc).find('.add_input').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid_ssacc).find('.add_inputdis').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid_ssacc).find('.add_texa').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid_ssacc).find('.add_check').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$("#"+id).attr("checked", true);
+                        	}else{
+                        		$("#"+id).attr("checked", false);
+                        	}
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid_ssacc).find('.add_select').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+		}
+		}); 
+}
+</script>
+<DIV ID="form_jq_ssec_account" STYLE="overflow:auto;position:relative;left:0px;top:0px;" CLASS="jqForm" TITLE="信息维护">
+	<div id="jq_ssec_account_addinfoarea">
+		<table id='jq_ssec_account_addinfoarea' class='ui-form-table'  border='0' style='width: 100%;'>
+			<tr>
+				<td class="add_lfspan"><label>社保账户名称<em class='add_fwid_rd'>*</em></label><td class="add_rtspan"><input class="add_input" type="text" value="" id="accuName" isck="1" titl="社保账户名称"></td>
+				<td class="add_lfspan"><label>地区名称<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan">
+					<input class="add_input" id="accuCity" type="hidden" isck="1" titl="地区名称">
+					<input class="add_inputdis" id="accuCityDis" type="text" name="" readonly="readonly"><span id="accuCity_sel" class="add_fwid">...</span>
+					</td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>社保登记号<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="accuCode" isck="1" titl="社保登记号"></td>
+				<td class="add_lfspan"><label>缴费专用卡<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="accuCard" isck="1" titl="缴费专用卡"></td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>UK编号<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="accuUkcode" isck="1" titl="UK编号"></td>
+				<td class="add_lfspan"><label>UK密码<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="accuPassword" isck="1" titl="UK密码"></td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>备注</label></td>
+				<td class="add_rtspan_texa" colspan="3"><textarea class="add_texa" id="accuNote"></textarea></td>
+				<td></td><td></td>
+			</tr>
+		</table>
+	</div>
+</DIV>
+ 

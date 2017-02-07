@@ -1,0 +1,406 @@
+<script type="text/javascript">
+	$(function() {
+		var ss = {
+			_mt : "contacts.selectByCompanyId",
+			compid : $("#companyidid").val()
+		};
+		getData(ss);
+		function getData(requestData) {
+
+			jQuery("#tab_contacts").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ '编号', '公司ID', '联系人姓名', '职位', '电话', '电子邮件',
+								'地区名称', '地址', '上级领导' ],
+						colModel : [ {
+							name : 'id',
+							index : 'id',
+							width : 50,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'companyName',
+							index : 'companyName',
+							width : 100,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'contName',
+							index : 'contName',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'contPosition',
+							index : 'contPosition',
+							width : 60,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'contIphone',
+							index : 'contIphone',
+							width : 85,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'contEmail',
+							index : 'contEmail',
+							width : 160,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'contDistrictName',
+							index : 'contDistrictName',
+							width : 65,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'contAddr',
+							index : 'contAddr',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'contSuperior',
+							index : 'contSuperior',
+							width : 60,
+							align : "left",
+							sorttype : "text"
+						} ],
+
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							if(com_error(xhr)){
+								return true;
+							}else{
+								alertMsg(xhr,"company_code_desc");
+								return false;
+							}
+							//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+						},
+						jsonReader : {
+							/*content中的响应*/
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 20,
+						rowList : [ 20, 50, 100 ],
+						pager : '#pager1_contacts',
+						height : 468,
+						width : 796,
+						shrinkToFit : false,
+						forceFit : true,
+						sortorder : "desc",
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+
+					});
+			jQuery("#tab_contacts").jqGrid('navGrid', '#pager1_contacts', {
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			});
+
+		}
+
+		/*--------加载表格 end------*/
+		/*----------新增 保存-----------*/
+		//新增点击事件
+		$("#add_contacts").click(function() {
+			contactsDialog("新增联系人信息", "add");
+		})
+
+		function contactsDialog(pagetitle, meth) {
+
+			var type = "contacts";
+			var url = "../company/business/addContactsbus.html";
+			var s = $("<DIV ID=\"add_menu_" + type + "\"></DIV>");
+			$(s).load(url + "?tsid=" + new Date().getTime(), function() {
+
+				if (meth == "add") {
+					$("#companyId").val($("#companyidid").val())
+				}
+
+			}).dialog(
+					{
+
+						autoOpen : true,
+						closeOnEscape : true,
+						bgiframe : true,
+						title : pagetitle,
+						height : 500,
+						width : 900,
+						resizable : false,
+						modal : true,
+						buttons : {
+							"保存" : function() {
+								
+								if(!validataContacts()){
+									return;
+								}
+								
+								//获取参数
+								requestData = serach("contacts.addorupdate",
+										"addContacts");
+								delete requestData.contDistrictName;
+								//调用方法
+								addOrupdateContacts(requestData, "UserLogin",
+										meth);
+							},
+							"取消" : function() {
+
+								$(this).dialog("close");
+							}
+						},
+						close : function(event, ui) {
+							$(this).remove();
+						}
+					})
+		}
+
+		/*---------新增保存 end --------*/
+		/*---------修改 ---------*/
+		//1.点击修改按钮加载选中的行的数据到修改页面
+		//点击修改第一层
+		$("#upd_contacts").click(function() {
+			var ids = $('#tab_contacts').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else if (ids.length > 1) {
+				comAlert("一次只能修改一条数据");
+				return;
+			}
+			//加载修改页面
+			contactsDialog("修改联系人信息", "upd");
+
+			//加载用户信息
+			var updateInfo = {
+				_mt : "contacts.selectById",
+				id : ids
+			};
+			getUpdateContacts(updateInfo, "UserLogin");
+
+		})
+
+		//获取要修改的用户的信息
+		function getUpdateContacts(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "POST",
+				url : pubsources.pub_getlink,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					if(com_error(result)){
+					//给修改页面的input框赋值
+					data = result.content["0"];
+					setData(data, "addContacts");
+					}else{
+						alertMsg(result,"company_code_desc");
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+				}
+			});
+		}
+		/*---------修改保存 end---------*/
+
+		/*----------删除--------*/
+		/*----------删除--------*/
+		$("#del_contacts").click(function() {
+			var ids = $('#tab_contacts').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "contacts.deleteBatchById",
+						ids : ids
+					};
+					deleteContacts(del, "UserLogin");
+				}
+			}
+		})
+
+		function deleteContacts(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							if(com_error(result)){
+							//TODO　判断删除是否成功
+							console.log(result);
+							jQuery("#tab_contacts").trigger("reloadGrid");
+							}else{
+								alertMsg(result,"company_code_desc");
+								return false;
+							}
+						},
+						error : function() {
+							comAlert(pubprompt.network_error);
+						}
+					});
+		}
+
+		/*-----------删除 end----------*/
+
+	})
+	
+	
+	
+	function validataContacts(){
+		var flag=true;
+		var contName = $.trim($("#contName").val());
+		var contPosition = $.trim($("#contPosition").val());
+		var contIphone = $.trim($("#contIphone").val());
+		var contEmail = $.trim($("#contEmail").val());
+		var contDistrict = $.trim($("#contDistrict").val());
+		var contAddr = $.trim($("#contAddr").val());
+		var contSuperior = $.trim($("#contSuperior").val());
+		
+		if(contName == ""){
+			comAlert("请输入联系人名称");
+			flag = false;
+			return;
+		}
+		
+		
+		/* if(contPosition == ""){
+			comAlert("请输入职位名称");
+			flag = false;
+			return
+		} */
+		
+		if(contIphone == ""){
+			comAlert("请输入电话号码");
+			flag = false;
+			return
+		}
+		
+		
+		   var re = /^1\d{10}$/ //手机号码以1开头的十一位数字
+		   if (!re.test(contIphone)) {
+			   comAlert("请输入正确的手机号码");
+				flag = false;
+				return
+		   }
+	
+
+		
+		/* if(contEmail == ""){
+			comAlert("请输入电子邮件");
+			flag = false;
+			return
+		}
+		 */
+		
+		/*邮箱地址分成“第一部分@第二部分”这样
+                   第一部分：由字母、数字、下划线、短线“-”、点号“.”组成，
+                   第二部分：为一个域名，域名由字母、数字、短线“-”、域名后缀组成，
+                  而域名后缀一般为.xxx或.xxx.xx，一区的域名后缀一般为2-4位，如cn,com,net，现在域名有的也会大于4位  */
+                  if(contEmail != ""){                  
+		var email = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/ //验证邮箱
+		    if(!email.test(contEmail)){
+		    	comAlert("请输入正确的邮箱格式");
+				flag = false;
+				return
+		    }
+                  }
+		
+		
+		
+		if(contDistrict == ""){
+			comAlert("请选择地区");
+			flag = false;
+			return
+		}
+		
+		/* if(contAddr == ""){
+			comAlert("请输入详细地址");
+			flag = false;
+			return
+		} */
+		
+		/* if(contSuperior == ""){
+			comAlert("请输入上级领导");
+			flag = false;
+			return
+		}
+		 */
+		return flag;
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+</script>
+
+<link rel="stylesheet" href="../css/table.css">
+
+<div class="topbutton">
+	<span> <input type="button" id="add_contacts"
+		value="&nbsp;新增&nbsp;"><input type="button"
+		id="upd_contacts" value="&nbsp;修改&nbsp;"><input
+		type="button" id="del_contacts" value="&nbsp;删除&nbsp;">
+	</span>
+</div>
+
+
+<div class="rPane_dt" style="padding-left: 0px;">
+	<table id="tab_contacts"></table>
+	<div id="pager1_contacts"></div>
+</div>
+
+
+
+

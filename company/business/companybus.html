@@ -1,0 +1,439 @@
+<script type="text/javascript" src="../js/errordefine/company.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$("#tg_companybus_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_companybus_funcode").val($("#tg_cur_funcode_temp").val());
+		var oH = $("#rPane").height() - 200;
+		var oW = $("#rPane").width() - 40
+
+		var ss = {
+			_mt : "company.selectByColuPage",
+			compType : "06insu"
+
+		};
+		getData(ss);
+		function getData(requestData) {
+
+			jQuery("#tab_companybus").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ '编号', '公司名称', '公司类型', '地区名称', '详细地址',
+								'创建日期', '终止日期', '管理员', '公司状态' ],
+						colModel : [ {
+							name : 'id',
+							index : 'id',
+							width : 150,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'compName',
+							index : 'compName',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compTypeDesc',
+							index : 'compTypeDesc',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compDistrictName',
+							index : 'compDistrictName',
+							width : 70,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compAddr',
+							index : 'compAddr',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compStarttime',
+							index : 'compStarttime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compEndtime',
+							index : 'compEndtime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compControllerName',
+							index : 'compControllerName',
+							width : 90,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'compStateDesc',
+							index : 'compStateDesc',
+							width : 60,
+							align : "left",
+							sorttype : "text"
+						} ],
+
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							if (com_error(xhr)) {
+								return true;
+							} else {
+								alertMsg(xhr, "company_code_desc");
+								return false;
+							}
+							//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+						},
+						jsonReader : {
+							/*content中的响应*/
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 20,
+						rowList : [ 20, 50, 100 ],
+						pager : '#pager1_companybus',
+						height : oH,
+						width : oW,
+						shrinkToFit : false,
+						forceFit : true,
+						sortname : 'id',
+						sortorder : "desc",
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+
+					});
+
+			jQuery("#tab_companybus").jqGrid('navGrid', '#pager1_companybus', {
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			});
+
+		}
+
+		$("#add_companybus").click(function() {
+			companyDialog("新增商保机构信息");
+			getSelectDataTypeList({
+				"compState" : "pubstatus"
+			});
+		})
+
+		function companyDialog(pagetitle) {
+			var s = $("<DIV ID=\"add_upd_company\"></DIV>");
+
+			var ids = $('#tab_companybus').jqGrid('getGridParam', 'selarrrow');
+
+			//加载新增页面
+			$(s).load(
+					"../company/business/companybasebus.html?tsid="
+							+ new Date().getTime(), function() {
+						if (pagetitle == "修改商保机构信息") {
+							$("#companyidid").val(ids);
+							$("#businesscompanyId").val($("#tg_cur_company").val());
+						}else{
+							$("#companyId").val($("#tg_cur_company").val());
+						}
+
+					}).dialog({
+				autoOpen : true,
+				closeOnEscape : true,
+				bgiframe : true,
+				title : pagetitle,
+				height : 600,
+				width : 1000,
+				resizable : false,
+				modal : true,
+				close : function(event, ui) {
+					$(this).remove();
+				}
+			})
+
+		}
+
+		//点击修改第一层
+		$("#upd_companybus").click(function() {
+			var ids = $('#tab_companybus').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else if (ids.length > 1) {
+				comAlert("一次只能修改一条数据");
+				return;
+			}
+
+			companyDialog("修改商保机构信息");
+
+			getSelectDataTypeList({
+				"compState" : "pubstatus"
+			});
+
+			//加载用户信息
+			var updateInfo = {
+				_mt : "company.selectById",
+				id : ids
+			};
+			getUpdateCompany(updateInfo, "UserLogin");
+
+		})
+
+		//获取要修改的用户的信息
+		function getUpdateCompany(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "POST",
+				url : pubsources.pub_getlink,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					if (com_error(result)) {
+						//给修改页面的input框赋值
+						data = result.content["0"];
+						setData(data, "addCompany");
+						$("#companyId").val($("#tg_cur_company").val());
+					} else {
+						alertMsg(result, "company_code_desc");
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+				}
+			});
+		}
+		/*---------修改保存 end---------*/
+
+		$("#del_companybus").click(function() {
+			var ids = $('#tab_companybus').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "company.deleteBatchById",
+						ids : ids
+					};
+					deleteCompany(del, "UserLogin");
+				}
+			}
+		})
+
+		function deleteCompany(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							console.log(result);
+							if (com_error(result)) {
+								comAlert(pubprompt.del_succ);
+								jQuery("#tab_companybus").trigger("reloadGrid");
+							} else {
+								comAlert(pubprompt.del_failure);
+								alertMsg(result, "company_code_desc");
+							}
+
+						},
+						error : function() {
+							comAlert(pubprompt.network_error);
+						}
+					});
+		}
+
+	})
+
+	//主页面的查询
+	$("#companybuss_search_btn").bind('click', function() {
+		//TODO 查询
+		requestData = {
+			_mt : "company.selectByColuPage",
+			compName : $("#companybus_search").val()
+		};
+		$("#tab_companybus").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	});
+
+	function queryCompanybus(state) {
+		requestData = {
+			_mt : "company.selectByColuPage",
+			compState : state
+		};
+		$("#tab_companybus").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	}
+
+	/*修改状态 */
+	function updateStateCompanyBus(state) {
+		var ids = $('#tab_companybus').jqGrid('getGridParam', 'selarrrow');
+		if (ids.length == 0) {
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		} else {
+			var type = ""
+			if (state == "02valid") {
+				type = "生效"
+			} else if (state == "03invalid") {
+				type = "失效/终止"
+			} else if (state == "01draft") {
+				type = "退回"
+			}
+			if (confirm("您确定要" + type + "所选中的数据？")) {
+				var updatestate = {
+					_mt : "company.updateStateBatchById",
+					ids : ids,
+					state : state
+				};
+				updatestates(updatestate, "UserLogin", type);
+			}
+		}
+	}
+
+	function updatestates(requestData, level, type) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//TODO　判断修改状态是否成功
+				console.log(result);
+				if (com_error(result)) {
+					comAlert(type + "成功");
+					jQuery("#tab_companybus").trigger("reloadGrid");
+				} else {
+					comAlert(type + "失败");
+					alertMsg(result, "company_code_desc");
+				}
+
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+</script>
+<style>
+input[type=radio] {
+	width: 15px;
+	height: 15px;
+}
+/* 按钮样式 */
+.buttonz {
+	height:20px;
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+}
+
+.buttonz:hover {
+	background: #0089db;
+	color: #fff;
+}
+</style>
+
+<div id="rPane_d" class="jq_top_div">
+	<div class="ctleft" id=""></div>
+	<div class="ctright">
+
+		<div class="rPane_d_menu">
+			<span> <input type="button" id="add_companybus"
+				value="&nbsp;新增&nbsp;"><input type="button"
+				id="upd_companybus" value="&nbsp;修改&nbsp;"><input
+				type="button" id="del_companybus" value="&nbsp;删除&nbsp;"><input
+				type="button" id="effect_company"
+				onclick="javascript:updateStateCompanyBus('02valid')"
+				value="&nbsp;生效&nbsp;"><input type="button"
+				onclick="javascript:updateStateCompanyBus('03invalid')"
+				id="invalid_company" value="&nbsp;失效&nbsp; "><input
+				type="button" id="back_company" value="&nbsp;退回&nbsp;"
+				onclick="javascript:updateStateCompanyBus('01draft')">
+			</span>
+		</div>
+
+
+
+		<div class="rpane_status">
+			<label><input type="radio" id="editing" name="status" value="01draft" onclick="javascript:queryCompanybus('01draft')" /> 编辑中</label>
+		    <label><input type="radio" id="enabled" name="status" value="02valid" onclick="javascript:queryCompanybus('02valid')" /> 生效</label>
+			<label><input type="radio" id="diabled" name="status" value="03invalid" onclick="javascript:queryCompanybus('03invalid')" /> 失效/终止</label>
+			<label><input type="radio" id="allstatus" name="status" value="" checked="checked" onclick="javascript:queryCompanybus('')" /> 全部</label><br>
+		</div>
+
+
+
+
+
+
+
+
+		<div class=rpane_search>
+			<input type="text" id="companybus_search" name="companybus_search"
+				placeholder="请输入公司名称">
+			<button id="companybuss_search_btn" class="buttonz">查询</button>
+		</div>
+		<div class=rPane_dt>
+			<table id="tab_companybus"></table>
+			<div id="pager1_companybus"></div>
+		</div>
+	</div>
+</div>
+<!-- 12 -->
+<input type="hidden" id="tg_companybus_funid" value="">
+<input type="hidden" id="tg_companybus_funcode" value="">

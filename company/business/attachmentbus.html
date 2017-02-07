@@ -1,0 +1,316 @@
+<script type="text/javascript">
+	$(function() {
+		var ss = {
+			_mt : "attachment.selectByCompanyId",
+			compid : $("#companyidid").val()
+		};
+		getData(ss);
+		function getData(requestData) {
+
+			jQuery("#tab_attachment").jqGrid({
+				url : pubsources.pub_getlink,
+				datatype : "json",
+				mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+				postData : requestData,
+				mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+				prmNames : {
+					page : "page",
+					rows : "rows",
+					sort : null,
+					order : null,
+					search : null,
+					nd : null,
+					npage : null
+				},//去除多余的参数
+				colNames : [ '编号', '公司ID', '证件编码', '证件名称', '附件标记' ],
+				colModel : [ {
+					name : 'id',
+					index : 'id',
+					width : 50,
+					align : "left",
+					sorttype : "text",
+					hidden : true
+				}, {
+					name : 'companyId',
+					index : 'companyId',
+					width : 100,
+					align : "left",
+					sorttype : "text",
+					hidden : true
+				}, {
+					name : 'attCoding',
+					index : 'attCoding',
+					width : 100,
+					align : "left",
+					sorttype : "text"
+				}, {
+					name : 'attName',
+					index : 'attName',
+					width : 100,
+					align : "left",
+					sorttype : "text"
+				}, {
+					name : 'attSignDesc',
+					index : 'attSignDesc',
+					width : 100,
+					align : "left",
+					sorttype : "text"
+				} ],
+
+				loadComplete : function(xhr) {
+					console.log(xhr);
+					if(com_error(xhr)){
+						return true;
+					}else{
+						alertMsg(xhr,"company_code_desc");
+						return false;
+					}
+					//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+				},
+				jsonReader : {
+					/*content中的响应*/
+					root : "rows",//表格中的数据
+					page : "page",//当前页码
+					total : "total",//总页数
+					records : "records"//总行数
+				},
+				rowNum : 20,
+				rowList : [ 20, 50, 100 ],
+				pager : '#pager1_attachment',
+				height : 468,
+				width : 796,
+				shrinkToFit : false,
+				forceFit : true,
+				sortorder : "desc",
+				viewrecords : true,
+				multiselect : true,
+				rownumbers : true,
+
+			});
+			jQuery("#tab_attachment").jqGrid('navGrid', '#pager1_attachment', {
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			});
+
+		}
+
+		/*--------加载表格 end------*/
+		/*----------新增 保存-----------*/
+		//新增点击事件
+		$("#add_attachment").click(function() {
+
+			attachmentDialog("新增附件信息", "add");
+		})
+
+		function attachmentDialog(pagetitle, meth) {
+
+			var type = "attachment";
+			var url = "../company/business/addAttachmentbus.html";
+			var s = $("<DIV ID=\"add_menu_" + type + "\"></DIV>");
+			$(s).load(url + "?tsid=" + new Date().getTime(), function() {
+
+				if (meth == "add") {
+					$("#companyId").val($("#companyidid").val())
+				}
+
+			}).dialog(
+					{
+
+						autoOpen : true,
+						closeOnEscape : true,
+						bgiframe : true,
+						title : pagetitle,
+						height : 500,
+						width : 900,
+						resizable : false,
+						modal : true,
+						buttons : {
+							
+							"保存" : function() {
+								
+								if(!validataAtt()){
+									return;
+								}
+
+								//获取参数
+								requestData = serach("attachment.addorupdate",
+										"addAttachment");
+								//调用方法
+								addOrupdate(requestData, "UserLogin", meth);
+							},
+							"取消" : function() {
+
+								$(this).dialog("close");
+							}
+						},
+						close : function(event, ui) {
+							$(this).remove();
+						}
+					})
+		}
+
+		/*---------新增保存 end --------*/
+		/*---------修改 ---------*/
+		//1.点击修改按钮加载选中的行的数据到修改页面
+		//点击修改第一层
+		$("#upd_attachment").click(function() {
+			var ids = $('#tab_attachment').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else if (ids.length > 1) {
+				comAlert("一次只能修改一条数据");
+				return;
+			}
+			//加载修改页面
+			attachmentDialog("修改附件信息", "upd");
+
+			//加载用户信息
+			var updateInfo = {
+				_mt : "attachment.selectById",
+				id : ids
+			};
+			getUpdateAttachment(updateInfo, "UserLogin");
+
+		})
+
+		//获取要修改的用户的信息
+		function getUpdateAttachment(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "POST",
+				url : pubsources.pub_getlink,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					if(com_error(result)){
+					//给修改页面的input框赋值
+					data = result.content["0"];
+					setData(data, "addAttachment");
+					}else{
+						alertMsg(result,"company_code_desc");
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+				}
+			});
+		}
+		/*---------修改保存 end---------*/
+
+		/*----------删除--------*/
+		/*----------删除--------*/
+		$("#del_attachment").click(function() {
+			var ids = $('#tab_attachment').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "attachment.deleteBatchById",
+						ids : ids
+					};
+					deleteAttachment(del, "UserLogin");
+				}
+			}
+		})
+
+		function deleteAttachment(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							if(com_error(result)){
+							//TODO　判断删除是否成功
+							console.log(result);
+							jQuery("#tab_attachment").trigger("reloadGrid");
+							}else{
+								alertMsg(result,"company_code_desc");
+							}
+						},
+						error : function() {
+							comAlert(pubprompt.network_error);
+						}
+					});
+		}
+
+		/*-----------删除 end----------*/
+
+	})
+	
+	
+	function validataAtt(){
+		var flag=true;
+		var attCoding = $.trim($("#attCoding").val());
+		var attName = $.trim($("#attName").val());
+		
+		if(attCoding == ""){
+			comAlert("请输入证件编码");
+			flag = false;
+			return;
+		}
+		
+		
+		if(attName == ""){
+			comAlert("请输入证件名称");
+			flag = false;
+			return
+		}
+
+		return flag;
+	
+	}
+	
+	
+	
+	
+	
+	
+</script>
+
+
+<link rel="stylesheet" href="../css/table.css">
+
+<div class="topbutton">
+	<span> <input type="button" id="add_attachment"
+		value="&nbsp;新增&nbsp;"><input type="button"
+		id="upd_attachment" value="&nbsp;修改&nbsp;"><input
+		type="button" id="del_attachment" value="&nbsp;删除&nbsp;">
+	</span>
+</div>
+
+
+
+<div class="rPane_dt" style="padding-left: 0px;">
+	<table id="tab_attachment"></table>
+	<div id="pager1_attachment"></div>
+</div>
+
+
+

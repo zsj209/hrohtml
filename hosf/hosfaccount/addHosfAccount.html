@@ -1,0 +1,219 @@
+<script type="text/javascript">
+	$("companyId").val(companyId);
+	$("#company_Name").click(function() {
+		var selpara = {
+			seltype : "selcompany",
+			seltitle : "所属公司",
+			rtnvalobj : "companyId",
+			rtndisobj : "companyName",
+			discol : 0
+		};
+		comsel(selpara);
+	})
+
+	$("#accountPro_Name").click(function() {
+		var selpara = {
+			seltype : "selcity",
+			seltitle : "选择城市",
+			rtnvalobj : "accountPro",
+			rtndisobj : "accountProName",
+			discol : 1,
+			flparams : "",
+			flparamvs : "",
+			vlck : "taxaccTmtid"
+		};
+		comsel(selpara);
+	})
+
+	$("#companyName").dblclick(function() {
+		if (confirm("确定要清除公司名称吗")) {
+			$("#companyName").val("");
+			$("#companyId").val("");
+		}
+	});
+
+	$("#accountProName").dblclick(function() {
+		if (confirm("确定要清除地区名称吗")) {
+			$("#accountProName").val("");
+			$("#accountPro").val("");
+		}
+	});
+
+	/* 新增或修改 */
+	function addOrupdate(requestData, level, meth) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encryptNew(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+
+				if (com_error(result)) {
+					//TODO 根据条件刷新
+					if (meth == "add") {
+						comAlert(pubprompt.ins_succ);
+					} else {
+						comAlert(pubprompt.upd_succ);
+					}
+
+					//关闭dialog
+					$("#upd_menu_account").dialog("close");
+					//刷新grid
+					jQuery("#tab_hosfaccount").trigger("reloadGrid");
+				} else {
+					if (meth == "add") {
+						comAlert(pubprompt.ins_failure);
+						alertMsg(result, "hosf_code_desc");
+					} else {
+						comAlert(pubprompt.upd_failure);
+						alertMsg(result, "hosf_code_desc");
+					}
+
+				}
+
+			},
+			error : function() {
+				comAlert(pubsources.network_error);
+			}
+		});
+	}
+</script>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addHosfAccount" class="ui-form-table" cellpadding="5"
+		border='0' style="width: 100%;">
+		<tr>
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>账号名称:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 35%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountName" name="accountName" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>地区名称:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 35%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountProName" name="accountProName" type="text"
+					class="ui-form-value" layout="1" maxlength="50" readonly=""></span>
+				<span id="accountPro_Name" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+				<span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+
+		</tr>
+		<tr>
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>登记号:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 35%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountRegister" name="accountRegister" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>补充登记号:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 35%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountAddregister" name="accountAddregister" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+
+
+
+		<tr>
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>Uk编号:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 35%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountUknum" name="accountUknum" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>Uk密码:</label>
+				<span class="ui-form-bspcs">*</span></td>
+
+			<td
+				style="width: 35%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountUkpass" name="accountUkpass" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+
+		<tr>
+
+
+
+
+
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>所属公司:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td
+				style="width: 35%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="companyName" name="companyName" type="text"
+					class="ui-form-value" layout="1" maxlength="50" readonly=""></span>
+				<span id="company_Name" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+				<span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+
+
+
+		</tr>
+
+
+
+
+		<tr>
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="accountNote"><label>备注:</label></td>
+			<td colspan="3"
+				style="width: 85%; background: #FFFFFF; padding-top: 3px; vertical-align: middle;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<textarea style="height: 60px; width: 606px;" id="accountNote"
+						name="accountNote" ismust="0" class="ui-form-value"></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+		<input type="hidden" id='id' />
+		<input type="hidden" id='companyId' />
+		<input type="hidden" id='accountPro' />
+	</table>
+</div>

@@ -1,0 +1,239 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script>
+var serversname=pubsources.pub_getlink;//网关接口
+var addgdid_pocins="form_jq_ssec_pocins";//新增 修改 显示数据的div
+var updinterface_pocins="socialSsecInsurance.selectDataByIds";//修改时根据id获取数据的接口
+$(function(){ 
+	var gdid_pocins="jq_ssec_pocins";//显示数据的div
+	var updinterface_pocins="socialSsecInsurance.selectDataByIds";//修改时根据id获取数据的接口
+	var upinfointerface_pocins="socialSsecInsurance.updateData";//修改数据的接口
+	var ininfointerface_pocins="socialSsecInsurance.insertData";//新增数据的接口
+	var dlinfointerface_pocins="socialSsecInsurance.batchDeleteByid";//批量删除接口
+	var bn_div_pocins="bn_ssec_pocins";//按钮div的id
+	var None="UserLogin";//安全等级
+	var bnsuffix_pocins="_ssec_pocins";//按钮后缀
+	var pageid_pocins="#page_ssec_pocins";//分页div
+	
+	$("#insceBdate").datepicker();
+	$("#insceEdate").datepicker();
+	
+	var pkid_poins=$("#ssec_poins_adduppk").val();//根据此键判断新增or修改
+	var pidvl=$("#jq_lf_policy_pid").val();
+	$("#inscePid").val(pidvl+"");//存放外键id
+	var pk= $("#inscePid").val();
+	var selids=[],selcode=[];
+	$('#'+addgdid_pocins).find('.add_select').each(function(){
+        var obj = $(this);
+        var id =obj.attr('id'); 
+        var name =obj.attr('name'); 
+        selids.push(id);
+        selcode.push(name);
+    });
+	$("#insceCprop").bind("input propertychange",function(){
+		$("#insceCpayprop").val($(this).val());
+	});
+	$("#inscePprop").bind("input propertychange",function(){
+		$("#inscePpayprop").val($(this).val());
+	});
+	if((selids==null || selids=="") && pkid_poins=="0"){
+		return;
+	}else if((selids==null || selids=="") && pkid_poins!="0"){
+		updatePosrSetval_poins(pkid_poins);
+		return;
+	}else{
+		var secodejs=JSON.stringify(selcode);
+		var clnrequestData = {_mt:getSeltOption,paramtypelist:secodejs};
+		var payload = {
+			    data: clnrequestData,
+			    level: "None",
+			};
+			data = encrypt(payload.level, payload.data);
+			$.ajax({
+				type : "GET",
+				url : serversname,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials:true
+				},
+				data : serialize(data),
+				success : function(result) {
+					var data = result.content["0"].value;
+					
+					//var selJson= eval('('+  data+ ')');
+					
+					if(data!=undefined)
+					{
+						for (var i = 0; i < selids.length; i++) {
+							var vname=$("#"+selids[i]).attr("name");
+							//清空select
+							$("#"+selids[i]).empty();
+							$("#"+selids[i]).append("<option value='0'>--请选择--</option>");//为Select追加一个Option(下拉项)
+							for(var j=0;j<data.length;j++){
+								for (var k = 0; k < data[j].paramList.length; k++) {
+									if(vname==data[j].typeCode){
+										 $("#"+selids[i]).append("<option value='"+data[j].paramList[k].code+"'>"+data[j].paramList[k].desc+"</option>");
+									}
+								}
+							}
+						}
+					}
+					if(pkid_poins!="0"){
+						updatePosrSetval_poins(pkid_poins);
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+			}
+			});
+	}
+});
+function updatePosrSetval_poins(pkid_poins){
+	var clnrequestData = {_mt:updinterface_pocins,selIds:pkid_poins};
+	var payload = {
+		    data: clnrequestData,
+		    level: level,
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "GET",
+			url : serversname,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials:true
+			},
+			data : serialize(data),
+			success : function(result) {
+				var data = result.content["0"].value;
+				lineJson = JSON.stringify(data[0]);
+                updateJson = eval('(' + lineJson + ')'); //Json
+                //获得key
+                var updateKey=new Array();
+                for (var o in updateJson){
+                        updateKey.push(o);
+                };
+                $('#'+addgdid_pocins).find('.add_input').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+addgdid_pocins).find('.add_inputdis').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+addgdid_pocins).find('.add_texa').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+addgdid_pocins).find('.add_check').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$("#"+id).attr("checked", true);
+                        	}else{
+                        		$("#"+id).attr("checked", false);
+                        	}
+                            return;
+                        }
+                     }
+                });
+                $('#'+addgdid_pocins).find('.add_select').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+		}
+		}); 
+}
+</script>
+<style> 
+</style>
+ 
+	<DIV ID="form_jq_ssec_pocins" STYLE="overflow:auto;position:relative;left:0px;top:0px;" CLASS="jqForm" TITLE="新增信息">
+		<div id="jq_ssec_pocins_addinfoarea">
+			<table id='jq_ssec_pocins_addinfoarea' class='ui-form-table'  border='0' style='width: 100%;'>
+				<tr>
+					<td class="add_lfspan"><label>险种名称<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceName" isck="1" titl="险种名称" isck="1"></td>
+					<td class="add_lfspan"><label>险种归属<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><select class="add_select" id="insceIns" name="scbinstype" isck="1" titl="险种归属"><option value="0">请选择</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>起始时间<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceBdate" isck="1,3" titl="起始时间" isck="1"></td>
+					<td class="add_lfspan"><label>终止时间<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceEdate" isck="1,3" titl="终止时间" ckvl="insceBdate" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>社保最高基数<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceHbase" isck="1" titl="社保最高基数" isck="1"></td>
+					<td class="add_lfspan"><label>社保最低基数<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceLbase" isck="1" titl="社保最低基数" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>企缴比例<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceCprop" isck="1" titl="企缴比例" isck="1"></td>
+					<td class="add_lfspan"><label>企缴小数位规则<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><select class="add_select" id="insceCrule" name="decimalRule" isck="1" titl="企缴小数位规则"><option value="0">请选择</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>个缴比例<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="inscePprop" isck="1" titl="个缴比例" isck="1"></td>
+					<td class="add_lfspan"><label>个缴小数位规则<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><select class="add_select" id="inscePrule" name="decimalRule" isck="1" titl="个缴小数位规则"><option value="0">请选择</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>企业附加金额<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceCamount" isck="1" titl="企业附加金额" isck="1"></td>
+					<td class="add_lfspan"><label>个人附加金额<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="inscePamount" isck="1" titl="个人附加金额" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>是否补缴</label></td><td class="add_rtspan"><input class="add_check ui-form-checkbox" type="checkbox" value="" id="insceIst" titl="是否补缴"></td>
+					<td class="add_lfspan"><label>支付频率<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><select class="add_select" id="insceFrequency" name="szfrequency" isck="1" titl="支付频率"><option value="0">请选择</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>企业支付比例<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceCpayprop" isck="1" titl="企业支付比例" isck="1"></td>
+					<td class="add_lfspan"><label>个人支付比例<em class='add_fwid_rd'>*</em></label></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="inscePpayprop" isck="1" titl="个人支付比例" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>备注</label></td>
+					<td class="add_rtspan_texa" colspan="3"><textarea class="add_texa" id="insceNote"></textarea></td>
+					<td><input class="add_input" type="hidden" value="" id="inscePid" isck="1" titl="政策id" isck="1"></td><td></td>
+				</tr>
+			</table>  
+		</div>
+	</DIV>
+ 

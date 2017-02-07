@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>仁云天弓平台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../css/images/favicon.ico"
+	mce_href="../css/images/favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="../css/images/favicon.ico"
+	mce_href="../css/images/favicon.ico" type="image/x-icon" />
+<!-- jq UI 样式表 -->
+<link rel="stylesheet" href="../css/jquery-ui-1.8.24.css">
+<link rel="stylesheet" href="../css/ui.jqgrid4.6.0.css">
+<link rel="stylesheet" href="../css/hrocloud.css">
+
+<!-- jquery插件包-必要 -->
+<!-- 这个是所有jquery插件的基础，首先第一个引入 -->
+<script type="text/javascript" src="../js/jquery1.7.2.js"></script>
+<!-- jq UI.js -->
+<script type="text/javascript" src="../js/jquery-ui-1.8.24.js"></script>
+<script type="text/javascript" src="../js/jquery.layout-1.4.3.js"></script>
+<!-- jqGrid插件包-必要 -->
+<script type="text/javascript" src="../js/jquery.jqGrid.src.js"></script>
+<!-- jqGrid插件的多语言包-非必要 -->
+<!-- 在jqgrid/js/i18n下还有其他的多语言包，可以尝试更换看效果 -->
+<script type="text/javascript" src="../js/grid.locale-cn.js"></script>
+<!-- 本页面初始化用到的js包，创建jqGrid的代码就在里面 -->
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/md5.js"></script>
+<script type="text/javascript" src="../js/hrocloud.js"></script>
+<script type="text/javascript" src="../js/pub_source.js"></script>
+<script type="text/javascript" src="../js/com_base.js"></script>
+<script type="text/javascript" src="../js/com_validate.js"></script>
+<script type="text/javascript" src="../js/com_fun.js"></script>
+<!-- 系统通用错误码定义 -->
+<script type="text/javascript" src="../js/errordefine/com_error.js"></script>
+<script type="text/javascript" src="../js/errordefine/usermgmt.js"></script>
+<script type="text/javascript" src="../js/errordefine/common.js"></script>
+</head>
+<body>
+	<!--头部 start-->
+	<div id="head" class="ui-layout-north">
+			<span id="headleft">HROCloud</span>
+		<ul id="headright">
+			<li id="headrightone"><a id="user_info" href="javascript:;" title="当前用户">
+					<img src="../css/images/13.png" alt="" />
+					<span id="userName"></span>
+				</a></li>
+			<li id="litg_switch_roletype">
+				<a title="切换角色"><img src="../css/images/22.png" style="float:left;margin-right:8px;" alt=""/></a>
+				<!--  
+				<span style="float:left;" id="">testfasdfadsfasdfasdf</span><img style="float:left; margin-right:2px; margin-top:20px;" src="../css/images/23.png" alt=""/>
+				-->
+				<span style="float:left;">
+					<select id="tg_switch_roletype" style="font-size:16px;width:100px;color:#fff;background-color:#0089dd;border:0px solid #fff;"></select>
+				</span></li>
+			<li id="headrightthree"><a href="javascript:;" title="退出">
+				<img src="../css/images/15.png" alt="" />
+				</a></li>
+		</ul>
+	</div>
+	<!--头部 end-->
+	<!--中间左边部分 start-->
+	<div id="lPaneA" class="ui-layout-west">
+		<div id="set_leftpane"></div>
+		<div id="lPane" class="lPane">
+			<!-- <a id="test_user">testuser</a> -->
+		</div>
+		<div id="lPane_1" class="lPane_1">
+			<ul>
+				<li><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/01.png" alt=""></a></li>
+				<li><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/02.png" alt=""></a></li>
+				<li><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/03.png" alt=""></a></li>
+				<li><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/04.png" alt=""></a></li>
+				<li><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/05.png" alt=""></a></li>
+				<li><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/06.png" alt=""></a></li>
+				<li><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/07.png" alt=""></a></li>
+				<li><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/08.png" alt=""></a></li>
+				<li id="last"><a href="javascript:;" title="客户服务管理"><img
+						src="../css/images/09.png" alt=""></a></li>
+			</ul>
+		</div>
+	</div>
+	<!--中间左边部分 end-->
+	<!--中间右边部分 start-->
+	<div id="rPane"
+		class="ui-layout-center ui-helper-reset ui-widget-content ui-layout-pane ui-layout-pane-center open">
+		<div id="tabs" style="position: absolute; z-index: 1; width: 100%">
+			<ul id="tag">
+				<li id="rPane_l"><a href="#tabs_1"><em><img
+							src="../css/images/11.png" alt=""></em><span>我的桌面</span></a></li>
+			</ul>
+			<div id="tabs_1"
+				style="font-size: 12px; text-align: center; padding: 10px; z-index: 3">
+				<div id="rPane_d">
+					<div>
+						<h1>欢迎</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--中间右边部分 end-->
+	<!-- 修改密码 start-->
+	<div>
+		<div id="modifypassword" title="修改密码">
+			<ul>
+				<li><span>旧密码:</span><input type="text" placeholder="请输入旧密码" /></li>
+				<li><span>新密码:</span><input type="password"
+					placeholder="请输入新密码" /></li>
+				<li><span>确认密码:</span><input type="password"
+					placeholder="请输入新密码" /></li>
+			</ul>
+		</div>
+	</div>
+	<!-- 修改密码 end  -->
+	<input type="hidden" id="tg_user_froletype" value="">
+	<input type="hidden" id="tg_cur_roletype"  value="">
+	<input type="hidden" id="tg_cur_company" value="">
+	<input type="hidden" id="tg_cur_funid_temp" value="">
+	<input type="hidden" id="tg_cur_funcode_temp" value="">
+
+	<!-- 修改第二层 end -->
+</body>
+</html>

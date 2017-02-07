@@ -1,0 +1,106 @@
+<script type="text/javascript">
+	$("#select_paramType").click(
+			function() {
+				var selpara = {seltype:"selparamtype", seltitle:"选择参数类型", rtnvalobj:"paramType", rtndisobj:"paramTypeName", discol:1, flparams:"", flparamvs:""};
+				comsel(selpara);
+	}) 
+	$("#select_ParamInfocompanyid").click(
+			function() {
+				var selpara = {seltype:"selcompany", seltitle:"所属公司", rtnvalobj:"companyId", rtndisobj:"companyIdDis", discol:1, flparams:"", flparamvs:""};
+				comsel(selpara);
+	}) 
+
+function cancelparamTypeName(){
+	if($("#paramTypeName").val()!=""){
+		if (confirm("确定要清除参数类型吗")) {
+			$("#paramTypeName").val("");
+			$("#paramType").val("");
+		}
+	}
+}
+$("#companyIdDis").dblclick(function() {
+	if($("#companyIdDis").val()!=""){
+		if (confirm("确定要清除所属公司吗")) {
+			$("#companyIdDis").val("");
+			$("#companyId").val("");
+		}
+	}
+	 
+});
+</script>
+<style type="text/css">
+	.ui-form-bspcs{
+		color: red;
+		padding-right:10px;
+		float: right;
+		font-weight: bold;
+		padding-top: 3px;
+	}
+</style>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addParamInfo" class="ui-form-table jqForm" cellpadding="5" border='0'
+		style="width: 100%;">
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="paramCode"><label>参数编码</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="paramCode" name="paramCode" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+			</td>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="paramType" ><label>参数类型</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="paramTypeName" name="paramTypeName" type="text" class="ui-form-value" readonly="readonly" ondblclick="cancelparamTypeName()"
+					layout="1" maxlength="50"></span> 
+					<span id="select_paramType" class="ui-form-sbtnew ui-form-sel" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td>
+			
+		</tr>
+	
+		<tr>
+			
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="paramName"><label>参数名称</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="paramName" name="paramName" type="text" class="ui-form-value" ismust="0"
+					></span>
+					
+					 <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="typeIsupdate"><label>所属公司</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="companyIdDis" name="companyIdDis" readonly="readonly" type="text" value="天弓平台" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+				<span id="select_ParamInfocompanyid" class="ui-form-sbtnew ui-form-sel" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="comment"><label>备注</label>
+			</td>
+			<td colspan="3" style="width:85%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+				<textarea id="comment" name="comment"  ismust="0"
+					class="ui-form-textarea ui-form-value"></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+	</table>
+	<input type="hidden" id="paramType">
+	<input type="hidden" id="id">
+	<input id="companyId" type="hidden" value="1">
+	

@@ -1,0 +1,153 @@
+
+/*重置样式*/
+html, body{font-size:12px;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,input,textarea,p,th,td,span{margin:0;padding:0;}
+body{font-family:"微软雅黑";overflow:hidden;position:relative;
+	-moz-user-select: none; /*火狐*/
+    -webkit-user-select: none; /*webkit浏览器*/
+    -ms-user-select: none; /*IE10*/
+    -khtml-user-select: none; /*早期浏览器*/
+    user-select: none;
+}
+h1,h2,h3,h4,h5,h6{font-style:normal;}
+img{border-style:none;display:block;}
+li{list-style:none;}
+a{text-decoration:none;}
+/*head*/
+#head{width:100%;height:44px;background:#0089dd;margin:0 auto;}
+#headleft{color:#fff;font-size:28px;line-height:44px;text-align:left;padding-left:10px;float:left;}
+#headright{float:right;padding-right:30px;}
+#headright li{float:left;height:44px;margin-right:16px;}
+#headright li img{margin-top:6px;}
+#headright #headrightone{margin-right:28px;}
+#headrightone img{float:left;margin-right:8px;}
+#headrightone span{float:right;font-size:16px;line-height:44px;text-align:center;color:#fff;}
+#litg_switch_roletype span{font-size:16px;line-height:44px;text-align:center;color:#fff;}
+/*main*/
+#set_leftpane{width:100%;height:39px;background:url(../css/images/20.png) no-repeat center 10px;cursor:pointer;background-color:#fafafa;}
+.ui-layout-pane {background:#fff;padding:0;border:0px solid #8db2e3; overflow:auto;}
+.ui-layout-west{background:#fafafa;width:200px;}
+.ui-layout-center{background:#fff;}
+.ui-layout-north {position:relative;overflow:auto;background:#0089db}                 
+.pnode{width:199px;height:38px;border-bottom:1px solid #f2f2f2;border-right:1px solid #f2f2f2;border-top:1px solid #f2f2f2;}
+.pnode:hover{background:#eee;}
+.pnode span{float:left;margin:10px 0 0 14px;width:20px;height:20px;}
+.pnode a{float:left;margin-left:22px;color:#757575;margin-top:10px;font-size:14px;}
+.pnode em{width:12px;height:6px;margin:17px 20px 0 0;float:right;background:url(../css/images/19.png) no-repeat;}
+.childdiv{background:#eee;display:none}
+.childdiv a{display:block;width:160px;height:40px;line-height:40px;text-align:center;color: #757575;font-size:14px;}
+.active a{color:#0089db;}
+.active em{background: url(../css/images/18.png) no-repeat;}
+#lPane{width:200px;position:absolute;}
+
+.node{width:200px;height:40px;line-height:40px;text-align:center;font-size:14px;color:#757575;cursor: pointer;}
+.nodecolor{color:#0089db;}
+
+#lPane_1{width:50px;position:absolute;left:-50px;background:#fafbf8;z-index:2;top:39px;}
+#lPane_1 li{width:49px;height:39px;cursor:pointer;border-right:1px solid #f2f2f2;border-top:1px solid #f2f2f2;cursor: pointer;}
+#lPane_1 #last{border-bottom:1px solid #f2f2f2;height:38px;}
+#lPane_1 li img{margin:10px 15px 10px 15px;}
+#rPane_l em{float:left;margin-right:4px;;}
+#rPane_l span{font-size:14px;}
+
+#rPane_r{float:left;height:40px;}
+#rPane_r li{float:left;margin-left:15px;line-height:40px;height:40px;font-size:14px;border:0;background:#0089db;}
+#rPane_r li:hover{background:#31AAF6;}
+.bgchg{background:#f00;}
+.rPane_d_menu{padding-left:16px;height:20px;margin-bottom:8px;margin-top:8px;}
+/*.rPane_d_menu span{height:24px;line-height:30px;}*/
+.rPane_d_menu input{background:#ccc;border:none;color:#0089db;cursor:pointer;height: 20px;line-height:20px;margin-right: 8px;}
+.rPane_d_menu input:hover{background:#0089db;color:#fff;}
+.rPane_dt{padding-left:16px;}
+.rPane_dt #list1{font-size:14px;color:#757575;}
+.rPane_dt #list1 input{width:14px;height:14px;border:1px solid #ccc;}
+.rpane_search{padding-left: 16px;height: 20px;margin-bottom: 8px;}
+.rpane_search input[type="text"]{width: 188px;height:18px;line-height:18px;color:#999999;border: 1px solid #cccccc;}
+.rpane_search input::-webkit-input-placeholder { /* WebKit browsers */  
+        color:    #999999 ;  
+    }  
+.rpane_search input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */  
+       color:    #999999;  
+       opacity:  1;  
+    }  
+.rpane_search input::-moz-placeholder { /* Mozilla Firefox 19+ */  
+       color:    #999999;  
+       opacity:  1;  
+    }  
+.rpane_search input:-ms-input-placeholder { /* Internet Explorer 10+ */  
+       color:    #999999;  
+    }  
+.rpane_search  input[type="button"]{background:#ccc;border:none;color:#0089db;cursor:pointer;width:45px; height: 20px;margin-left: 8px;}
+.rpane_search input[type="button"]:hover{background:#0089db;color:#fff;}
+.rpane_status{
+	padding-left: 16px;margin-bottom: 8px;
+}
+.rpane_status label{cursor:pointer;height:11px;width:13px;margin-right: 8px;}
+.rpane_status input[type="radio"]{
+	height:11px;width:13px;
+}
+
+/*修改密码*/
+#modifypassword ul{padding-top:14px;height:90px;}
+#modifypassword li{width:270px;height:20px;margin:0 auto;margin-bottom:10px;}
+#modifypassword span{font-size:14px;float:left;height:30px;line-height:30px;text-align:left;width:70px;}
+#modifypassword input{padding-left:4px;width:192px;height:20px;float:right;}
+
+/*公用css样式*/
+.ui-grid-qkshdiv {background-color:#e7f5fe;line-height:30px;padding-left:15px;}
+.ui-grid-qkshdiv input{color:#31AAF6;margin-left:10px;}
+.ui-qksh-btsh {width:20px;height:20px;padding-top:6px;padding-left:28px;background:url(../css/images/12.png) 4px 4px no-repeat;display:inline;cursor:pointer!important;}
+.ui-jqgrid-hbox{background:#e7f5fe}
+
+.ui-tabs-nav li {position: relative;border:1px solid red;}
+.ui-tabs-selected a span {padding-right: 10px;}
+.ui-tabs-close {display: none;position: absolute;top: 3px;right: 0px;z-index: 800;width: 16px;height: 14px;font-size: 10px; font-style: normal;cursor: pointer;}
+.ui-tabs-selected .ui-tabs-close {display: block;}
+.ui-layout-west .ui-jqgrid tr.jqgrow td { border-bottom: 0px none;}
+.ui-tabs {border:0px none; padding:0;}
+.ui-tabs .ui-tabs-panel{padding:1px;}
+
+/*jqForm  .jqForm input {width:180px;}*/
+.jqForm {font-size:12px;line-height:20px;}
+.jqForm LABEL {padding-left:20px;}
+.jqForm INPUT {width:180px;height: 20px}
+.jqForm SELECT {width:184px;height: 22px;border: 1px solid #cccccc;}
+.jqForm TEXTAREA {height:60px;}
+.jqForm .ui-form-checkbox {width:16px;}
+.jqForm .ui-form-radio {width:16px;vertical-align:middle;}
+.jqForm .ui-form-radiospan {vertical-align:middle;}
+.jqForm .ui-form-bspc{margin-top:7px;margin-left:3px;float:left;}
+.jqForm .ui-form-spc{margin:5px;float:left;}
+.jqForm .ui-form-must{background:url(images/dian.png) no-repeat left top ;}
+.jqForm a {color: white;font-size: 12px;}
+.jqForm h3 {position:relative;margin-top:5px; height:28px}
+.jqForm h3 span {float:left;margin:5px}
+.jqForm h3 a {font-size:13px; line-height: 28px;}
+.jqForm .ui-form-tab{font-size:12px;}
+.jqForm .ui-form-sbtnew {float:left;overflow:hidden;margin-left:3px;margin-top:2px;display:inline; cursor: pointer !important;}
+.jqForm .ui-form-sel{width:18px;height:18px;background:url(images/pnqry.png) left top no-repeat;cursor:pointer;}
+.jqForm .ui-form-table {width:100%;overflow:visible;}
+   
+ /* '*'的样式 */
+.ui-form-bspcs{color: red;padding-right:10px;float: right;font-weight: bold;padding-top: 3px;}
+.ui-form-picbtn{float: left; overflow:hidden; margin-left:3px; margin-top:2px; display:inline; cursor: pointer !important;
+	height: 18px; width: 18px;background: rgba(0, 0, 0, 0) url("images/pnqry.png") no-repeat scroll left top; cursor: pointer;}
+.btclasscs {background-color: #e4e4e4;border: 0 solid #e4e4e4; color: #0f88cd; font-weight: bold;height: 25px;margin-top: 6px;width: 100%;}
+.btclasscs:hover {background: #0089db;color: #fff;}
+
+.pnode_closes {background: url("../css/images/tree/pnode.png") no-repeat left center;overflow: auto;}
+.pnode_opens {background: url("../css/images/tree/pnode_open.png") no-repeat left	center;	overflow: auto;}
+.pnodestates {background: url("../css/images/tree/pnode_state.png") no-repeat left bottom;overflow: auto;list-style-type: none;padding-left: 30px;width: 200px;color: #757575;}
+
+.ui-form-textarea{width: 604px;max-width: 604px; height: 60px;}
+.treebackground{border:0;outline:none; cursor:pointer;width: 100%;}
+.treebackground:hover{background-color:#bdf;} 	
+.sclick{background-color:#bdf;}
+.cityTrees{width:200px;padding-left:25px;display: block;}
+.ctleft{float:left;width: 200px;font-size: 12px;}
+.ctright{float:left;width: 70%;}
+.jqTree {list-style: none;font-size: 12px;line-height: 20px;width: 80px;margin: 0;padding-left: 6px;color: black;
+}
+.jqTreepnode{list-style: none;font-size: 12px;line-height: 20px;width:200px;margin: 0;padding-left: 6px;color: black;
+}
+.pnodes a{float:left;margin-left:5px;color:#757575;margin-top:10px;font-size:14px;}

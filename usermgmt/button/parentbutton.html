@@ -1,0 +1,25 @@
+<script type="text/javascript">
+$("#button_node_btn").bind('click',function(){
+	if($.trim($("#button_node_search").val()) == ""){
+		return;
+	}
+	comAlert('父节点查询');
+	requestData = {
+			_mt : "node.nodepage",
+			nodeName : $("#button_node_search").val()
+		};
+	 $("#tab_button_node_parent").jqGrid('setGridParam',{
+            postData:requestData, //发送数据
+            page:1
+        }).trigger("reloadGrid");
+})
+</script>
+
+<div>
+    <input type="text" id="button_node_search">
+    <button id="button_node_btn">查询</button>
+</div>
+<div >
+    <table id="tab_button_node_parent"></table>
+    <div id="pager_button_node_parent"></div>
+</div>

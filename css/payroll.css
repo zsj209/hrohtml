@@ -1,0 +1,204 @@
+/*主子表  子表头部按钮样式*/
+.jq_top_button {
+	padding-left: 8px;
+	height: 28px;
+	text-align: left;
+	margin-top: 8px;
+}
+.jq_top_bs_button {
+	height: 20px;
+	text-align: left;
+	padding-left: 8px;
+}
+
+.jq_top_bs_button input {
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+	width: 52px;
+	height: 20px;
+	margin-left: 8px;
+}
+.child_div_cs{
+	padding-top: 8px;margin-left: 16px;
+}
+.add_radio{
+	cursor:pointer;
+}
+.add_radiolf{
+	cursor:pointer;float: left;width: 30px;
+}
+.add_radiort{
+	cursor:pointer;float: left;width: 30px;margin-left: 20px;
+}
+.jq_top_bs_button input:hover {
+	background: #0089db;
+	color: #fff;
+} /*新增页面 字段td*/ /*左文本*/
+.add_lfspan {
+	width: 15%;
+	background: #e7f5fe;
+	line-height: 32px;
+	text-align: left;
+	margin-top: 4px;
+	padding-left: 6px
+} /*右文本*/
+.add_rtspan {
+	width: 35%;
+	text-align: left;
+	padding-left: 10px;
+	height: 28px;
+} /*texa布局*/
+.add_texa {
+	width: 85%;
+	height: 60px;
+	text-align: left;
+	float: left;
+	margin-left: 10px;
+	margin-top: 2px;
+}
+
+.add_texa {
+	height: 60px;
+	border: 1px solid #cccccc;
+} /*必填*/
+.add_fwid_rd {
+	color: #f00;
+	margin: 0 10px 0 5px;
+	float: right;
+}
+
+.add_menu_ht {
+	background: #0089db;
+	height: 32px;
+}
+
+.add_menu_ht span {
+	font-size: 12px;
+	color: #fff;
+	float: left;
+	margin: 6px 0 0 10px;
+}
+
+.add_menu_hm {
+	width: auto;
+	height: 374px;
+	padding: 6px 12px;
+	border-bottom: 1px solid #c7deec
+} /*主子表 左右div样式*/
+.div_left {
+	float: left;
+	width: 150px;
+}
+
+.div_center {
+	margin-left: 150px;
+}
+.margin_left8{
+	margin-left: 8px;
+}
+.margin_left16{
+	margin-left: 16px;
+}
+ /*文本框*/
+.add_input {
+	width: 180px;
+	border: 1px solid #cccccc;
+}
+
+.add_inputdis {
+	width: 140px;
+	border: 1px solid #cccccc;
+} /*select框*/
+.add_select {
+	width: 182px
+} /*check框*/
+.add_check {
+	width: 16px
+}
+ /*头部按钮样式*/
+.jq_top_button input {
+	width: 52px;
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+	height: 20px;
+	margin-left: 8px;
+}
+
+.jq_top_button input:hover {
+	background: #0089db;
+	color: #fff;
+} /*快捷查询按钮样式*/
+.jq_top_quick {
+	padding-left: 16px;
+	margin-bottom: 8px;
+	text-align: left;
+}
+
+.jq_top_quick input[type="text"] {
+	width: 188px;
+	height: 20px;
+	color: #999999;
+	border: 1px solid #cccccc;
+}
+
+.jq_top_quick input[type="button"] {
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+	width: 52px;
+	height: 20px
+}
+
+.jq_top_quick input[type="button"]:hover {
+	background: #0089db;
+	color: #fff;
+}
+
+.oncursor {
+	cursor: pointer;
+	width: 99%;
+	color: #0f88cd;
+	height: 30px;
+	line-height: 30px;
+	font-size: 12px;
+	text-align: left;
+}
+
+.oncursorimg {
+	float: left;
+	margin-top: 8px;
+	padding-left: 8px;
+} /*主子表 头部保存按钮样式*/
+.bn_sv_base {
+	width: 52px;
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+	height: 20px;
+	margin-left: 1px;
+}
+
+.bn_sv_base:hover {
+	background: #0089db;
+	color: #fff;
+} /*根据id选择 ...*/
+.add_fwid {
+	cursor: pointer;
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	background: #8bd2fe;
+	line-height: 18px;
+	text-align: center;
+	margin-left: 4px;
+	color: #ffffff;
+} /*查看不可编辑样式*/
+.readonlycs {
+	readonly: expression(this.readOnly = true);
+}

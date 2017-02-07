@@ -1,0 +1,92 @@
+<!---------------------------------------------------------
+Coding:       zfy
+Create Date:   2017-01-10
+Desc:       参数类型信息
+update History:
+  date:        
+  coding:      
+  desc:        
+---------------------------------------------------------->
+
+<script type="text/javascript">
+	$(function() {
+		var cn = [ '期间编码' ];
+		var cm = [{
+			name : 'periodCode',
+			index : 'periodCode',
+			width : 200,
+			align : "left",
+			sorttype : "text"
+		} ];
+		jQuery("#tb_com_sel_period").jqGrid({
+			url : pubsources.pub_getlink,
+			datatype : "json",
+			mtype : "POST",
+			postData : {
+				_mt : "commperiod.selectPeriodByColumn",
+				companyId:1002
+			},
+			mylevel : "UserLogin",
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			colNames : cn,
+			colModel : cm,
+			loadComplete : function(xhr) {
+				console.log(xhr);
+				return true;
+			},
+			jsonReader : {
+				root : "rows",
+				page : "page",
+				total : "total",
+				records : "records"
+			},
+			rowNum : 10,
+			rowList : [10,20,50 ],
+			pager : '#pg_com_sel_period',
+			shrinkToFit : false,
+			forceFit : true,
+			sortname : 'id',
+			sortorder : "desc",
+			viewrecords : true,
+			rownumbers : true,
+			ondblClickRow : function(id) {
+				/* var rowData = jQuery("#tb_com_sel_period").getRowData(id);
+				var paramTypeName = rowData['typeName'];
+				var code = rowData['typeCode'];
+					$("#paramTypes").val(code);
+					$("#paramNames").val(paramTypeName); */
+				//buttons = $('#tb_com_sel_period').dialog('option', 'buttons');
+				//$(buttons + ":last").trigger("click");
+				buttons = $('#com_sel_selhroperiod').parent().find(".ui-dialog-buttonset").find("button");
+				$(buttons).find(":first").trigger("click");
+			},
+			height : 260,
+			width : 650
+		});
+	});
+ 	$("#node_periods_btn").click(function(){
+		var periodsCodes=$("#node_parent_period").val();
+		//comAlert(node_parent_search)
+		//if(paramtype!=""){
+			var ss = {
+					_mt : "commperiod.selectPeriodByColumn",
+					periodCode:periodsCodes
+				};
+				$("#tb_com_sel_period").setGridParam({postData:ss}).trigger("reloadGrid", [{page:1}]);
+		//}
+	}); 
+</script>
+<div>
+ 期间编码 <input type="text" id="node_parent_period">
+    <button id="node_periods_btn">查询</button>
+</div>
+<table id="tb_com_sel_period" class="scroll"></table>
+<div id="pg_com_sel_period" class="scroll" style="height: 30px"></div>

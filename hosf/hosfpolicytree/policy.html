@@ -1,0 +1,671 @@
+
+<script type="text/javascript" src="../js/errordefine/hosf.js"></script>
+<script type="text/javascript">
+	$(function() {
+
+		$("#tg_hosfpolicy_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_hosfpolicy_funcode").val($("#tg_cur_funcode_temp").val());
+
+		var hosfpolicycompanyId=$("#tg_cur_company").val();
+		// 省市区获取树结构
+		var treeparams = {
+			_mt : "commoncity.queryTreeCityList"
+		};
+		getInfo_comm_treegjjPolicy(treeparams, "UserLogin");
+
+		var oH = $("#rPane").height() - 173;
+		var oW = $("#rPane").width() - 240;
+
+		$("#tree_hosfpolicy_list").css("height",
+				($("#rPane").height() - 82) + "px");
+		var ss = {
+			_mt : "hosfPolicy.getPolicyByPage"
+		};
+
+		getData(ss);
+		function getData(requestData) {
+
+			jQuery("#tab_policy").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ '编号', '所属公司', '政策名称', '地区名称', '开始时间',
+								'结束时间', '公积金报增日', '公积金报减日', '是否有效' ],
+						colModel : [ {
+							name : 'id',
+							index : 'id',
+							width : 0,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'companyName',
+							index : 'companyName',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'policyName',
+							index : 'policyName',
+							width : 130,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'policyProName',
+							index : 'policyProName',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'policyStarttime',
+							index : 'policyStarttime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'policyEndtime',
+							index : 'policyEndtime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'policyAddayDesc',
+							index : 'policyAddayDesc',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'policyMinusdayDesc',
+							index : 'policyMinusdayDesc',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'policyValidDesc',
+							index : 'policyValidDesc',
+							width : 60,
+							align : "left",
+							sorttype : "text"
+						} ],
+
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+							if (com_error(xhr)) {
+								return true;
+							} else {
+								alertMsg(xhr, "hosf_code_desc");
+								return false;
+							}
+
+						},
+						jsonReader : {
+							/*content中的响应*/
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 20,
+						rowList : [ 20, 50, 100 ],
+						pager : '#pager1_policy',
+						height : oH,
+						width : oW,
+						shrinkToFit : false,
+						forceFit : true,
+						sortorder : "desc",
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+
+					});
+
+			jQuery("#tab_policy").jqGrid('navGrid', '#pager1_policy', {
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			});
+
+		}
+
+		$("#add_policy").click(function() {
+			policyDialog("新增公积金政策信息");
+			getSelectDataTypeList({
+				"policyAdday" : "seldays",
+				"policyMinusday" : "seldays",
+				"policyValid" : "yesno"
+			});
+		})
+
+		function policyDialog(pagetitle) {
+			var s = $("<DIV ID=\"add_upd_policy\"></DIV>");
+
+			var ids = $('#tab_policy').jqGrid('getGridParam', 'selarrrow');
+			//加载新增页面
+			$(s).load(
+					"../hosf/hosfpolicytree/base.html?tsid="
+							+ new Date().getTime(), function() {
+						//修改时将id保存在页面
+						if (pagetitle == "修改公积金政策信息") {
+							$("#policyidid").val(ids);
+							$("#hosfpolicycompanyid").val($("#tg_cur_company").val());
+						}else{
+							$("#companyId").val($("#tg_cur_company").val());
+						}
+						
+					}).dialog({
+				autoOpen : true,
+				closeOnEscape : true,
+				bgiframe : true,
+				title : pagetitle,
+				height : 600,
+				width : 1000,
+				resizable : false,
+				modal : true,
+				close : function(event, ui) {
+					$(this).remove();
+				}
+			})
+
+		}
+
+		//点击修改第一层
+		$("#upd_policy").click(function() {
+			var ids = $('#tab_policy').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else if (ids.length > 1) {
+				comAlert("一次只能修改一条数据");
+				return;
+			}
+
+			policyDialog("修改公积金政策信息");
+
+			getSelectDataTypeList({
+				"policyAdday" : "seldays",
+				"policyMinusday" : "seldays",
+				"policyValid" : "yesno"
+			});
+
+			//加载用户信息
+			var updateInfo = {
+				_mt : "hosfPolicy.selectById",
+				id : ids
+			};
+			getUpdatePolicy(updateInfo, "UserLogin");
+
+		})
+
+		//获取要修改的用户的信息
+		function getUpdatePolicy(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "POST",
+				url : pubsources.pub_getlink,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+
+					if (com_error(result)) {
+						//给修改页面的input框赋值
+						data = result.content["0"];
+						setData(data, "addPolicy");
+						$("#companyId").val($("#tg_cur_company").val());
+					} else {
+						alertMsg(result, "hosf_code_desc");
+					}
+				},
+				error : function() {
+					comAlert(pubsources.network_error);
+				}
+			});
+		}
+
+		//复制政策
+		$("#copy_policy").click(function() {
+			var ids = $('#tab_policy').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert("请选择要复制的信息");
+				return;
+			} else {
+				if (confirm("您确定要复制选中的信息？")) {
+					var copy = {
+						_mt : "hosfPolicy.copyPolicy",
+						ids : ids
+					};
+					copyPolicy(copy, "UserLogin");
+				}
+			}
+		})
+
+		function copyPolicy(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							console.log(result);
+
+							if (com_error(result)) {
+								comAlert("复制成功");
+								jQuery("#tab_policy").trigger("reloadGrid");
+							} else {
+								comAlert("复制失败");
+								alertMsg(result, "hosf_code_desc");
+							}
+
+						},
+						error : function() {
+							comAlert(pubsources.network_error);
+						}
+					});
+		}
+
+		/*---------修改保存 end---------*/
+
+		$("#del_policy").click(function() {
+			var ids = $('#tab_policy').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "hosfPolicy.deleteBatchByIds",
+						delIds : ids
+					};
+					deletePolicy(del, "UserLogin");
+				}
+			}
+		})
+
+		function deletePolicy(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							//js错误代码
+							console.log(result);
+							if (com_error(result)) {
+								comAlert(pubprompt.del_succ);
+								jQuery("#tab_policy").trigger("reloadGrid");
+							} else {
+								comAlert(pubprompt.del_failure);
+								alertMsg(result, "hosf_code_desc");
+							}
+
+						},
+						error : function() {
+							comAlert(pubsources.network_error);
+						}
+					});
+		}
+
+		/***
+		 * 获取左边城市类别
+		 */
+		function getInfo_comm_treegjjPolicy(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "GET",
+						url : pubsources.pub_getlink,
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//给修改页面的input框赋值
+							data = result.content["0"].value;
+							//  alert(data[0].id)
+							var _arr = [];
+							_arr.push('<ul>');/**/
+							for ( var o in data) {
+								var data2 = data[o].list;
+								if (data2 != "") {
+									_arr
+											.push('<li class="pnodes jqTreepnode sshows" style="background:none;border:0;padding:0;">');/**/
+									_arr
+											.push('<a class="cityTrees" snames="'
+													+ data[0].cityName
+													+ '" href="javascript:void(0)" onclick="showgjjPolicys(this)" sid="'
+													+ data[0].id
+													+ '" gdid="1" fun="1603" value="'
+													+ data[0].id
+													+ '" gid="1" ><div class="treeLevel"><div class="treebackground" style="padding-left:0;">'
+													+ data[0].cityName
+													+ '</div></div></a>');
+
+								} else {
+									_arr.push('<li class=" sshows">');
+									_arr
+											.push('<a class="cityTrees" snames="'
+													+ data[0].cityName
+													+ '" href="javascript:void(0)" onclick="showgjjPolicys(this)" sid="'
+													+ data[0].id
+													+ '" gdid="1" fun="1603" value="'
+													+ data[0].id
+													+ '" gid="1" ><div class="pnodestates"><div class="treebackground" style="">'
+													+ data[0].cityName
+													+ '</div></div></a>');
+								}
+								_arr.push('<ul class="jqTree child" >');
+								for ( var i in data2) {
+									var data3 = data2[i].list;
+									if (data3 != "") {
+										_arr.push('<li class="sshows">');
+										_arr
+												.push('<a  href="javascript:void(0)" class="cityTrees"   snames="'
+														+ data2[i].cityName
+														+ '" fun="1395" value="'
+														+ data2[i].id
+														+ '" sid="'
+														+ data2[i].id
+														+ '" gid="1" gdid="1" onclick="showgjjPolicys(this)"><div class="treeLevel"><div class="treebackground">'
+														+ data2[i].cityName
+														+ '</div></div></a>');
+									} else {
+										_arr.push('<li class=" sshows">');
+										_arr
+												.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+														+ data2[i].cityName
+														+ '" onclick="showgjjPolicys(this)" gid="1" sid="'
+														+ data2[i].id
+														+ '" value="'
+														+ data2[i].id
+														+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+														+ data2[i].cityName
+														+ '</div></div></a>');
+									}
+
+									_arr.push('<ul class="jqTree child" >');
+
+									if (data3 != "") {
+										for ( var j in data3) {
+											var data4 = data3[j].list;
+											if (data4 != "") {
+												_arr
+														.push('<li class="sshows"  >');
+												_arr
+														.push('<a  href="javascript:void(0)" class="cityTrees"  snames="'
+																+ data3[j].cityName
+																+ '"  fun="1429" value="'
+																+ data3[j].id
+																+ '" sid="'
+																+ data3[j].id
+																+ '" gid="1" gid="1603" onclick="showgjjPolicys(this)"  ><div class="treeLevel"><div class="treebackground" style="">'
+																+ data3[j].cityName
+																+ '</div></div></a>');
+
+											} else {
+												_arr
+														.push('<li class=" sshows">');
+												_arr
+														.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+																+ data3[j].cityName
+																+ '" onclick="showgjjPolicys(this)" gid="1" sid="'
+																+ data3[j].id
+																+ '" value="'
+																+ data3[j].id
+																+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+																+ data3[j].cityName
+																+ '</div></div></a>');
+											}
+											_arr
+													.push('<ul class="jqTree child" >');
+
+											if (data3 != "") {
+												for ( var k in data4) {
+													_arr
+															.push('<li class=" sshows">');
+													_arr
+															.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'
+																	+ data4[k].cityName
+																	+ '" onclick="showgjjPolicys(this)" gid="1" sid="'
+																	+ data4[k].id
+																	+ '" value="'
+																	+ data4[k].id
+																	+ '" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'
+																	+ data4[k].cityName
+																	+ '</div></div></a>');
+													_arr.push('</li>');
+												}
+											}
+											_arr.push('</ul>');
+											_arr.push('</li>');
+										}
+									}
+
+									_arr.push('</ul>');
+									_arr.push('</li>');
+								}
+								_arr.push('</ul>');
+								_arr.push('</li>');
+
+							}
+							_arr.push('</ul>');
+
+							$("#tree_hosfpolicy_list").html(_arr.join(""));
+							treeListgjjPolicy();
+						},
+						error : function() {
+							alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+						}
+					});
+
+		}
+
+		function treeListgjjPolicy() {
+			$("#tree_hosfpolicy_list ul li").children("ul").hide();
+			$("#tree_hosfpolicy_list").find("li").not(":has(ul)").children("a")
+					.css({
+						textDecoration : "none",
+						color : "#333",
+						background : "none"
+					}).click(
+							function() {
+								$(this).get(0).location.href = "'"
+										+ $(this).attr("href") + "'";
+							});
+			$("#tree_hosfpolicy_list").find("li:has(ul)").children("a")
+					.addClass("pnode_closes").removeClass("pnode_opens").click(
+							function() {
+								//alert($(this).css("background"))
+								if ($(this).next("ul").is(":hidden")) {
+									$(this).next("ul").show();//slideDown("fast");
+									if ($(this).parent("li").siblings("li")
+											.children("ul").is(":visible")) {
+										$(this).parent("li").siblings("li")
+												.find("ul").hide();//slideUp("fast");
+										$(this).parent("li").siblings(
+												"li:has(ul)").children("a")
+												.addClass("pnode_closes")
+												.removeClass("pnode_opens")
+												.end().find("li:has(ul)")
+												.children("a").addClass(
+														"pnode_closes")
+												.removeClass("pnode_opens");
+
+									}
+									$(this).addClass("pnode_opens")
+											.removeClass("pnode_closes");
+									return false;
+								} else {
+									$(this).next("ul").hide();//slideUp("fast");
+									//不用toggle()的原因是为了在收缩菜单的时候同时也将该菜单的下级菜单以后的所有元素都隐藏
+									$(this).addClass("pnode_closes")
+											.removeClass("pnode_opens");
+									$(this).next("ul").children("li")
+											.find("ul").hide();//fadeOut("10");
+									$(this).next("ul").find("li:has(ul)")
+											.children("a").addClass(
+													"pnode_closes")
+											.removeClass("pnode_opens");
+									return false;
+								}
+							});
+		}
+
+		$("#tp_policy_refresh").bind('click', function() {
+			//省市区获取树结构
+			var treeparams = {
+				_mt : "commoncity.queryTreeCityList"
+			};
+			getInfo_comm_treegjjPolicy(treeparams, "UserLogin");
+		});
+
+	})
+
+	function showgjjPolicys(e) {
+		var cityId = $(e).attr("value");
+		$('.treebackground').each(function() {
+			$(this).removeClass("sclick");
+		});
+		$(e).children("div").children("div").addClass("sclick");
+		var colmRequestDatass = {
+			_mt : "hosfPolicy.getPolicyByTree",
+			cityid : cityId
+		};
+		var payload = {
+			data : colmRequestDatass,
+			level : "UserLogin",
+		};
+		var data = encrypt(payload.level, payload.data);
+		$("#tab_policy").setGridParam({
+			postData : data
+		}).trigger("reloadGrid", [ {
+			page : 1
+		} ]);
+	}
+
+	//主页面的查询
+	$("#policys_search_btnb").bind('click', function() {
+		//TODO 查询
+		requestData = {
+			_mt : "hosfPolicy.getPolicyByColumPage",
+			policyName : $("#policy_searchb").val()
+		};
+		$("#tab_policy").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	});
+</script>
+
+
+
+<style>
+/* 按钮样式 */
+.buttonz {
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+	height: 20px;
+	line-hegiht: 20px;
+}
+
+.buttonz:hover {
+	background: #0089db;
+	color: #fff;
+}
+</style>
+
+
+
+<div id="rPane_d" class="jq_top_div">
+
+	<div class="ctleft" style="width: 200px;">
+		<div>
+			<input id="tp_policy_refresh" class="btclasscs" value="刷新"
+				type="button">
+		</div>
+		<div id="tree_hosfpolicy_list"
+			style="overflow-x: hidden; overflow-y: scroll; border-bottom: 1px solid #C7DEEC;"></div>
+
+	</div>
+	<div class="ctright">
+
+		<div class="rPane_d_menu">
+			<span> <input type="button" id="copy_policy"
+				value="&nbsp;复制&nbsp;"><input type="button" id="add_policy"
+				value="&nbsp;新增&nbsp;"><input type="button" id="upd_policy"
+				value="&nbsp;修改&nbsp;"><input type="button" id="del_policy"
+				value="&nbsp;删除&nbsp;">
+			</span>
+		</div>
+		<div class="rpane_search">
+			<input type="text" id="policy_searchb" name="policy_searchb"
+				style="height: 18px;" placeholder="请输入政策名称">
+			<button id="policys_search_btnb" class="buttonz">查询</button>
+		</div>
+		<div class=rPane_dt>
+			<table id="tab_policy"></table>
+			<div id="pager1_policy"></div>
+		</div>
+	</div>
+</div>
+
+
+<input type="hidden" id="tg_hosfpolicy_funid" value="">
+<input type="hidden" id="tg_hosfpolicy_funcode" value="">
+

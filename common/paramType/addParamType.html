@@ -1,0 +1,83 @@
+<script type="text/javascript">
+$(function(){
+	$("#select_paramTypeCompid").click(
+			function() {
+				//comsel("selcompany", "所属公司", "companyId", "companyIdDis", 0);
+				var selpara = {seltype:"selcompany", seltitle:"所属公司", rtnvalobj:"companyId", rtndisobj:"companyIdDis", discol:1, flparams:"", flparamvs:""};
+				comsel(selpara);
+	}) 
+})
+$("#companyIdDis").dblclick(function() {
+	if($("#companyIdDis").val()!=""){
+		if (confirm("确定要清除所属公司吗")) {
+			$("#companyIdDis").val("");
+			$("#companyId").val("");
+		}
+	}
+	 
+});
+</script>
+<style type="text/css">
+	.ui-form-bspcs{
+		color: red;
+		padding-right:10px;
+		float: right;
+		font-weight: bold;
+	}
+</style>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addParamType" class="ui-form-table" cellpadding="5" border='0'
+		style="width: 100%;">
+		
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="typeCode"><label>编码</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="typeCode" name="typeCode" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+			</td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="typeName"><label>参数名称</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="typeName" name="typeName" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+			</td>
+
+		</tr>
+			<tr>
+			
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="typeIsupdate"><label>所属公司</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="companyIdDis" name="companyIdDis" readonly="readonly" type="text" value="天弓平台" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+				<span id="select_paramTypeCompid" class="ui-form-sbtnew ui-form-sel" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+	
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="comment"><label>备注</label>
+			</td>
+			<td colspan="3" style="width:85%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+				<textarea class="ui-form-textarea ui-form-value" id="comment" name="comment"  ismust="0"
+					></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+		
+	</table>
+	<input id="id" type="hidden">
+	<input id="companyId" type="hidden" value="1">

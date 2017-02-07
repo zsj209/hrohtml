@@ -1,0 +1,116 @@
+ <!---------------------------------------------------------
+Coding:        eddy
+Create Date:   2017-01-18
+Desc:        选择城市信息
+update History:
+  date:        
+  coding:      
+  desc:        
+---------------------------------------------------------->
+
+<script type="text/javascript">
+	//comAlert("selnode.html" + pubsources.pub_getlink);
+	$(function() {
+		var sle_type = "seltemle",
+			sel_flparams = $("#com_sel_"+sle_type).attr("flparams"),
+			sel_flparamvs = $("#com_sel_"+sle_type).attr("flparamvs");
+		sel_flparams =  ((sel_flparams==null || sel_flparams=="null" || sel_flparams=="undefined")?"":sel_flparams);
+		sel_flparamvs =  ((sel_flparamvs==null || sel_flparamvs=="null" || sel_flparamvs=="undefined")?"":sel_flparamvs);
+		sel_flparams = sel_flparams.split(",");
+		sel_flparamvs = sel_flparamvs.split(",");
+		//alert(sel_flparams);
+		//alert(sel_flparamvs);
+		var cityvl=$("#taxaccCity").val();
+		var pd = {
+				_mt : "payrollPaysTemplate.selectDataByPaysTemplate",templateCity:cityvl
+		};
+		$.each(sel_flparams,function(i,v){
+			pd[v] = sel_flparamvs[i];
+		});
+		var cn = [ 'id', '模版名称' ];
+		var cm = [ {
+			name : 'id',
+			index : 'id',
+			width : 100,
+			align : "left",
+			sorttype : "text",
+			hidden : true
+		}, {
+			name : 'templateName',
+			index : 'templateName',
+			width : 150,
+			align : "left",
+			sorttype : "text",
+			hidden : false
+		} ];
+		jQuery("#tb_com_sel_opencity").jqGrid(
+				{
+					url : pubsources.pub_getlink,
+					datatype : "json",
+					mtype : "POST",
+					postData : pd,
+					mylevel : "UserLogin",
+					prmNames : {
+						page : "page",
+						rows : "rows",
+						sort : null,
+						order : null,
+						search : null,
+						nd : null,
+						npage : null
+					},
+					colNames : cn,
+					colModel : cm,
+					loadComplete : function(xhr) {
+						console.log(xhr);
+						return true;
+					},
+					jsonReader : {
+						root : "rows",
+						page : "page",
+						total : "total",
+						records : "records"
+					},
+					rowNum : 10,
+					rowList : [ 10, 20, 50 ],
+					pager : '#pg_com_sel_opencity',
+					shrinkToFit : false,
+					forceFit : true,
+					sortname : 'id',
+					multiselect : false,
+					autowidth : true,
+					rownumWidth: 40,
+					sortorder : "desc",
+					viewrecords : true,
+					rownumbers : true,
+					ondblClickRow : function(id) {
+						//comAlert(id);
+						//buttons = $('#tb_com_sel_opencity').dialog('option','buttons');
+						//$(buttons + ":last").trigger("click");
+						buttons = $('#com_sel_'+sle_type).parent().find(".ui-dialog-buttonset").find("button");
+						$(buttons).find(":first").trigger("click");
+					},
+					height : 270,
+					width : 650
+				}).navGrid("#pg_com_sel_opencity",{refresh: false, edit: false, add: false, del: false, search: false})
+				.navButtonAdd("#pg_com_sel_opencity",{title:"refresh",caption:"",buttonicon:"ui-icon-refresh",
+					onClickButton:function(){},	position : "last"});
+		$("#com_sel_qksearch").click(function(){
+			var cityname = $("#com_sel_search_city").val();
+			if(!val_isnull(cityname)) {
+				var pd = $("#tb_com_sel_opencity").getGridParam("postData");
+				$.extend(pd,{templateName: cityname})
+				//$("#tb_com_sel_opencity").setGridParam({postData:pd}).trigger("reloadGrid", [{page:1}]);
+				$("#tb_com_sel_opencity").setGridParam({postData:pd,page:1}).trigger("reloadGrid");
+			} else {
+				comAlert(pubprompt.pub_sel_plsintqrycond);
+			}
+		});
+	});
+</script>
+<div class="ui-grid-qkshdiv" style="width:650">
+	<label>模版名称：</label><input type="text" id="com_sel_search_city">
+	<span id="com_sel_qksearch" class="ui-qksh-btsh">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+</div>
+<table id="tb_com_sel_opencity" class="scroll"></table>
+<div id="pg_com_sel_opencity" class="scroll" style="height: 30px"></div>

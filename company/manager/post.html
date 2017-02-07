@@ -1,0 +1,544 @@
+<script type="text/javascript" src="../js/errordefine/company.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$("#tg_managerpost_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_managerpost_funcode").val($("#tg_cur_funcode_temp").val());
+		var oH = $("#rPane").height() - 200;
+		var oW = $("#rPane").width() - 40;
+
+		var ss = {
+			_mt : "post.getPostByPage"
+		};
+		getData(ss);
+		function getData(requestData) {
+
+			jQuery("#tab_postmanager").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ '编号', '公司ID', '岗位名称', '所属组织','创建日期',
+								'终止日期', '操作角色', '用户绑定', '岗位状态', '是否全数据' ],
+						colModel : [ {
+							name : 'id',
+							index : 'id',
+							width : 0,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'companyId',
+							index : 'companyId',
+							width : 0,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'postName',
+							index : 'postName',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postOrgidName',
+							index : 'postOrgidName',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						},{
+							name : 'postStarttime',
+							index : 'postStarttime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postEndtime',
+							index : 'postEndtime',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postRoleName',
+							index : 'postRole',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postUserName',
+							index : 'postUser',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postStateDesc',
+							index : 'postState',
+							width : 80,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'postDataDesc',
+							index : 'postData',
+							width : 70,
+							align : "left",
+							sorttype : "text"
+						} ],
+
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+							if(com_error(xhr)){
+								return true;
+							}else{
+								alertMsg(xhr,"company_code_desc");
+								return false;
+							}
+						},
+						jsonReader : {
+							/*content中的响应*/
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 20,
+						rowList : [ 20, 50, 100 ],
+						pager : '#pager1_postmanager',
+						height : oH,
+						width : oW,
+						shrinkToFit : false,
+						forceFit : true,
+						sortorder : "desc",
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+
+					});
+			jQuery("#tab_postmanager").jqGrid('navGrid', '#pager1_postmanager',
+					{
+						edit : false,
+						add : false,
+						del : false,
+						search : false
+					});
+
+		}
+
+		/*--------加载表格 end------*/
+		/*----------新增 保存-----------*/
+		//新增点击事件
+		$("#add_postmanager").click(function() {
+
+			postDialog("新增后台管理员信息", "add");
+
+			getSelectDataTypeList({
+				"postState" : "pubstatus",
+				"postData" : "yesno"
+			});
+		})
+
+		function postDialog(pagetitle, meth) {
+
+			var type = "post";
+			var url = "../company/manager/addPost.html";
+			var s = $("<DIV ID=\"add_menu_" + type + "\"></DIV>");
+			$(s).load(url + "?tsid=" + new Date().getTime(), function() {
+			}).dialog({
+
+				autoOpen : true,
+				closeOnEscape : true,
+				bgiframe : true,
+				title : pagetitle,
+				height : 500,
+				width : 900,
+				resizable : false,
+				modal : true,
+				buttons : {
+					
+					"保存" : function() {
+						
+						//验证参数
+						if(!validataPost()){
+							return;
+						}
+						
+						//获取参数
+						requestData = serach("post.addorupdate", "addPost");
+						delete requestData.postOrgidName;
+						delete requestData.postUserName;
+						delete requestData.postRoleName;
+						//调用方法
+						addOrupdate(requestData, "UserLogin", meth);
+					},
+					"取消" : function() {
+
+						$(this).dialog("close");
+					}
+				},
+				close : function(event, ui) {
+					$(this).remove();
+				}
+			})
+		}
+
+		/*---------新增保存 end --------*/
+		/*---------修改 ---------*/
+		//1.点击修改按钮加载选中的行的数据到修改页面
+		//点击修改第一层
+		$("#upd_postmanager").click(
+				function() {
+					var ids = $('#tab_postmanager').jqGrid('getGridParam',
+							'selarrrow');
+					if (ids.length == 0) {
+						comAlert(pubprompt.pub_nochoice);
+						return;
+					} else if (ids.length > 1) {
+						comAlert("一次只能修改一条数据");
+						return;
+					}
+					//加载修改页面
+					postDialog("修改后台管理员信息", "upd");
+
+					//加载用户信息
+					var updateInfo = {
+						_mt : "post.selectById",
+						id : ids
+					};
+
+					getSelectDataTypeList({
+						"postState" : "pubstatus",
+						"postData" : "yesno"
+					});
+
+					getUpdatePost(updateInfo, "UserLogin");
+
+				})
+
+		//获取要修改的用户的信息
+		function getUpdatePost(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "GET",
+				url : pubsources.pub_getlink,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					if(com_error(result)){
+					//给修改页面的input框赋值
+					data = result.content["0"];
+					setData(data, "addPost");
+					}else{
+						alertMsg(xhr,"company_code_desc");
+					}
+
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+				}
+			});
+		}
+
+		/*----------删除--------*/
+		$("#del_postmanager").click(function() {
+			var ids = $('#tab_postmanager').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "post.deleteBatchById",
+						ids : ids
+					};
+					deletePost(del, "UserLogin");
+				}
+			}
+		})
+
+		function deletePost(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level,
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							if(com_error(result)){
+							//TODO　判断删除是否成功
+							console.log(result);
+							jQuery("#tab_postmanager").trigger("reloadGrid");
+							}else{
+								alertMsg(result,"company_code_desc");
+								return false;
+							}
+
+						},
+						error : function() {
+							comAlert(pubprompt.network_error);
+						}
+					});
+		}
+
+		/*-----------删除 end----------*/
+
+	})
+
+	//主页面的查询
+	$("#postman_search_btn").bind('click', function() {
+
+		requestData = {
+			_mt : "post.selectByColuPage",
+			postName : $("#postman_search").val()
+		};
+		$("#tab_postmanager").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	})
+	
+	
+	
+	
+	
+
+	
+function queryPost(state) {
+    requestData = {
+        _mt: "post.selectByColuPage",
+        postState: state
+    };
+    $("#tab_postmanager").jqGrid('setGridParam', {
+        postData: requestData, //发送数据
+        page: 1
+    }).trigger("reloadGrid");
+}
+	
+
+	
+	
+	
+function validataPost(){
+	var flag=true;
+	var postName = $.trim($("#postName").val());
+	var postOrgid = $.trim($("#postOrgid").val());
+	var postStarttime = $.trim($("#postStarttime").val());
+	var postEndtime = $.trim($("#postEndtime").val());
+	var postRole = $.trim($("#postRole").val());
+	var postUser = $.trim($("#postUser").val());
+	var postState = $.trim($("#postState").val());
+	var postData = $.trim($("#postData").val());
+	
+	if(postName == ""){
+		comAlert("请输入岗位名称");
+		flag = false;
+		return;
+	}
+	
+	if(postOrgid == ""){
+		comAlert("请选择所属组织");
+		flag = false;
+		return
+	}
+	
+	if(postStarttime == ""){
+		comAlert("请选择开始时间");
+		flag = false;
+		return
+	}
+	
+	
+	
+	
+	
+
+	if(postRole == ""){
+		comAlert("请选择角色");
+		flag = false;
+		return
+	}
+	
+	
+	if(postUser == ""){
+		comAlert("请选择绑定用户");
+		flag = false;
+		return
+	}
+	
+	
+	
+	if(postData == ""){
+		comAlert("请选择是否全数据");
+		flag = false;
+		return
+	}
+	
+	
+	return flag;
+
+}
+	
+/*修改状态 */
+function updateStatePost(state) {
+	var ids = $('#tab_postmanager').jqGrid('getGridParam', 'selarrrow');
+	if (ids.length == 0) {
+		comAlert(pubprompt.pub_nochoice);
+		return;
+	} else {
+		var type = ""
+		if (state == "02valid") {
+			type = "生效"
+		} else if (state =="03invalid") {
+			type = "失效/终止"
+		} else if (state =="01draft") {
+			type = "退回"
+		}
+		if (confirm("您确定要" + type + "所选中的数据？")) {
+			var updatestate = {
+				_mt : "post.updateStateBatchById",
+				ids : ids,
+				state : state
+			};
+			updatestates(updatestate, "UserLogin", type);
+		}
+	}
+}
+
+function updatestates(requestData, level, type) {
+	var payload = {
+		data : requestData,
+		level : level
+	};
+	data = encrypt(payload.level, payload.data);
+	console.log(data);
+	$
+			.ajax({
+				type : "POST",
+				url : pubsources.pub_getlink,
+				contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					//TODO　判断删除是否成功
+					console.log(result);
+					if(com_error(result)){
+						comAlert(type+"成功");
+						jQuery("#tab_postmanager").trigger("reloadGrid");
+					} else {
+						comAlert(type+"失败");
+						alertMsg(result,"company_code_desc");
+					}
+
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+				}
+			});
+}	
+	
+	
+	
+	
+	
+</script>
+
+<style>
+
+/* 按钮样式 */
+.buttonz {
+	height:20px;
+	background: #ccc;
+	border: none;
+	color: #0089db;
+	cursor: pointer;
+}
+
+.buttonz:hover {
+	background: #0089db;
+	color: #fff;
+}
+</style>
+
+<div id="rPane_d" class="jq_top_div">
+	<div class="ctleft" id=""></div>
+	<div class="ctright">
+
+		<div class="rPane_d_menu">
+			<span> <input type="button" id="add_postmanager"
+				value="&nbsp;新增&nbsp;"><input type="button"
+				id="upd_postmanager" value="&nbsp;修改&nbsp;"><input
+				type="button" id="del_postmanager" value="&nbsp;删除&nbsp;"><input
+				type="button" id="effect_company"
+				onclick="javascript:updateStatePost('02valid')"
+				value="&nbsp;生效&nbsp;"><input type="button"
+				onclick="javascript:updateStatePost('03invalid')"
+				id="invalid_company" value="&nbsp;失效&nbsp; "><input
+				type="button" id="back_company" value="&nbsp;退回&nbsp;"
+				onclick="javascript:updateStatePost('01draft')">
+			</span>
+		</div>
+
+
+		<div class="rpane_status">
+			<label><input type="radio" id="editing" name="status"
+				value="01draft" onclick="javascript:queryPost('01draft')" /> 编辑中</label> <label><input
+				type="radio" id="enabled" name="status" value="02valid"
+				onclick="javascript:queryPost('02valid')" /> 生效</label> <label><input
+				type="radio" id="diabled" name="status" value="03invalid"
+				onclick="javascript:queryPost('03invalid')" /> 失效/终止</label> <label><input
+				type="radio" id="allstatus" name="status" value="" checked="checked"
+				onclick="javascript:queryPost('')" /> 全部 </label> <br>
+		</div>
+
+
+		<div class="rpane_search">
+			<input type="text" id="postman_search" name="postman_search"
+				placeholder="请输入岗位名称">
+			<button id="postman_search_btn" class="buttonz">查询</button>
+		</div>
+
+		<div class=rPane_dt>
+			<table id="tab_postmanager"></table>
+			<div id="pager1_postmanager"></div>
+		</div>
+
+	</div>
+</div>
+
+<input type="hidden" id="tg_managerpost_funid" value="">
+<input type="hidden" id="tg_managerpost_funcode" value="">
+
+

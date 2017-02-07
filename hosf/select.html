@@ -1,0 +1,22 @@
+<script type="text/javascript">
+$("#city_btn").click(function(){
+	var node_parent_search=$("#city_search").val();
+	//comAlert(node_parent_search)
+	if(city_search!=""){
+		var ss = {
+				_mt : "commparmtype.selectParamTypeByColumn",
+				paramName:node_parent_search
+			};
+			$("#city_parent").setGridParam({postData:ss}).trigger("reloadGrid", [{page:1}]);
+	}
+});
+</script>
+<div>
+   城市名称： <input type="text" id="city_search">
+    <button id="city_btn">查询</button>
+</div>
+
+<div >
+    <table id="city_parent"></table>
+    <div id="pager_city_parent"></div>
+</div>

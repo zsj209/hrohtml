@@ -1,0 +1,96 @@
+<!---------------------------------------------------------
+Coding:        darren
+Create Date:   2017-01-09
+Desc:          通用选择功能结点页面
+update History:
+  date:        
+  coding:      
+  desc:        
+---------------------------------------------------------->
+
+<script type="text/javascript">
+	//comAlert("selnode.html" + pubsources.pub_getlink);
+	$(function() {
+		var cn = [ '节点名称' ];
+		var cm = [ {
+			name : 'nodeName',
+			index : 'nodeName',
+			width : 200,
+			align : "left",
+			sorttype : "text"
+		} ];
+		jQuery("#tb_com_sel_node").jqGrid({
+			url : pubsources.pub_getlink,
+			datatype : "json",
+			mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+			postData : {
+				_mt : "node.nodepage"
+			},
+			mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"UserLogin","None"
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},//去除多余的参数
+			colNames : cn,
+			colModel : cm,
+			loadComplete : function(xhr) {
+				console.log(xhr);
+				//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+				return true;
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+			rowNum : 10,
+			rowList : [ 10, 20, 50 ],
+			pager : '#pg_com_sel_node',
+			shrinkToFit : false,
+			forceFit : true,
+			sortname : 'id',
+			sortorder : "desc",
+			viewrecords : true,
+			rownumbers : true,
+			ondblClickRow : function(id) {
+				//buttons = $('#tb_com_sel_node').dialog('option', 'buttons');
+				//$(buttons + ":first").trigger("click");
+
+				//jqueyr UI 变化后需要做调整
+				//comAlert($('#com_sel_selnode').parent().find(".ui-dialog-buttonset").find("button").length);
+				buttons = $('#com_sel_selnode').parent().find(".ui-dialog-buttonset").find("button");
+				//comAlert($(buttons).length);
+				//comAlert($(buttons).find(":first").html());
+				$(buttons).find(":first").trigger("click");
+			},
+			height : 270,
+			width : 650
+		});
+		
+		$("#com_sel_qksearch").click(function(){
+			var nodeName = $("#com_sel_search_node").val();
+			if(!val_isnull(nodeName)) {
+				var pd = $("#tb_com_sel_node").getGridParam("postData");
+				$.extend(pd,{nodeName: nodeName})
+				//$("#tb_com_sel_opencity").setGridParam({postData:pd}).trigger("reloadGrid", [{page:1}]);
+				$("#tb_com_sel_node").setGridParam({postData:pd,page:1}).trigger("reloadGrid");
+			} else {
+				comAlert(pubprompt.pub_sel_plsintqrycond);
+			}
+		});
+		
+	});
+</script>
+<div class="ui-grid-qkshdiv" style="width:650">
+	<label>节点名称：</label><input type="text" id="com_sel_search_node">
+	<span id="com_sel_qksearch" class="ui-qksh-btsh">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+</div>
+<table id="tb_com_sel_node" class="scroll"></table>
+<div id="pg_com_sel_node" class="scroll" style="height: 30px"></div>

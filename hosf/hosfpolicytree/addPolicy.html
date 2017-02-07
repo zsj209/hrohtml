@@ -1,0 +1,314 @@
+<script type="text/javascript">
+	$("#policyStarttime").datepicker();
+	$("#policyEndtime").datepicker();
+
+	//所属公司
+	/* $("#company_Name").click(function() {
+		var selpara = {
+				seltype : "selcompany",
+				seltitle : "所属公司",
+				rtnvalobj : "companyId",
+				rtndisobj : "companyName",
+				discol : 0
+			};
+			comsel(selpara);
+	}) */
+
+
+	$("#policyPro_Name").click(function() {
+		var selpara = {
+				seltype : "selcity",
+				seltitle : "选择城市",
+				rtnvalobj : "policyPro",
+				rtndisobj : "policyProName",
+				discol : 1,
+				flparams : "",
+				flparamvs : "",
+				vlck : "taxaccTmtid"
+			};
+			comsel(selpara);
+	})
+	
+	
+	/* $("#companyName").dblclick(function() {
+		if (confirm("确定要清除公司名称吗")) {
+			$("#companyName").val("");
+			$("#companyId").val("");
+		}
+	}); */
+	
+	$("#policyProName").dblclick(function() {
+		if (confirm("确定要清除地区名称吗")) {
+			$("#policyProName").val("");
+			$("#policyPro").val("");
+		}
+	});
+	
+	
+
+	//保存
+	$("#save_insruancesss").click(function() {
+		
+		if(!validataPolicy()){
+			return;
+		}
+		
+		//获取参数
+		 requestData = serach("hosfPolicy.addorupdate", "addPolicy");
+		delete requestData.companyName;
+		delete requestData.policyProName;
+		//调用方法
+		addorupdateDatePolicy(requestData, "UserLogin");
+	})
+
+	/* 新增或修改 */
+	function addorupdateDatePolicy(requestData, level, meth) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encryptNew(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//TODO 根据条件刷新
+				if (com_error(result)) {
+					comAlert(pubprompt.upd_succ);
+					jQuery("#tab_policy").trigger("reloadGrid");
+				} else {
+					alertMsg(result, "hosf_code_desc");
+					comAlert(pubprompt.upd_failure);
+				}
+
+			},
+			error : function() {
+				comAlert(pubsources.network_error);
+			}
+		});
+	}
+	
+	
+	function validataPolicy(){
+		var flag=true;
+		var policyName = $.trim($("#policyName").val());
+		var policyPro= $.trim($("#policyPro").val());
+		var policyStarttime = $.trim($("#policyStarttime").val());
+		var policyEndtime = $.trim($("#policyEndtime").val());
+		var policyAdday = $.trim($("#policyAdday").val());
+		var policyMinusday = $.trim($("#policyMinusday").val());
+		var policyValid = $.trim($("#policyValid").val());
+		var companyId = $.trim($("#companyId").val());
+		
+		
+		if(policyName == ""){
+			comAlert("请输入政策名称");
+			flag = false;
+			return;
+		}
+		
+		if(policyPro == ""){
+			comAlert("请选择地区");
+			flag = false;
+			return
+		}
+		
+		if(policyStarttime == ""){
+			comAlert("请选择开始时间");
+			flag = false;
+			return
+		}
+		
+		if(policyEndtime == ""){
+			comAlert("请选择结束时间");
+			flag = false;
+			return
+		}
+		
+		
+		var now = new Date().getTime();//当前时间戳
+		var time_1 = new Date(policyStarttime).getTime();//开始时间戳
+		var time_2 = new Date(policyEndtime).getTime();//结束时间戳
+		
+		if(time_1>time_2){
+			comAlert("开始时间需要小于结束时间");
+			flag = false;
+			return
+		}
+		
+		
+		
+		if(policyAdday == ""){
+			comAlert("请选择公积金报增日");
+			flag = false;
+			return
+		}
+		
+		if(policyMinusday == ""){
+			comAlert("请选择公积金报减日");
+			flag = false;
+			return
+		}
+		
+		
+		if(policyValid == ""){
+			comAlert("请选择是否有效");
+			flag = false;
+			return
+		}
+		
+		
+		if(companyId == ""){
+			comAlert("请选择所属公司");
+			flag = false;
+			return
+		}
+		return flag;
+	
+	}
+	
+	
+	
+	
+</script>
+
+
+<link rel="stylesheet" href="../css/table.css">
+
+<div class="topbutton">
+	<input type="button" id="save_insruancesss" value="&nbsp;保存&nbsp;">
+</div>
+<div class="jqForm ui-widget-content" style="border: 0px;">
+	<table id="addPolicy" class="ui-form-table" cellpadding="5" border='0'
+		style="width: 100%;">
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>政策名称:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="policyName" name="policyName" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>地区名称:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="policyProName" name="policyProName" type="text"
+					class="ui-form-value" layout="1" maxlength="50" readonly=""></span>
+				<span id="policyPro_Name" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+				<span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+		</tr>
+
+
+
+
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>开始时间:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="policyStarttime" name="policyStarttime" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>结束时间:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="policyEndtime" name="policyEndtime" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+		<tr>
+
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>公积金报增日:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select name="policyAdday" id="policyAdday" class="ui-form-value"
+					layout="1" maxlength="40" typeCode="seldays">
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>公积金报减日:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select name="policyMinusday" id="policyMinusday"
+					class="ui-form-value" layout="1" maxlength="40" typeCode="seldays">
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+		</tr>
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>是否有效:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select name="policyValid" id="policyValid" class="ui-form-value"
+					layout="1" maxlength="50" typeCode="yesno">
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+
+
+			<!-- <td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>所属公司:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="companyName" name="companyName" type="text"
+					class="ui-form-value" layout="1" maxlength="50" readonly=""></span>
+				<span id="company_Name" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+				<span class="ui-form-bspc">&nbsp;&nbsp;</span></td> -->
+
+		</tr>
+
+		<tr>
+			<td
+				style="width: 15%; background: rgb(231, 245, 254); vertical-align: middle;"
+				class="ui-form_tddisp" name="serp_svc_code"><label>备注:</label></td>
+			<td
+				style="background: #FFFFFF; padding-top: 3px; vertical-align: middle;"
+				colspan="3"><span class="ui-form-spc">&nbsp;</span> <span
+				style="float: left"> <textarea
+						style="width: 570px; height: 72px; max-width: 570px; max-height: 72px;"
+						id="policyNote" name="policyNote" type="text"
+						class="ui-form-value" layout="1" maxlength="50"></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+		<!--隐藏的属性用户类型-->
+		<!-- 角色id -->
+		<input id="id" name="id" type="hidden" value="">
+		<!-- 所属公司id -->
+		<input type="hidden" id='policyPro' />
+		<input type="hidden" id='companyId' />
+	</table>
+
+
+</div>

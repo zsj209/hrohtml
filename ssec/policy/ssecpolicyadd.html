@@ -1,0 +1,362 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script>
+var addgdid_policy="form_jq_ssec_policy";//新增 修改 显示数据的div
+var pkid=$("#ssec_policy_adduppk").val();//updateTag
+var gdid_policy="jq_ssec_policy";//显示数据的div
+var upinfointerface_policy="socialSsecpolicy.updateData";//修改数据的接口
+var ininfointerface_policy="socialSsecpolicy.insertData";//新增数据的接口
+var bn_div_policy="bn_ssec_policy";//按钮div的id
+var _mtpolicy="socialSsecpolicy.selectDataByIds";//updateTag
+var gdid="form_jq_ssec_policy_base";//updateTag
+var level="UserLogin";//updateTag
+var policyAry = new customDictionary();
+var policyUp=0;
+
+$(document).ready(function(){
+	
+	$("#policyCity_sel").click(function() {
+		var selpara = {seltype:"selcity", seltitle:"选择城市", rtnvalobj:"policyCity", rtndisobj:"policyCityDis", discol:1, flparams:"", flparamvs:""};
+		comsel(selpara);
+	});
+	$("#policyCityDis").dblclick(function() {
+		if(confirm("确定要清除地区名称吗")){
+			$("#policyCity").val("");
+			$("#policyCityDis").val("");
+		}
+		 
+	});
+	
+	var cityId=$("#ssec_policy_city").val();
+	var cityName=$("#ssec_policy_citydis").val();
+	if(cityId!="" && cityId!=1000){
+		$("#policyCity").val(cityId);
+		$("#policyCityDis").val(cityName);
+	}
+	
+	
+	$("#policyBgdate").datepicker();
+	$("#policyEddate").datepicker();
+	
+	$("#jq_lf_policy_pid").val(pkid);
+	$("#jq_lf_policy_base").css("background","#b7ddff");
+	$("#jq_lf_policy_one").css("background","#fff");
+	$("#jq_lf_policy_two").css("background","#fff");
+	
+	$("#"+addgdid_policy+"_one").remove();
+	$("#"+addgdid_policy+"_two").remove();
+	$("#form_jq_ssec_pocins").remove();//子节点divid 
+	$("#form_jq_ssec_oderins").remove();//子节点divid 
+	
+	$("#jq_lf_policy_base").bind("click",{type:1,addgdid:addgdid_policy},mainchildDisplay_policy);//新增页面 主信息点击事件
+	$("#jq_lf_policy_one").bind("click",{type:2,addgdid:addgdid_policy},mainchildDisplay_policy);//新增页面 子信息点击事件
+	$("#jq_lf_policy_two").bind("click",{type:3,addgdid:addgdid_policy},mainchildDisplay_policy);//新增页面 子信息点击事件
+	$("#jq_ssec_policy_basave").bind("click",{addgdid:addgdid_policy,gdid:gdid_policy,ininfointerface:ininfointerface_policy,upinfointerface:upinfointerface_policy,bn_div:bn_div_policy},addupSave_ssecpolicymain);//新增页面 子单据新增按钮保存事件
+	
+	var selids=[],selcode=[];
+	$('#'+gdid).find('.add_select').each(function(){
+        var obj = $(this);
+        var id =obj.attr('id'); 
+        var name =obj.attr('name'); 
+        selids.push(id);
+        selcode.push(name);
+    });
+	$('#'+gdid).find('.add_radio').each(function(){
+		 var obj = $(this);
+       var name =obj.attr('name'); 
+		$(":radio[name='"+name+"'][value='0']").prop("checked", "checked");
+	});
+	if((selids==null || selids=="") && pkid=="0"){
+		return;
+	}else if((selids==null || selids=="") && pkid!="0"){
+		updatePosrSetval_ssecpolicy(pkid);
+		return;
+	}else{
+		var secodejs=JSON.stringify(selcode);
+		var clnrequestData = {_mt:getSeltOption,paramtypelist:secodejs};
+		var payload = {
+			    data: clnrequestData,
+			    level: "None",
+			};
+			data = encrypt(payload.level, payload.data);
+			$.ajax({
+				type : "GET",
+				url : serversname,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials:true
+				},
+				data : serialize(data),
+				success : function(result) {
+					var data = result.content["0"].value;
+					
+					//var selJson= eval('('+  data+ ')');
+					
+					if(data!=undefined)
+					{
+						for (var i = 0; i < selids.length; i++) {
+							var vname=$("#"+selids[i]).attr("name");
+							//清空select
+							$("#"+selids[i]).empty();
+							$("#"+selids[i]).append("<option value='0'>--请选择--</option>");//为Select追加一个Option(下拉项)
+							for(var j=0;j<data.length;j++){
+								for (var k = 0; k < data[j].paramList.length; k++) {
+									if(vname==data[j].typeCode){
+										 $("#"+selids[i]).append("<option value='"+data[j].paramList[k].code+"'>"+data[j].paramList[k].desc+"</option>");
+									}
+								}
+							}
+						}
+					}
+					if(pkid!="0"){
+						updatePosrSetval_ssecpolicy(pkid);
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+			}
+			});
+	}
+});
+/*
+ * 主子表点击事件
+ * */
+function mainchildDisplay_policy(e){
+	if(e.data.type=="1"){
+		//主节点单击事件
+		var grdis=$('#'+e.data.addgdid+"_base").css('display');
+		$("#jq_lf_policy_base").css("background","#b7ddff");
+		$("#jq_lf_policy_one").css("background","#fff");
+		$("#jq_lf_policy_two").css("background","#fff");
+		if(grdis=="block"){return;}
+		else{
+			$("#"+e.data.addgdid+"_base").show();
+			$("#"+e.data.addgdid+"_one").remove(); 
+			$("#"+e.data.addgdid+"_two").remove(); 
+			$("#form_jq_ssec_pocins").remove(); //子节点divid
+			$("#form_jq_ssec_oderins").remove();//子节点divid 
+			
+		}
+	}else if(e.data.type=="2"){
+		var pkid=$("#jq_lf_policy_pid").val();
+		if(pkid=="" || pkid=="0"){
+			comAlert(pubprompt.pub_savebase);
+			return;
+		}
+		var grdis=$('#'+e.data.addgdid+"_base").css('display');
+		if(grdis=="block"){
+			policyUp=ckValuesIsup(policyAry,addgdid_policy);
+			if(policyUp>0){
+				comAlert(pubprompt.pub_upnosv);
+				return;
+			}
+		}
+		
+		$("#jq_lf_policy_one").css("background","#b7ddff");
+		$("#jq_lf_policy_base").css("background","#fff");
+		$("#jq_lf_policy_two").css("background","#fff");
+		//子节点单击事件
+		var grdis=$('#'+e.data.addgdid+"_one").css('display');
+		if(grdis=="block"){return;}
+		else{
+			$("#"+e.data.addgdid+"_base").hide();
+			$("#"+e.data.addgdid+"_one").remove();
+			$("#"+e.data.addgdid+"_two").remove();
+			$("#form_jq_ssec_pocins").remove(); //子节点divid
+			$("#form_jq_ssec_oderins").remove();//子节点divid 
+			var fone='<DIV CLASS="div_center"  id="'+e.data.addgdid+'_one" style=""></div>';
+			$("#"+e.data.addgdid+"_base").after(fone);
+			$("#"+e.data.addgdid+"_one").load('../ssec/policy/ssecpolicyins.html');//子节点divid 加载页面
+		}
+	}else if(e.data.type=="3"){
+		var pkid=$("#jq_lf_policy_pid").val();
+		if(pkid=="" || pkid=="0"){
+			comAlert(pubprompt.pub_savebase);
+			return;
+		}
+		var grdis=$('#'+e.data.addgdid+"_base").css('display');
+		if(grdis=="block"){
+			policyUp=ckValuesIsup(policyAry,addgdid_policy);
+			if(policyUp>0){
+				comAlert(pubprompt.pub_upnosv);
+				return;
+			}
+		}
+		$("#jq_lf_policy_two").css("background","#b7ddff");
+		$("#jq_lf_policy_base").css("background","#fff");
+		$("#jq_lf_policy_one").css("background","#fff");
+		//子节点单击事件
+		var grdis=$('#'+e.data.addgdid+"_two").css('display');
+		if(grdis=="block"){return;}
+		else{
+			$("#"+e.data.addgdid+"_base").hide();
+			$("#"+e.data.addgdid+"_one").remove();
+			$("#"+e.data.addgdid+"_two").remove();
+			$("#form_jq_ssec_pocins").remove(); //子节点divid
+			$("#form_jq_ssec_oderins").remove();//子节点divid 
+			var fone='<DIV CLASS="div_center"  id="'+e.data.addgdid+'_two" style=""></div>';
+			$("#"+e.data.addgdid+"_base").after(fone);
+			$("#"+e.data.addgdid+"_two").load('../ssec/policy/ssecpolicyinsdis.html');//子节点divid 加载页面
+		}
+	}
+}
+function addupSave_ssecpolicymain(e){
+	var rtNb=bn_addupSave_main(gdid_policy+"_addinfoarea",e,"jq_lf_policy_pid");
+	//返回值为1的时候表示保存成功
+	if(rtNb==1){
+		//清空集合、标记
+		policyUp=0;
+		policyAry=ckValuesUpset(addgdid_policy);
+	}
+}
+//updateTag
+function updatePosrSetval_ssecpolicy(){
+	var clnrequestData = {_mt:_mtpolicy,selIds:pkid};
+	var payload = {
+		    data: clnrequestData,
+		    level: level,
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "GET",
+			url : serversname,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials:true
+			},
+			data : serialize(data),
+			success : function(result) {
+				var data = result.content["0"].value;
+				lineJson = JSON.stringify(data[0]);
+                updateJson = eval('(' + lineJson + ')'); //Json
+                //获得key
+                var updateKey=new Array();
+                for (var o in updateJson){
+                	policyAry.put(o,updateJson[o]);
+                    updateKey.push(o);
+                };
+                $('#'+gdid).find('.add_input').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_inputdis').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_texa').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_check').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$("#"+id).attr("checked", true);
+                        	}else{
+                        		$("#"+id).attr("checked", false);
+                        	}
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_select').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_radio').each(function(){
+                    var obj = $(this);
+                    var name =obj.attr('name'); 
+                    for(var i=0;i<updateKey.length;i++){
+                    	if(name == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$(":radio[name='"+name+"'][value='1']").prop("checked", "checked");
+                        	}else{
+                        		$(":radio[name='"+name+"'][value='0']").prop("checked", "checked");
+                        	}
+                    	}
+                     }
+                });
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+		}
+		});
+}
+function ckpayPolicy(stvl){
+	$(":radio[name='policyValid'][value='" + stvl + "']").prop("checked", "checked");
+}
+</script>
+<style>
+</style>
+<div id="form_jq_ssec_policy"  TITLE="" style="height: 99%;">
+	<div class="div_left" style="height: 99%;">
+		<div style="border: 1px solid #cccccc;width: 98%;height: 99%;" id="ssec_polcid_hg">
+			<div class="oncursor" id="jq_lf_policy_base"><img class="oncursorimg" src="../css/images/com/collapsed.gif"><span style="float:left;">基本信息</span></div>
+			<div class="oncursor" id="jq_lf_policy_one"><img class="oncursorimg" src="../css/images/com/collapsed.gif"><span style="float:left;">社保险种</span></div>
+			<div class="oncursor" id="jq_lf_policy_two"><img class="oncursorimg" src="../css/images/com/collapsed.gif"><span style="float:left;">历史险种</span></div>
+			<div style="display: none"><input type="hidden" id="jq_lf_policy_pid" values="0"/></div>
+		</div>
+	</div> 
+	<DIV CLASS="div_center"  id="form_jq_ssec_policy_base">
+		<div id="form_jq_ssec_policy" class="margin_left16">
+			<div><input id="jq_ssec_policy_basave" type="button" value="保存" class="bn_sv_base"/></div>
+			<table id='jq_ssec_policy_addinfoarea' class='jqForm'  border='0' style='width: 100%;margin-top: 8px;'>
+				<tr>
+					<td class="add_lfspan"><label>政策名称<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="policyName" isck="1" titl="政策名称"></td>
+					<td class="add_lfspan"><label>地区名称<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan">
+					<input class="add_input" id="policyCity" type="hidden" isck="1" titl="地区名称">
+					<input class="add_inputdis" id="policyCityDis" type="text" name="" readonly="readonly"><span id="policyCity_sel" class="add_fwid">...</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>开始时间<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="policyBgdate" isck="1,3" titl="开始时间"></td>
+					<td class="add_lfspan"><label>结束时间<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="policyEddate" isck="1,3" ckvl="policyBgdate" titl="结束时间"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>报增日期<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><select class="add_select" id="policyAday" name="seldays" isck="1" titl="报增日期"><option value="0">--请选择--</option></select></td>
+					<td class="add_lfspan"><label>报减日期<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><select class="add_select" id="policyRday" name="seldays" isck="1" titl="报减日期"><option value="0">--请选择--</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>基数相同</label></td><td class="add_rtspan"><input class="add_check ui-form-checkbox" type="checkbox" value="" id="policyBase" titl="基数相同"></td>
+					<td class="add_lfspan"><label>是否有效</label></td>
+					<td class="add_rtspan">
+						<div onclick="ckpayPolicy(1)" class="add_radiolf"><input type="radio" class="add_radio ui-form-radio" name="policyValid" value="1" id="policyValidy" checked="checked"/><span class="ui-form-radiospan" style="float: right;"> 是</span></div>
+						<div onclick="ckpayPolicy(0)" class="add_radiort"><input type="radio" class="add_radio ui-form-radio" name="policyValid" value="0" id="policyValidn" /><span class="ui-form-radiospan" style="float: right;"> 否</span></div>
+					</td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>备注</label></td>
+					<td class="add_rtspan_texa" colspan="3"><textarea class="add_texa" id="policyNote"></textarea></td>
+					<td></td><td></td>
+				</tr>
+			</table>
+		</div>
+	</DIV>
+</div>

@@ -1,0 +1,218 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script>
+$(function(){ 
+	var serversname=pubsources.pub_getlink;//网关接口
+	var gdid_pocins="jq_ssec_pocins";//显示数据的div
+	var addgdid_pocins="form_jq_ssec_pocins";//新增 修改 显示数据的div
+	var updinterface_pocins="socialSsecInsurance.selectDataByIds";//修改时根据id获取数据的接口
+	var upinfointerface_pocins="socialSsecInsurance.updateData";//修改数据的接口
+	var ininfointerface_pocins="socialSsecInsurance.insertData";//新增数据的接口
+	var dlinfointerface_pocins="socialSsecInsurance.batchDeleteByid";//批量删除接口
+	var bn_div_pocins="bn_ssec_pocins";//按钮div的id
+	var None="UserLogin";//安全等级
+	var bnsuffix_pocins="_ssec_pocins";//按钮后缀
+	var pageid_pocins="#page_ssec_pocins";//分页div
+	
+
+	var bahg=$("#ssec_polcid_hg").height()-80;
+	
+	/*--------加载表格------*/
+	//获取按钮
+	gettablebninfo_pocins(bn_div_pocins, None);
+	function gettablebninfo_pocins(bndivid, level) {
+		//$("#jq_pays_fmatpro_addinfoarea").html("<input class='add_input' type='text' id='fmatproDataitem' isck='1' titl='数据项' isck='1'>");
+		var bnnames = eval("([{code:'bn_add',name:'新增'},{code:'bn_upd',name:'修改'},{code:'bn_del',name:'删除'}])");
+		//获取按钮信息
+		getButtonInfo_pocins(bndivid,bnnames);
+	}
+	/*拼接按钮模块div*/
+	function getButtonInfo_pocins(bndivid,bnnames){
+		var _arr = [];
+		for(var i=0;i<bnnames.length;i++){
+			//此处需要修改  为了区分，按钮后缀改为自己的
+			_arr.push('<input type="button" id="'+bnnames[i].code+bnsuffix_pocins+'" value="&nbsp;'+bnnames[i].name+'&nbsp;">');
+		}
+		$("#"+bndivid).html(_arr.join(""));
+		//获取jqgrid数据
+		gettableHead_pocins();
+	} 
+	/*获得jqgrid表头*/
+	function gettableHead_pocins() {
+		var data=[];
+		data.push("id,险种名称,险种归属,起始时间,终止时间,社保最高基数,社保最低基数,企缴比例,企缴小数位规则,个缴比例,个缴小数位规则,企业附加金额,个人附加金额,是否补缴,支付频率,企业支付比例,个人支付比例");
+		data.push("[{name:'id'},{name:'insceName',width:'100'},{name:'insceInsDis',width:'100'},{name:'insceBdate',width:'100'},"+
+		"{name:'insceEdate',width:'100'},{name:'insceHbase',width:'100'},{name:'insceLbase',width:'100'},"+
+		"{name:'insceCprop',width:'100'},{name:'insceCruleDis',width:'100'},{name:'inscePprop',width:'100'},"+
+		"{name:'inscePruleDis',width:'100'},{name:'insceCamount',width:'100'},{name:'inscePamount',width:'100'},"+
+		"{name:'insceIstDis',width:'100'},{name:'insceFrequencyDis',width:'100'},{name:'insceCpayprop',width:'100'},"+
+		"{name:'inscePpayprop',width:'100'}]");
+		disjQgridTable_pocins(data[0],data[1]);
+	}
+
+	/*获取jqgrid数据*/
+	function disjQgridTable_pocins(colNames,colModel) {
+		var colnms = colNames.split(",");
+		var colmdsJson= eval('('+  colModel+ ')');
+		  
+		//清空jqgrid中的数据
+	  $('#'+gdid_pocins).jqGrid('clearGridData');
+	  var pidvl=$("#jq_lf_policy_pid").val();
+	  var payload = {data: {_mt:"socialSsecInsurance.selectDataSsecInsurance",inscePid:pidvl,insceState:"0"},level: None};
+	  //var data = encrypt(payload.level, payload.data);
+	  
+	  $("#"+gdid_pocins).jqGrid({
+			url:serversname,
+			datatype: "json",
+			mtype: "POST",
+			postData: payload.data,
+			mylevel : None,
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+			colNames: colnms,
+		   	colModel: colmdsJson,
+		   	rowNum : 10, 
+			forceFit : true, 
+			rownumbers : true,
+		   	autowidth: false,
+		   	shrinkToFit:false,
+		   	rowList: [10,50,100],
+		   	pager : pageid_pocins,
+		   	sortname: 'id',
+		    viewrecords: true,
+		    rownumbers: true,
+		    rownumWidth: "30",
+		    gridview: true, 
+		    multiselect: true, 
+		    sortorder: "desc",
+		    height: bahg,
+		    width: dipgoWo-96,
+	 	 	ondblClickRow: function(id) {
+				 
+			}
+		}).navGrid("#pg_",{refresh: false, edit: false, add: false, del: false, search: false})
+		.navButtonAdd("#pg_",{title:"refresh",caption:"",buttonicon:"ui-icon-refresh",
+			onClickButton:function(){
+				
+			},position:"last"});
+	  jQuery("#"+gdid_pocins).setGridParam().hideCol("id").trigger("reloadGrid");
+		//此处需要修改 此处注意 因为无法动态拼接方法，所以只能这样绑定 
+		$("#bn_add"+bnsuffix_pocins).bind("click",{bntype:"add",addgdid:addgdid_pocins,gdid:gdid_pocins,ininfointerface:ininfointerface_pocins,bn_div:bn_div_pocins},addinfo_pocins);//新增方法名请改成自己的
+		//此处需要修改 修改按钮 参数说明：jqgrid的id，修改标识，获取修改数据的接口，修改的div拼接页面的div，修改的div的外层id（用于显示隐藏界面）
+		$("#bn_upd"+bnsuffix_pocins).bind("click",{bntype:"upd",addgdid:addgdid_pocins,gdid:gdid_pocins,upinfointerface:upinfointerface_pocins,updinterface:updinterface_pocins,bn_div:bn_div_pocins},addinfo_pocins);//新增方法名请改成自己的
+		
+		//此处需要修改 删除按钮  参数说明：jqgrid的id，删除数据接口
+		$("#bn_del"+bnsuffix_pocins).bind("click",{gdid:gdid_pocins,delinterface:dlinfointerface_pocins},bn_del_pocins);
+		
+		
+	}
+	/*--------加载表格 end------*/
+
+	/*
+	 * 新增方法
+	 * */
+	function addinfo_pocins(e){
+		var pkid="0";
+		if(e.data.bntype=="upd"){
+			if(getSledRowsNumber(e.data.gdid)){return;}
+			var r = $("#"+e.data.gdid).getGridParam('selrow');
+			pkid=$("#"+e.data.gdid).getCell(r,2);
+			if(pkid==null){
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			}
+		}
+		$("#ssec_poins_adduppk").val(pkid);
+		//setaddupDivVlues(addgdid_pocins);
+		var tilStr=getAddOrUp(pkid,"社保险种");
+		//var pidvl=$("#jq_lf_policy_pid").val();
+		//$("#inscePid").val(pidvl+"");//存放外键id
+		var btns = {
+				'保存':function() {bn_addupSave_mian(addgdid_pocins+"_addinfoarea",e,pkid);},
+				'取消':function() {$(this).dialog('close');$("#touming").hide();}
+			};
+		var s = $("<DIV ID='"+addgdid_pocins+"_addinfoarea'></DIV>");
+		$(s).load("../ssec/policy/ssecpolicyinsadd.html?tsid="+ new Date().getTime()).dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			title : tilStr,
+			height : dipgoHo,
+			width : dipgoWo+40,
+			resizable : false,
+			modal : true,
+			buttons :btns,
+			close : function(event, ui) {
+				$(this).remove();
+			}
+		});
+		/**
+		$("#"+e.data.addgdid).dialog({
+			autoOpen: true,
+			bgiframe: true,
+			title : tilStr,
+			height: 500,
+			width: 800,
+			modal: true,
+			resizable : false,
+			buttons: btns,
+			close: function(event, ui) {
+				$(this).dialog('close');
+				$("#touming").hide();
+			}
+		});
+		gettableSelectval(e,pkid);
+		**/
+		//显示透明层
+		$("#touming").show();
+	}
+
+	function bn_del_pocins(e){
+		var gdid=e.data.gdid,delinterface=e.data.delinterface;
+		var rows = $("#"+gdid).getGridParam('selarrrow'),rl="";
+		var dsum=0;
+		$.each(rows, function(i,n){
+			rl += $("#"+gdid).getCell(n,2) + ",";
+			dsum=dsum+1;
+		});
+		if(rows.length >= 1) {rl=rl.substring(0,rl.length-1);}
+		if(rl==""){
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		}
+		if(confirm("您确定删除选中的 "+dsum+" 条记录吗？")) {
+			delDataInfo(gdid,delinterface,None,rl);
+		}
+	}
+
+
+	});
+</script>
+<style> 
+</style>
+
+<div class="rPane_d" class="jq_top_div">
+	<div id="bn_ssec_pocins" class="jq_top_bs_button" >
+	</div>
+	<div class="child_div_cs">
+		<table id="jq_ssec_pocins" class="jqgridtable"></table> 
+		<div id="page_ssec_pocins"></div>
+	</div>
+	<div style="display: none;">
+		<input type="hidden" value="" id="ssec_poins_adduppk"/>
+	</div>
+</div>

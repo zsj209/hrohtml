@@ -1,0 +1,446 @@
+<script type="text/javascript">
+	$(function() {
+		//单选框的chenge事件
+		$('input:radio[name="role_status"]').change( function(){
+			//TODO 查询
+			requestData = {
+				_mt : "role.rolepage",
+				roleName : $("#role_search").val(),
+				enabled : $("input[name='role_status']:checked").val()
+			};
+			$("#tab_role").jqGrid('setGridParam', {
+				postData : requestData, //发送数据
+				page : 1
+			}).trigger("reloadGrid");
+		})
+		
+		var oH = $("#rPane").height() - 200;
+		var oW = $("#rPane").width() - 40;
+		var ss = {
+			_mt : "role.rolepage",
+			roleName : $("#role_search").val(),
+			enabled : $("input[name='role_status']:checked").val()
+		};
+		getRoleData(ss);
+		function getRoleData(requestData) {
+			jQuery("#tab_role").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "RoleLogin",//自定义字段表示访问方法的安全等级"RoleLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ "角色名称", "创建时间", "终止时间","所属公司","角色类型","是否有效"],
+						colModel : [ {
+							name : 'roleName',
+							index : 'roleName',
+							width : 100,
+							align : "left",
+							sorttype : "text",
+						}, {
+							name : 'createTime',
+							index : 'createTime',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'terminationTime',
+							index : 'terminationTime',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'companyName',
+							index : 'companyName',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'typeDesc',
+							index : 'typeDesc',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'enabledDesc',
+							index : 'enabledDesc',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}],
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+							if(com_error(xhr)){
+								return true ;
+							}else{
+								alertMsg(xhr,"usermgmt_code_desc");
+								return false;
+							}
+						},
+						jsonReader : {
+							/*content中的响应*/
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 20,
+						rowList : [ 20, 50, 100],
+						pager : '#pager1_role',
+						height : oH,
+						width : oW,
+						shrinkToFit : false,
+						forceFit : true,
+						sortorder : "desc",
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+					});
+			  jQuery("#tab_role").jqGrid('navGrid','#pager1_role',{edit:false,add:false,del:false,search:false});
+
+		}
+
+		/*--------加载表格 end------*/
+		/*----------新增 保存-----------*/
+		//新增点击事件
+		$("#add_role").click(function() {
+			roleDialog("新增角色信息");
+			//加载下拉框
+			getSelectDataTypeList({"type":"bustype","enabled":"pubstatus"});
+		})
+
+		function roleDialog(pagetitle) {
+			var s = $("<DIV ID=\"add_upd_role\"></DIV>");
+			//加载新增页面
+			$(s).load("../usermgmt/role/addrole.html?tsid="+ new Date().getTime(), function() {
+				
+			}).dialog(
+					{
+						autoOpen : true,
+						closeOnEscape : true,
+						bgiframe : true,
+						title : pagetitle,
+						height : 500,
+						width : 900,
+						resizable : false,
+						modal : true,
+						buttons : {
+							"保存" : function() {
+								//保存
+								//验证参数
+								 if(!validataRole()){
+									return;
+								} 
+								//获取参数
+								requestData = serach("role.addOrModifyRole",
+										"addRole");
+								delete requestData.companyName;
+								//调用方法
+								var flag = false;
+								if($("#id").val() == null || $("#id").val() == ""){
+									flag = true;
+								}
+								addOrModifyRole(requestData, "UserLogin",flag);
+								
+							},
+							"取消" : function() {
+								$(this).dialog("close");
+							},
+						},
+						close : function(event, ui) {
+							$(this).remove();
+						}
+					})
+		}
+
+		/*---------新增保存 end --------*/
+		/*---------修改 ---------*/
+		//1.点击修改按钮加载选中的行的数据到修改页面
+		//点击修改第一层
+		$("#upd_role").click(function() {
+			var ids = $('#tab_role').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert("请选择要修改的信息");
+				return;
+			} else if (ids.length > 1) {
+				comAlert("一次只能修改一条数据");
+				return;
+			}
+			//加载修改页面
+			roleDialog("修改角色信息");
+
+			//加载下拉框
+			getSelectDataTypeList({"type":"bustype","enabled":"pubstatus"},false,function(){
+				//加载角色信息
+				var updateRoleInfo = {
+					_mt : "role.getrolebyid",
+					id : ids
+				};
+				getUpdateRole(updateRoleInfo, "RoleLogin");
+				
+			});
+		})
+
+		//获取要修改的角色的信息
+		function getUpdateRole(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "POST",
+				url : pubsources.pub_getlink,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					//给修改页面的input框赋值
+					if(com_error(result)){
+						data = result.content["0"];
+						setData(data, "addRole");
+					}else{
+						alertMsg(result,"usermgmt_code_desc");
+					}
+				},
+				error : function() {
+					comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+				}
+			});
+		}
+		/*---------修改保存 end---------*/
+
+		/*----------删除--------*/
+		$("#del_role").click(function() {
+			var ids = $('#tab_role').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert("请选择要删除的信息");
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "role.deleterole",
+						ids : ids
+					};
+					deleteRole(del, "RoleLogin");
+				}
+			}
+		})
+
+		function deleteRole(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							console.log(result);
+							if(com_error(result)){
+								comAlert("删除成功");
+								jQuery("#tab_role").trigger("reloadGrid");
+							}else{
+								alertMsg(result,"usermgmt_code_desc");
+							}
+						
+							
+						},
+						error : function() {
+							comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+						}
+					});
+		}
+		/*-----------删除 end----------*/
+		/*---------修改保存 end---------*/
+
+		/*----------批量改变角色状态--------*/
+		//生效
+		$("#modify_status_valid").bind('click',function(){msv("02valid",true)});
+		//失效
+		$("#modify_status_invalid").bind('click',function(){msv("03invalid",false)});
+		
+		function msv(status,flag) {
+			var ids = $('#tab_role').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert("请选择要修改的信息");
+				return;
+			} else {
+				if (confirm("您确定要修改选中的信息？")) {
+					var modify = {
+						_mt : "role.modifyenabled",
+						ids : ids,
+						status:status
+					};
+					modifyStatus(modify, "RoleLogin",flag);
+				}
+			}
+		}
+
+		function modifyStatus(requestData, level,flag) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							console.log(result);
+							if(com_error(result)){
+								if(flag){//生效成功
+									comAlert(pubprompt.valid_succ);
+								}else{//失效成功
+									comAlert(pubprompt.invalid_failure);
+									
+								}
+								jQuery("#tab_role").trigger("reloadGrid");
+							}else{
+								alertMsg(result,"usermgmt_code_desc");
+							}
+						},
+						error : function() {
+							comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+						}
+					});
+		}
+		/*----------批量改变角色状态 end----------*/
+		
+	})
+	
+	//主页面的查询
+	$("#roles_search_btn").bind('click', function() {
+		requestData = {
+			_mt : "role.rolepage",
+			roleName : $("#role_search").val(),
+			enabled : $("input[name='role_status']:checked").val()
+		};
+		$("#tab_role").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	});
+	
+	function validataRole(){
+		var flag=true;
+		var roleName = $.trim($("#roleName").val());
+		var type = $.trim($("#type").val());
+		var enabled = $.trim($("#enabled").val());
+		var companyName = $.trim($("#companyName").val());
+		var createTime = $.trim($("#createTime").val());
+		if(roleName == ""){
+			comAlert("请填写角色名称");
+			return flag = false;
+		}
+		if(type == ""){
+			comAlert("请选择角色类型");
+			return flag = false;
+		}
+		if(createTime == ""){
+			comAlert("请选择创建日期");
+			return flag = false;
+		}
+		if(companyName == ""){
+			comAlert("请选择所属公司");
+			return flag = false;
+		}
+		if(enabled == ""){
+			comAlert("请选择是否有效");
+			return flag = false;
+		}
+		return flag;
+	
+	}
+	
+	/* 权限分配 */
+	$("#permission_assignment").click(function(){
+		$("#permiss_roleId").val("");
+		$("#permiss_roleName").val("");
+		var ids = $('#tab_role').jqGrid('getGridParam', 'selarrrow');
+		if (ids.length == 0) {
+			comAlert("请选择要分配权限的角色");
+			return;
+		} else if (ids.length > 1) {
+			comAlert("一次只能给一个角色分配权限");
+			return;
+		}
+		//加载 权限分配页面
+		rolePermission("权限分配");
+		
+	});
+
+	function rolePermission(pagetitle) {
+		var s = $("<DIV ID=\"add_role_permission\"></DIV>");
+		var roleId = $('#tab_role').jqGrid('getGridParam', 'selarrrow')[0];
+		var rowData = $("#tab_role").getRowData(roleId);
+		var roleName = rowData.roleName;
+		$("#permiss_roleId").val(roleId);
+		$("#permiss_roleName").val(roleName);
+		//加载权限分配页面
+		$(s).load("../usermgmt/role/assignPermission.html?tsid="+ new Date().getTime()).dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			title : pagetitle,
+			height : 600,
+			width : 900,
+			resizable : false,
+			modal : true,
+			close : function(event, ui) {
+				$(this).remove();
+			}
+		});
+	};
+</script>
+<div class="rPane_d_menu">
+	<input type="button" id="add_role" value="&nbsp;新增&nbsp;"><input type="button" id="upd_role" value="&nbsp;修改&nbsp;"><input type="button" id="del_role" value="&nbsp;删除&nbsp;"><input type="button" id="modify_status_valid" value="&nbsp;生效&nbsp;"><input type="button" id="modify_status_invalid" value="&nbsp;失效&nbsp;"><input type="button" id="permission_assignment" value="&nbsp;权限分配&nbsp;">
+</div>
+<div class="rpane_status">
+		<input style="vertical-align:middle;" type="radio" id="role_status_1" name="role_status" value="01draft" /><label for ="role_status_1" style="vertical-align:middle;">编辑中</label><input style="vertical-align:middle;" type="radio" id="role_status_2" name="role_status" value="02valid" checked="checked" /><label for="role_status_2" style="vertical-align:middle;">生效</label><input style="vertical-align:middle;" type="radio" id="role_status_3" name="role_status" value="03invalid" /><label for="role_status_3" style="vertical-align:middle;">失效</label><input style="vertical-align:middle;" type="radio" id="role_status_4" name="role_status" value="" /><label for="role_status_4" style="vertical-align:middle;">全部</label></br>
+</div>
+<div class="rpane_search jqForm">
+	<input type="text"
+		id="role_search" style="float: left;" name="node_search"
+		 placeholder="请输入角色名称"><input type="button" id="roles_search_btn"
+		value="&nbsp;查询&nbsp;">
+</div>
+<div class=rPane_dt>
+	<table id="tab_role"></table>
+	<div id="pager1_role"></div>
+</div>
+<input type="hidden" id="permiss_roleId">
+<input type="hidden" id="permiss_roleName">

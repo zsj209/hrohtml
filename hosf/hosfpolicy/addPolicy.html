@@ -1,0 +1,356 @@
+<script type="text/javascript">
+	function addAccount(requestData, level) {
+		var payload = {
+			data : requestData,
+			level : level,
+		};
+		data = encryptNew(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "GET",
+			url : "http://servers2.hrocloud.com:8099/api/v1",
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//TODO 根据条件刷新
+				jQuery("#list1_account").trigger("reloadGrid");
+			},
+			error : function() {
+				comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+			}
+		});
+	}
+
+	//根据id查询
+	$("#select_city").click(function() {
+		$("#upd_menu_account").dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			width : 600,
+			resizable : false,
+			modal : true,
+			buttons : {
+				"取消" : function() {
+
+					$(this).dialog("close");
+				},
+				"保存" : function() {
+					//获取参数
+
+					id = $('#city_parent').jqGrid('getGridParam', 'selrow');
+					rowData = jQuery("#city_parent").getRowData(id);
+					paramTypeName = rowData['typeName'];
+					$("#paramType").val(id);
+					$("#paramTypeName").val(paramTypeName);
+					$(this).dialog("close");
+				},
+			}
+		});
+		$("#upd_menu_account").load("../hosf/select.html", function() {
+			requestData = {
+				_mt : "commparmtype.selectParamTypeByColumn"
+			};
+			getCity(requestData);
+		});
+
+	})
+
+	function getCity(requestData) {
+		jQuery("#city_parent").jqGrid({
+			url : 'http://servers2.hrocloud.com:8099/api/v1',
+			datatype : "json",
+			mtype : "POST",
+			postData : requestData,
+			mylevel : "UserLogin",
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			colNames : [ '编号', '类型名称' ],
+			colModel : [ {
+				name : 'id',
+				index : 'id',
+				width : 100,
+				align : "center",
+				sorttype : "text",
+				hidden : true
+			}, {
+				name : 'typeName',
+				index : 'typeName',
+				width : 400,
+				align : "left",
+				sorttype : "text"
+			} ],
+			loadComplete : function(xhr) {
+				console.log(xhr);
+
+				return true;
+			},
+			jsonReader : {
+				root : "rows",
+				page : "page",
+				total : "total",
+				records : "records"
+			},
+			ondblClickRow : function(rowid, iRow, iCol, e) {
+				var rowData = jQuery("#city_parent").getRowData(rowid);
+				var accountPro = rowData['typeName'];
+
+				$("#accountdis").val(rowid);
+				$("#accountPro").val(accountPro);
+
+				$("#upd_menu_account").dialog("close");
+
+			},
+			rowNum : 5,
+			rowList : [ 5, 10, 20 ],
+			pager : '#pager_city_parent',
+			shrinkToFit : false,
+			forceFit : true,
+			sortname : 'id',
+			sortorder : "desc",
+			viewrecords : true,
+			rownumbers : true,
+
+		});
+		//  jQuery("#list1").jqGrid('navGrid','#pager1',{edit:false,add:false,del:false});
+	}
+
+	//根据id查询
+	$("#select_company").click(function() {
+		$("#upd_menu_account").dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			width : 600,
+			resizable : false,
+			modal : true,
+			buttons : {
+				"取消" : function() {
+
+					$(this).dialog("close");
+				},
+				"保存" : function() {
+					//获取参数
+
+					id = $('#company_parent').jqGrid('getGridParam', 'selrow');
+					rowData = jQuery("#company_parent").getRowData(id);
+					companyName = rowData['companyName'];
+					$("#companyId").val(id);
+					$("#companyName").val(companyName);
+					$(this).dialog("close");
+				},
+			}
+		});
+		$("#upd_menu_account").load("../hosf/company.html", function() {
+			requestData = {
+				_mt : "company.getCompanyByPage"
+			};
+			getParent(requestData);
+		});
+
+	})
+
+	function getParent(requestData) {
+		jQuery("#company_parent").jqGrid({
+			url : 'http://servers2.hrocloud.com:8099/api/v1',
+			datatype : "json",
+			mtype : "POST",
+			postData : requestData,
+			mylevel : "None",
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			colNames : [ '编号', '公司名称' ],
+			colModel : [ {
+				name : 'id',
+				index : 'id',
+				width : 100,
+				align : "center",
+				sorttype : "text",
+				hidden : true
+			}, {
+				name : 'compName',
+				index : 'compName',
+				width : 400,
+				align : "left",
+				sorttype : "text"
+			} ],
+			loadComplete : function(xhr) {
+				console.log(xhr);
+
+				return true;
+			},
+			jsonReader : {
+				root : "rows",
+				page : "page",
+				total : "total",
+				records : "records"
+			},
+			ondblClickRow : function(rowid, iRow, iCol, e) {
+				var rowData = jQuery("#company_parent").getRowData(rowid);
+				var compName = rowData['compName'];
+			
+				$("#companyids").val(rowid);
+				$("#companyId").val(compName);
+
+				$("#upd_menu_account").dialog("close");
+
+			},
+			rowNum : 5,
+			rowList : [ 5, 10, 20 ],
+			pager : '#pager_company_parent',
+			shrinkToFit : false,
+			forceFit : true,
+			sortname : 'id',
+			sortorder : "desc",
+			viewrecords : true,
+			rownumbers : true,
+
+		});
+		//  jQuery("#list1").jqGrid('navGrid','#pager1',{edit:false,add:false,del:false});
+	}
+</script>
+
+<style type="text/css">
+.ui-form-bspcs {
+	color: red;
+	padding-right: 10px;
+	float: right;
+	font-weight: bold;
+	padding-top: 3px;
+}
+</style>
+
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addAccount" class="ui-form-table" cellpadding="5" border='0'
+		style="width: 100%;">
+
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>账号名称:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountName" name="accountName" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>地区名称:</label>
+				<span class="ui-form-bspcs">*</span></td>
+
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<input ismust="1" id="accountPro" name="accountPro" type="text"
+					class="ui-form-value" layout="1" maxlength="50">
+			</span> <span id="select_city" class="ui-form-sbtnew ui-form-sel">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td>
+
+
+
+			<!-- <td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountPro" name="accountPro" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td> -->
+
+
+		</tr>
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>登记号:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountRegister" name="accountRegister" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>补充登记号:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountAddregister" name="accountAddregister" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+
+
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>Uk编号:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountUknum" name="accountUknum" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>Uk密码:</label>
+				<span class="ui-form-bspcs">*</span></td>
+
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="accountUkpass" name="accountUkpass" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>所属公司:</label>
+				<span class="ui-form-bspcs">*</span></td>
+
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<input ismust="1" id="companyId" name="companyId" type="text"
+					class="ui-form-value" layout="1" maxlength="50">
+			</span> <span id="select_company" class="ui-form-sbtnew ui-form-sel">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		</tr>
+
+
+
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="accountNote"><label>备注:</label></td>
+			<td colspan="3"
+				style="width: 85%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<textarea style="height: 60px; width: 580px;" id="accountNote"
+						name="accountNote" ismust="0" class="ui-form-value"></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+
+
+		<input type="hidden" id="id" >
+		<input type="hidden" id="accountdis" value="1000">
+		<input type="hidden" id="companyids">
+	</table>
+</div>

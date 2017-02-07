@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>HROCloud人力资源外包服务平台</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="../img/favicon.ico" mce_href="../img/favicon.ico" type="image/x-icon"/>
+	<link rel="shortcut icon" href="../img/favicon.ico" mce_href="../img/favicon.ico" type="image/x-icon"/>
+	<link rel="stylesheet" href="../css/hrocloud.css">
+	<script type="text/javascript" src="../build/MD5/js/jquery.js"></script>
+	<script type="text/javascript" src="../build/hrocloud.js"></script>
+</head>
+<body>
+		
+			<div id="touming"></div>
+			<div id="touming2"></div>
+			<div id="head">
+					<h1 id="headleft"><span>HROCloud</span></h1>			
+					<ul id="headright">
+						<li id="headrightone"><a href="javascript:;" title="当前用户"><img src="../img/13.png" alt=""/><span>杨彭城</span></a></li>
+						<li id="headrighttwo"><a href="javascript:;" title="修改密码"><img src="../img/14.png" alt=""/></a></li>
+						<li id="headrightthree"><a href="javascript:;" title="退出"><img src="../img/15.png" alt=""/></a></li>
+					</ul>				
+			</div>
+			<div id="lPaneA">
+				<div id="set_leftpane"></div>
+				<div id="lPane" class="lPane">
+					<div id="node0" class="pnode collapsed" funid="1" sizcache="1" sizset="0">
+						<span><img src="../img/01.png" alt=""></span>
+						<a href="javascript:;">客户服务管理</a>
+						<em></em>
+					</div>
+					<div id="childnode0" class="childdiv">
+						<div class="node childchg" id="node10" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node11" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node12" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node13" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node14" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node15" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+					</div>
+					<div id="node1" class="pnode collapsed" funid="1" sizcache="1" sizset="0">
+						<span><img src="../img/01.png" alt=""></span>
+						<a href="javascript:;">客户服务管理</a>
+						<em></em>
+					</div>
+					<div id="childnode1" class="childdiv">
+						<div class="node childchg" id="node16" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node17" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node18" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node19" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node20" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node21" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+					</div>
+					<div id="node2" class="pnode collapsed" funid="1" sizcache="1" sizset="0">
+						<span><img src="../img/01.png" alt=""></span>
+						<a href="javascript:;">客户服务管理</a>
+						<em></em>
+					</div>
+					<div id="childnode2" class="childdiv">
+						<div class="node childchg" id="node16" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node17" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node18" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node19" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node20" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+						<div class="node childchg" id="node21" funid="1581" sizcache="1" sizset="0"><a href="javascript:;">服务产品管理</a></div>
+					</div>
+
+				<!-- <div id="node3" class="pnode collapsed" funid="1" sizcache="1" sizset="0"></div>
+					<div id="node4" class="pnode collapsed" funid="1" sizcache="1" sizset="0"></div>
+					<div id="node5" class="pnode collapsed" funid="1" sizcache="1" sizset="0"></div>
+					<div id="node6" class="pnode collapsed" funid="1" sizcache="1" sizset="0"></div>
+					<div id="node7" class="pnode collapsed" funid="1" sizcache="1" sizset="0"></div>
+					<div id="node8" class="pnode collapsed" funid="1" sizcache="1" sizset="0"></div>
+					<div id="node9" class="pnode collapsed" funid="1" sizcache="1" sizset="0"></div> -->
+				</div>
+			</div>
+			<div id="lPane_1">
+				<ul>
+							<li id="set_leftpane_1"><img src="../img/21.png" alt=""></li>
+							<li><a href="javascript:;" title="客户服务管理"><img src="../img/01.png" alt=""></a></li>
+							<li><a href="javascript:;" title="客户服务管理"><img src="../img/02.png" alt=""></a></li>
+							<li><a href="javascript:;" title="客户服务管理"><img src="../img/03.png" alt=""></a></li>
+							<li><a href="javascript:;" title="客户服务管理"><img src="../img/04.png" alt=""></a></li>
+							<li><a href="javascript:;" title="客户服务管理"><img src="../img/05.png" alt=""></a></li>
+							<li><a href="javascript:;" title="客户服务管理"><img src="../img/06.png" alt=""></a></li>
+							<li><a href="javascript:;" title="客户服务管理"><img src="../img/07.png" alt=""></a></li>
+							<li><a href="javascript:;" title="客户服务管理"><img src="../img/08.png" alt=""></a></li>
+							<li id="last"><a href="javascript:;" title="客户服务管理"><img src="../img/09.png" alt=""></a></li>
+				</ul>
+			</div>
+			<div id="rPane">
+					<div id="rPane_t">
+						<div id="rPane_l"><em><img src="../img/11.png" alt=""></em><span>我的工作台</span></div>
+						<ul id="rPane_r">
+								<li>服务产品管理<span style="font-size:12px;margin-left:4px;">X</span></li>	
+								<!-- <li>商保平台管理</li>	
+								<li>薪资平台管理</li>	
+								<li>供应商信息管理</li>	
+								<li>档案管理机构</li>	
+								<li>公共信息管理</li>	
+								<li>雇员信息查询</li>	
+								<li>雇员信息查询</li>	
+								<li>雇员信息查询</li> -->	
+						</ul>
+					</div>
+					<div id="rPane_d">
+						<div  id="rPane_d_menu">
+							<span>
+								<input type="button" id="add" value="&nbsp;新增&nbsp;"><input type="button" id="upd" value="&nbsp;修改&nbsp;"><input type="button" id="del" value="&nbsp;删除&nbsp;"><input type="button" id="search" value="&nbsp;查询&nbsp;">
+							</span>
+						</div>
+						<div >
+							<table  border="1" cellspacing="0">
+								<tr>
+									<td>&nbsp;</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>唯一编码</td>
+									<td>服务项目名称</td>
+									<td>备注</td>
+								</tr>
+								<tr>
+									<td>1</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>SVC2016120001</td>
+									<td>社保服务管理</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>2</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>SVC2015100001</td>
+									<td>入账开票管理</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>3</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>SVC2014100011</td>
+									<td>雇员服务管理</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>4</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>SVC2014100010</td>
+									<td>财务账务管理</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>5</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>SVC2014100009</td>
+									<td>公积金服务管理</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>6</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>SVC2014100006</td>
+									<td>商保服务管理</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>7</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>SVC2014100005</td>
+									<td>社保服务管理</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>8</td>
+									<td><input type="checkbox" style="width:14px;height:14px;border:1px solid #ccc"></td>
+									<td>SVC2014100004</td>
+									<td>收费结算管理</td>
+									<td></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+			</div>
+			<div id="modifypassword">
+					<h1><span>修改密码</span><em>X</em></h1>
+					<ul>
+						<li><span>旧密码:</span><input type="text" placeholder="请输入旧密码"/></li>			
+						<li><span>新密码:</span><input type="password" placeholder="请输入新密码"/></li>			
+						<li><span>确认密码:</span><input type="password" placeholder="请输入新密码"/></li>
+					</ul>
+					<div id="modifypassword-down">
+						<button id="one">确定</button><button id="two">取消</button>
+					</div>
+			</div>
+			<div id="logout">
+					<h3>您确定要退出吗？</h3>
+					<button>确定</button><button>取消</button>
+			</div>
+			<div id="add_menu">
+				<div id="add_menu_t"><span>基本信息</span><em>X</em></div>
+				<div id="add_menu_m">
+					<div id="add_menu_mt">
+						<span>唯一编码</span><input type="text" readonly="true" value="XXXXXX">
+						<span>服务项目名称</span><input type="text">&nbsp;<span id="aa">...</span><br>
+						<span>备注</span><textarea></textarea>
+					</div>
+				</div>
+				<div id="add_menu_d">
+					<button>保存</button><button>取消</button>
+				</div>		
+			</div>
+			<div id="add_menu_h">
+				<div id="add_menu_ht"><span>服务项目名称</span><em>X</em></div>
+				<div id="add_menu_hm"></div>
+				<div id="add_menu_hd">
+					<button>保存</button><button>取消</button>
+				</div>
+			</div>
+</body>
+</html>

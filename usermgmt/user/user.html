@@ -1,0 +1,461 @@
+<script type="text/javascript">
+	$(function() {
+		$("#tg_user_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_user_funcode").val($("#tg_cur_funcode_temp").val());
+		//单选框的chenge事件
+		$('input:radio[name="user_status"]').change(function() {
+
+			requestData = {
+				_mt : "usrmgmt.userpage",
+				nameOrMobile : $("#user_search").val(),
+				status : $("input[name='user_status']:checked").val()
+			};
+			$("#list1_user").jqGrid('setGridParam', {
+				postData : requestData, //发送数据
+				page : 1
+			}).trigger("reloadGrid");
+
+		})
+
+		var oH = $("#rPane").height() - 200;
+		var oW = $("#rPane").width() - 35;
+
+		var ss = {
+			_mt : "usrmgmt.userpage",
+			nameOrMobile : $("#user_search").val(),
+			status : $("input[name='user_status']:checked").val()
+		};
+		getUserData(ss);
+		function getUserData(requestData) {
+
+			jQuery("#list1_user").jqGrid(
+					{
+						url : pubsources.pub_getlink,
+						datatype : "json",
+						mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+						postData : requestData,
+						mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"UserLogin","None"
+						prmNames : {
+							page : "page",
+							rows : "rows",
+							sort : null,
+							order : null,
+							search : null,
+							nd : null,
+							npage : null
+						},//去除多余的参数
+						colNames : [ "手机号码", "姓名", "邮箱", "手机号", "身份证号码", "性别",
+								"出生日期", "用户状态" ],
+						colModel : [ {
+							name : 'mobileNo',
+							index : 'mobileNo',
+							width : 100,
+							align : "left",
+							sorttype : "text",
+							hidden : true
+						}, {
+							name : 'name',
+							index : 'name',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'email',
+							index : 'email',
+							width : 150,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'mobileNo',
+							index : 'mobileNo',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'idNo',
+							index : 'idNo',
+							width : 150,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'genderDesc',
+							index : 'genderDesc',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'birthDate',
+							index : 'birthDate',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						}, {
+							name : 'statusDesc',
+							index : 'statusDesc',
+							width : 100,
+							align : "left",
+							sorttype : "text"
+						} ],
+						loadComplete : function(xhr) {
+							console.log(xhr);
+							if (com_error(xhr)) {
+								return true;
+							} else {
+								alertMsg(xhr, "usermgmt_code_desc");
+								return false;
+							}
+						},
+						jsonReader : {
+							/*content中的响应*/
+							root : "rows",//表格中的数据
+							page : "page",//当前页码
+							total : "total",//总页数
+							records : "records"//总行数
+						},
+						rowNum : 20,
+						rowList : [ 20, 50, 100 ],
+						pager : '#pager1_user',
+						height : oH,
+						width : oW,
+						shrinkToFit : false,
+						forceFit : true,
+						sortorder : "desc",
+						viewrecords : true,
+						multiselect : true,
+						rownumbers : true,
+
+					});
+			jQuery("#list1_user").jqGrid('navGrid', '#pager1_user', {
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			});
+
+		}
+
+		/*--------加载表格 end------*/
+		/*----------新增 保存-----------*/
+		//新增点击事件
+		$("#add_user").click(function() {
+
+			userDialog("新增用户信息");
+			//加载下拉框
+			getSelectDataTypeList({
+				"status" : "pubstatus",
+				"gender" : "gender"
+			});
+		})
+
+		function userDialog(pagetitle) {
+			var s = $("<DIV ID=\"add_upd_user\"></DIV>");
+			//加载新增页面
+			$(s).load(
+					"../usermgmt/user/adduser.html?tsid="
+							+ new Date().getTime(), function() {
+
+					})
+					.dialog(
+
+							{
+								autoOpen : true,
+								closeOnEscape : true,
+								bgiframe : true,
+								title : pagetitle,
+								height : 500,
+								width : 900,
+								resizable : false,
+								modal : true,
+								buttons : {
+									"保存" : function() {
+										//验证参数
+										if (!validataUser()) {
+											return;
+										}
+										//获取参数
+										requestData = serach(
+												"usrmgmt.addOrModifyUser",
+												"addUser");
+
+										var flag = false;
+										if ($("#id").val() == "") {
+											flag = true;
+										}
+
+										//调用方法
+										addOrModifyUser(requestData,
+												"UserLogin", flag);
+										$(this).dialog("close");
+									},
+									"取消" : function() {
+
+										$(this).dialog("close");
+									}
+								},
+								close : function(event, ui) {
+									$(this).remove();
+								}
+							});
+
+		}
+
+		/*---------新增保存 end --------*/
+		/*---------修改 ---------*/
+		//1.点击修改按钮加载选中的行的数据到修改页面
+		//点击修改第一层
+		$("#upd_user").click(function() {
+			var ids = $('#list1_user').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert("请选择要修改的信息");
+				return;
+			} else if (ids.length > 1) {
+				comAlert("一次只能修改一条数据");
+				return;
+			}
+			//加载修改页面
+			userDialog("修改用户信息");
+
+			//加载下拉框
+			getSelectDataTypeList({
+				"status" : "pubstatus",
+				"gender" : "gender"
+			}, false, function() {
+				//加载用户信息
+				var updateUserInfo = {
+					_mt : "usrmgmt.getuserbyid",
+					id : ids,
+					purpose : 0
+				};
+				getUpdateUser(updateUserInfo, "UserLogin");
+
+			});
+		})
+
+		//获取要修改的用户的信息
+		function getUpdateUser(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$.ajax({
+				type : "POST",
+				url : pubsources.pub_getlink,
+
+				dataType : "json",
+				xhrFields : {
+					withCredentials : true
+				},
+				data : serialize(data),
+				success : function(result) {
+					if (com_error(result)) {
+						//给修改页面的input框赋值
+						data = result.content["0"];
+						setData(data, "addUser");
+					} else {
+						alertMsg(result, "usermgmt_code_desc");
+					}
+				},
+				error : function() {
+					comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+				}
+			});
+		}
+		/*---------修改保存 end---------*/
+
+		/*----------删除--------*/
+		$("#del_user").click(function() {
+			var ids = $('#list1_user').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert("请选择要删除的信息");
+				return;
+			} else {
+				if (confirm("您确定要删除选中的信息？")) {
+					var del = {
+						_mt : "usrmgmt.deleteuser",
+						ids : ids
+					};
+					deleteUser(del, "UserLogin");
+				}
+			}
+		})
+
+		function deleteUser(requestData, level) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							console.log(result);
+							if (com_error(result)) {
+								comAlert("删除成功");
+								jQuery("#list1_user").trigger("reloadGrid");
+							} else {
+								alertMsg(result, "usermgmt_code_desc" + ",删除失败");
+							}
+
+						},
+						error : function() {
+							comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+						}
+					});
+		}
+		/*-----------删除 end----------*/
+		/*---------修改保存 end---------*/
+
+		/*----------批量改变用户状态--------*/
+		//生效
+		$("#modify_status_valid").bind('click', function() {
+			msv("02valid", true)
+		});
+		//失效
+		$("#modify_status_invalid").bind('click', function() {
+			msv("03invalid", false)
+		});
+
+		function msv(status, flag) {
+			//comAlert(status);
+			var ids = $('#list1_user').jqGrid('getGridParam', 'selarrrow');
+			if (ids.length == 0) {
+				comAlert("请选择要修改的信息");
+				return;
+			} else {
+				if (confirm("您确定要修改选中的信息？")) {
+					var del = {
+						_mt : "usrmgmt.modifystatus",
+						ids : ids,
+						status : status
+					};
+					modifyStatus(del, "UserLogin", flag);
+				}
+			}
+		}
+
+		function modifyStatus(requestData, level, flag) {
+			var payload = {
+				data : requestData,
+				level : level
+			};
+			data = encrypt(payload.level, payload.data);
+			console.log(data);
+			$
+					.ajax({
+						type : "POST",
+						url : pubsources.pub_getlink,
+						contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+						crossDomain : true,
+						dataType : "json",
+						xhrFields : {
+							withCredentials : true
+						},
+						data : serialize(data),
+						success : function(result) {
+							//TODO　判断删除是否成功
+							console.log(result);
+							if (com_error(result)) {
+
+								if (flag) {//生效成功
+									comAlert(pubprompt.valid_succ);
+								} else {//失效成功
+									comAlert(pubprompt.invalid_failure);
+
+								}
+								jQuery("#list1_user").trigger("reloadGrid");
+							} else {
+								alertMsg(result, "usermgmt_code_desc" + ",修改失败");
+							}
+
+						},
+						error : function() {
+							comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+						}
+					});
+		}
+		/*----------批量改变用户状态 end----------*/
+
+	})
+
+	//主页面的查询
+	$("#users_search_btn").bind('click', function() {
+		//TODO 查询
+		requestData = {
+			_mt : "usrmgmt.userpage",
+			nameOrMobile : $("#user_search").val(),
+			status : $("input[name='user_status']:checked").val()
+		};
+		$("#list1_user").jqGrid('setGridParam', {
+			postData : requestData, //发送数据
+			page : 1
+		}).trigger("reloadGrid");
+	});
+	function validataUser() {
+		var flag = true;
+		var mobileNo = $.trim($("#mobileNo").val());
+		var status = $.trim($("#status").val());
+		var email = $.trim($("#email").val());
+		if (mobileNo == "") {
+			comAlert("请输入手机号");
+			flag = false;
+		} else {
+			if (!validateMobile(mobileNo)) {
+				comAlert("手机号格式不正确");
+				flag = false;
+			}
+		}
+		if (status == "") {
+			comAlert("请选择用户状态");
+			flag = false;
+		}
+		if (email != "") {
+			if (!validateEmail(email)) {
+				comAlert("邮箱格式不正确");
+				flag = false;
+			}
+		}
+		return flag;
+
+	}
+</script>
+
+<!-- 12 -->
+
+<div class="rPane_d_menu">
+	<input type="button" id="add_user" value="&nbsp;新增&nbsp;"><input type="button" id="upd_user" value="&nbsp;修改&nbsp;"><input type="button" id="modify_status_valid" value="&nbsp;生效&nbsp;"><input type="button" id="modify_status_invalid" value="&nbsp;失效&nbsp;"><input
+		type="button" id="" value="&nbsp;重置密码&nbsp;">
+
+</div>
+<div class="rpane_status">
+	<input style="vertical-align: middle;" type="radio" id="user_status_1" name="user_status" value="01draft" /><label for="user_status_1" style="vertical-align: middle;">编辑中</label><input style="vertical-align: middle;" type="radio" id="user_status_2" name="user_status" value="02valid" checked="checked" /><label
+		style="vertical-align: middle;" for="user_status_2">生效</label><input style="vertical-align: middle;" type="radio" id="user_status_3" name="user_status" value="03invalid" /><label for="user_status_3" style="vertical-align: middle;">失效</label><input style="vertical-align: middle;" type="radio" id="user_status_4" name="user_status" value=""
+		 /><label for="user_status_4" style="vertical-align: middle;">全部</label>
+</div>
+<div class="rpane_search jqForm">
+	<input type="text"
+		id="user_search" style="float: left;"
+		 placeholder="请输入用户姓名/手机号"><input type="button" id="users_search_btn"
+		value="&nbsp;查询&nbsp;">
+</div>
+<div class=rPane_dt>
+	<table id="list1_user"></table>
+	<div id="pager1_user"></div>
+</div>
+<input type="hidden" id="tg_user_funid" value="">
+<input type="hidden" id="tg_user_funcode" value="">
+
+<!-- 12 -->
+

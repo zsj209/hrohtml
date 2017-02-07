@@ -1,0 +1,135 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script>
+var serversname=pubsources.pub_getlink;//网关接口
+var gdid_fmpro="jq_pays_fmatpro";//显示数据的div
+var addgdid_fmpro="form_jq_pays_fmatpro";//新增 修改 显示数据的div 
+var updinterface_fmpro="payrollFmatpro.selectDataByIds";//修改时根据id获取数据的接口
+var upinfointerface_fmpro="payrollFmatpro.updateData";//修改数据的接口
+var ininfointerface_fmpro="payrollFmatpro.insertData";//新增数据的接口
+var dlinfointerface_fmpro="payrollFmatpro.batchDeleteByid";//批量删除接口
+var bn_div_fmpro="bn_pays_fmatpro";//按钮div的id
+var None="UserLogin";//安全等级
+var bnsuffix_fmpro="_paysfmatpro";//按钮后缀
+var pageid_fmpro="#page_pays_fmatpro";//分页div
+$(function(){ 
+	
+
+	
+	var pkid_poins=$("#ssec_ins_adduppk").val();
+	var pidvl=$("#jq_lf_format_pid").val();
+	$("#fmatproPid").val(pidvl+"");//存放外键id
+	var pk= $("#fmatproPid").val();
+ 	if(pkid_poins!="0"){
+ 		updatePosrSetval_ins(pkid_poins);
+ 	}
+});
+function updatePosrSetval_ins(pkid_poins){
+	var clnrequestData = {_mt:updinterface_fmpro,selIds:pkid_poins};
+	var payload = {
+		    data: clnrequestData,
+		    level: level,
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "GET",
+			url : serversname,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials:true
+			},
+			data : serialize(data),
+			success : function(result) {
+				var data = result.content["0"].value;
+				lineJson = JSON.stringify(data[0]);
+                updateJson = eval('(' + lineJson + ')'); //Json
+                //获得key
+                var updateKey=new Array();
+                for (var o in updateJson){
+                        updateKey.push(o);
+                };
+                $('#'+addgdid_fmpro).find('.add_input').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+addgdid_fmpro).find('.add_inputdis').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+addgdid_fmpro).find('.add_texa').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+addgdid_fmpro).find('.add_check').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$("#"+id).attr("checked", true);
+                        	}else{
+                        		$("#"+id).attr("checked", false);
+                        	}
+                            return;
+                        }
+                     }
+                });
+                $('#'+addgdid_fmpro).find('.add_select').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+			},
+			error : function() {
+				comAlert(pubprompt.pub_nochoice);
+		}
+		}); 
+}
+</script>
+
+<DIV ID="form_jq_pays_fmatpro" STYLE="overflow:auto;position:relative;left:0px;top:0px;" CLASS="jqForm" TITLE="新增信息">
+		<div id="jq_pays_fmatpro_addinfoarea">
+			<table id='jq_pays_fmatpro_addinfoarea' class='ui-form-table'  border='0' style='width: 100%;'>
+				<tr>
+					<td class="add_lfspan"><label>数据项<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan">
+					<input class="add_input" type="text" value="" id="fmatproDataitem" isck="1" titl="数据项" isck="1"></td>
+					<td class="add_lfspan"><label>来源<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan">
+					<input class="add_input" type="text" value="" id="fmatproFieldname" isck="1" titl="来源" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>报盘顺序<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="fmatproOrder" isck="1,2" titl="报盘顺序"></td>
+					<td></td><td ><input class="add_input" type="hidden" id="fmatproPid"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><label>备注</label></td>
+					<td class="add_rtspan_texa" colspan="3"><textarea class="add_texa" id="fmatproNote"></textarea></td>
+					<td></td><td></td>
+				</tr>
+			</table>  
+		</div>
+	</DIV>

@@ -1,0 +1,183 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script type="text/javascript">
+var pkid=$("#pay_tax_adduppk").val();
+var _mt="payrollTax.selectDataByIds";
+var gdid="form_jq_pays_tax";
+var level="UserLogin";
+
+$(document).ready(function(){
+	var selids=[],selcode=[];
+	$('#'+gdid).find('.add_select').each(function(){
+        var obj = $(this);
+        var id =obj.attr('id'); 
+        var name =obj.attr('name'); 
+        selids.push(id);
+        selcode.push(name);
+    });
+	if((selids==null || selids=="") && pkid=="0"){
+		return;
+	}else if((selids==null || selids=="") && pkid!="0"){
+		updatePosrSetval_paystax(pkid);
+		return;
+	}else{
+		var secodejs=JSON.stringify(selcode);
+		var clnrequestData = {_mt:getSeltOption,paramtypelist:secodejs};
+		var payload = {
+			    data: clnrequestData,
+			    level: "None",
+			};
+			data = encrypt(payload.level, payload.data);
+			$.ajax({
+				type : "GET",
+				url : serversname,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials:true
+				},
+				data : serialize(data),
+				success : function(result) {
+					var data = result.content["0"].value;
+					
+					//var selJson= eval('('+  data+ ')');
+					
+					if(data!=undefined)
+					{
+						for (var i = 0; i < selids.length; i++) {
+							var vname=$("#"+selids[i]).attr("name");
+							//清空select
+							$("#"+selids[i]).empty();
+							$("#"+selids[i]).append("<option value='0'>--请选择--</option>");//为Select追加一个Option(下拉项)
+							for(var j=0;j<data.length;j++){
+								for (var k = 0; k < data[j].paramList.length; k++) {
+									if(vname==data[j].typeCode){
+										 $("#"+selids[i]).append("<option value='"+data[j].paramList[k].code+"'>"+data[j].paramList[k].desc+"</option>");
+									}
+								}
+							}
+						}
+					}
+					if(pkid!="0"){
+						updatePosrSetval_paystax(pkid);
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+			}
+			});
+	}
+});
+function updatePosrSetval_paystax(){
+	var clnrequestData = {_mt:_mt,selIds:pkid};
+	var payload = {
+		    data: clnrequestData,
+		    level: level,
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "GET",
+			url : serversname,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials:true
+			},
+			data : serialize(data),
+			success : function(result) {
+				var data = result.content["0"].value;
+				lineJson = JSON.stringify(data[0]);
+                updateJson = eval('(' + lineJson + ')'); //Json
+                //获得key
+                var updateKey=new Array();
+                for (var o in updateJson){
+                        updateKey.push(o);
+                };
+                $('#'+gdid).find('.add_input').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_inputdis').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_texa').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_check').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$("#"+id).attr("checked", true);
+                        	}else{
+                        		$("#"+id).attr("checked", false);
+                        	}
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_select').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+		}
+		}); 
+}
+</script>
+<DIV ID="form_jq_pays_tax" STYLE="overflow:auto;position:relative;left:0px;top:0px;" CLASS="jqForm" TITLE="信息维护">
+	<div id="jq_pays_tax_addinfoarea">
+		<table id='jq_pays_tax_addinfoarea' class='ui-form-table'  border='0' style='width: 100%;'>
+			<tr>
+				<td class="add_lfspan"><label>税率编码<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="taxCode" isck="1" titl="税率编码"></td>
+				<td class="add_lfspan"><label>税率类别<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><select class="add_select" id="taxType" name="taxtype" isck="1" titl="税率类别"><option value="0">请选择</option></select></td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>等级下限<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="taxLowerlimit" isck="1,2" titl="等级下限"></td>
+				<td class="add_lfspan"><label>等级上限<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="taxUpperlimit" isck="1,2" titl="等级上限"></td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>税率百分数<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="taxRate" isck="1,2" titl="税率百分数"></td>
+				<td class="add_lfspan"><label>速算扣除数</label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="taxSpeed" isck="2" titl="速算扣除数"></td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>倒推下限</label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="taxSplolimit" isck="2" titl="倒推下限"></td>
+				<td class="add_lfspan"><label>倒推上限</label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="taxSpuplimit" isck="2" titl="倒推上限"></td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>备注</label></td>
+				<td class="add_rtspan_texa" colspan="3"><textarea class="add_texa" id="taxNote"></textarea></td>
+				<td></td><td></td>
+			</tr>
+		</table>
+	</div>
+</DIV>
+ 

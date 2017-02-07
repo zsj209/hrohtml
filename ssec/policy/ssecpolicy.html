@@ -1,0 +1,460 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script type="text/javascript" src="../js/payroll_base.js"></script>
+<script>
+var serversname=pubsources.pub_getlink;//网关接口
+var clmreqData_ssesplo={_mt:"socialSsecpolicy.selectDataSsecpolicy"};//获取数据的接口
+var gdid_ssesplo="jq_ssec_policy";//显示数据的div
+var addgdid_ssesplo="form_jq_ssec_policy";//新增 修改 显示数据的div
+var updinterface_ssesplo="socialSsecpolicy.selectDataByIds";//修改时根据id获取数据的接口
+var upinfointerface_ssesplo="socialSsecpolicy.updateData";//修改数据的接口
+var ininfointerface_ssesplo="socialSsecpolicy.insertData";//新增数据的接口
+var dlinfointerface_ssesplo="socialSsecpolicy.batchDeleteByid";//批量删除接口
+var bn_div_ssesplo="bn_ssec_policy";//按钮div的id
+var None="UserLogin";//安全等级
+var bnsuffix_ssesplo="_ssec_policy";//按钮后缀
+var pageid_ssesplo="#page_ssec_policy";//分页div
+$(function(){ 
+	$("#tg_policy_funid").val($("#tg_cur_funid_temp").val());
+	$("#tg_policy_funcode").val($("#tg_cur_funcode_temp").val());
+	//省市区获取树结构刷新
+	$("#city_refresh_policy").bind("click",city_refresh_policy);
+	
+	function city_refresh_policy(){
+		//省市区获取树结构
+		var treeparams = {_mt:"commoncity.queryTreeCityList"};
+		getInfo_comm_treeCitypolicy(treeparams, "UserLogin");
+	}
+	$("#city_ssec_policy").css("height",($("#rPane").height() - 84)+"px");
+	/*--------加载表格------*/
+	//获取按钮
+	gettablebninfo_ssecpolicy(bn_div_ssesplo, None);
+	function gettablebninfo_ssecpolicy(bndivid, level) {
+		var bnnames = eval("([{code:'bn_init',name:'复制'},{code:'bn_add',name:'新增'},{code:'bn_upd',name:'修改'},{code:'bn_del',name:'删除'}])");
+		//获取按钮信息
+		getButtonInfo_ssecpolicy(bndivid,bnnames);
+	}
+	/*拼接按钮模块div*/
+	function getButtonInfo_ssecpolicy(bndivid,bnnames){
+		var _arr = [];
+		for(var i=0;i<bnnames.length;i++){
+			//此处需要修改  为了区分，按钮后缀改为自己的
+			_arr.push('<input class="bn_ml" type="button" id="'+bnnames[i].code+bnsuffix_ssesplo+'" value="&nbsp;'+bnnames[i].name+'&nbsp;">');
+		}
+		$("#"+bndivid).html(_arr.join(""));
+		//获取jqgrid数据
+		gettableHead_ssecpolicy();
+	} 
+	/*获得jqgrid表头*/
+	function gettableHead_ssecpolicy() {
+		var data=[];
+		data.push("id,政策名称,地区名称,开始时间,截止时间,报增日期,报减日期,基数相同,是否有效");
+		data.push("[{name:'id'},{name:'policyName',width:'100'},{name:'policyCityDis',width:'80'},{name:'policyBgdate',width:'80'}"+
+		",{name:'policyEddate',width:'80'},{name:'policyAday',width:'80'},{name:'policyRday',width:'80'}"+
+		",{name:'policyBaseDis',width:'80'},{name:'policyValidDis',width:'80'}]");
+		disjQgridTable_ssecpolicy(data[0],data[1]);
+	}
+
+	/*获取jqgrid数据*/
+	function disjQgridTable_ssecpolicy(colNames,colModel) {
+		var colnms = colNames.split(",");
+		var colmdsJson= eval('('+  colModel+ ')');
+		  
+		//清空jqgrid中的数据
+		$('#'+gdid_ssesplo).jqGrid('clearGridData');
+	  var payload = {data: clmreqData_ssesplo,level: None};
+	  //var data = encrypt(payload.level, payload.data);
+	 
+	  $("#"+gdid_ssesplo).jqGrid({
+			url:serversname,
+			datatype: "json",
+			mtype: "POST",
+			postData: payload.data,
+			mylevel : None,
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+			colNames: colnms,
+		   	colModel: colmdsJson,
+		   	rowNum : 20, 
+			forceFit : true, 
+			rownumbers : true,
+		   	autowidth: false,
+		   	shrinkToFit:false,
+		   	rowList: [20,50,100],
+		   	pager : pageid_ssesplo,
+		   	sortname: 'id',
+		    viewrecords: true,
+		    rownumbers: true,
+		    rownumWidth: "30",
+		    gridview: true, 
+		    multiselect: true, 
+		    sortorder: "desc",
+		    height: pgoHn,
+		    width: pgoWTree,
+	 	 	ondblClickRow: function(id) {
+				 
+			}
+		}).navGrid("#page_ssec_policy",{refresh: false, edit: false, add: false, del: false, search: false})
+		.navButtonAdd("#page_ssec_policy",{title:"refresh",caption:"",buttonicon:"ui-icon-refresh",
+			onClickButton:function(){
+				var colmRequestDatas = {_mt:"socialSsecpolicy.selectDataSsecpolicy",policyCity:"1000"};
+				reloadGridData(colmRequestDatas,gdid_ssesplo,pageid_ssesplo);
+			},position:"last"});
+	  jQuery("#"+gdid_ssesplo).setGridParam().hideCol("id").trigger("reloadGrid");
+	 	 $("#bn_init"+bnsuffix_ssesplo).bind("click",{},initinfo_SsecPolicy);//初始化
+		//此处需要修改 此处注意 因为无法动态拼接方法，所以只能这样绑定 
+		$("#bn_add"+bnsuffix_ssesplo).bind("click",{bntype:"add",addgdid:addgdid_ssesplo,gdid:gdid_ssesplo,ininfointerface:ininfointerface_ssesplo,upinfointerface:upinfointerface_ssesplo,bn_div:bn_div_ssesplo},addinfo_SsecPolicy);//新增方法名请改成自己的
+		//此处需要修改 修改按钮 参数说明：jqgrid的id，修改标识，获取修改数据的接口，修改的div拼接页面的div，修改的div的外层id（用于显示隐藏界面）
+		$("#bn_upd"+bnsuffix_ssesplo).bind("click",{bntype:"upd",addgdid:addgdid_ssesplo,gdid:gdid_ssesplo,upinfointerface:upinfointerface_ssesplo,updinterface:updinterface_ssesplo,bn_div:bn_div_ssesplo},addinfo_SsecPolicy);//新增方法名请改成自己的
+		
+		//此处需要修改 删除按钮  参数说明：jqgrid的id，删除数据接口
+		$("#bn_del"+bnsuffix_ssesplo).bind("click",{gdid:gdid_ssesplo,delinterface:dlinfointerface_ssesplo,refstp:'no'},bn_del_SsecPolicy);
+		 
+		/***
+		 * 获取左边城市类别
+		 */
+		var cityrequestData={_mt:"commoncity.queryTreeCityList"};
+		var level="UserLogin";
+		getInfo_comm_treeCitypolicy(cityrequestData,level);
+	}
+	
+	 
+	/*--------加载表格 end------*/
+	
+	/*初始化方法*/
+	function initinfo_SsecPolicy(){
+		var pkvls=getSledRows(gdid_ssesplo);
+		var cknm=getSledRowsNumb(gdid_ssesplo);
+		if(pkvls.length==0){
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		}else if(cknm>=5){
+			comAlert("一次只可复制5条以下政策信息");
+			return;
+		}
+		if(confirm("您确定要复制选中的 "+cknm+" 条记录吗？")) {
+			var requestData = {
+					_mt : "socialSsecpolicy.copyDataByIds",
+					copyIds : pkvls
+				};
+				var payload = {
+					data : requestData,
+					level : level,
+				};
+				data = encrypt(payload.level, payload.data);
+				$.ajax({
+					type : "GET",
+					url : serversname,
+					crossDomain : true,
+					dataType : "json",
+					xhrFields : {
+						withCredentials : true
+					},
+					data : serialize(data),
+					success : function(result) {
+						comAlert(pubprompt.todeal_succ);
+						$("#" + gdid_ssesplo).trigger("reloadGrid", [ {
+							page : 1
+						} ]);
+					},
+					error : function() {
+						comAlert(pubprompt.todeal_failure);
+					}
+				});
+		}
+		
+	}
+	/*
+	 * 新增方法
+	 * */
+	function addinfo_SsecPolicy(e){
+		var pkid="0";
+		if(e.data.bntype=="upd"){
+			if(getSledRowsNumber(e.data.gdid)){return;}
+			var r = $("#"+e.data.gdid).getGridParam('selrow');
+			pkid=$("#"+e.data.gdid).getCell(r,2);
+			if(pkid==null){
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			}
+		}
+		$("#ssec_policy_adduppk").val(pkid);
+		var tilStr=getAddOrUp(pkid,"社保政策");
+		
+		var s = $("<DIV ID='"+addgdid_ssesplo+"_addinfoarea_dlg'></DIV>");
+		$(s).load("../ssec/policy/ssecpolicyadd.html?tsid="+ new Date().getTime()).dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			title : tilStr,
+			height : dipgoH,
+			width : dipgoW,
+			resizable : false,
+			modal : true,
+			buttons :[],
+			close : function(event, ui) {
+				$(this).remove();
+			}
+		});
+		//gettableSelectval(e,pkid);
+		//显示透明层
+		$("#touming").show();
+	}
+
+	function bn_del_SsecPolicy(e){
+		var gdid=e.data.gdid,delinterface=e.data.delinterface;
+		var rows = $("#"+gdid).getGridParam('selarrrow'),rl="";
+		var dsum=0;
+		$.each(rows, function(i,n){
+			rl += $("#"+gdid).getCell(n,2) + ",";
+			dsum=dsum+1;
+		});
+		if(rows.length >= 1) {rl=rl.substring(0,rl.length-1);}
+		if(rl==""){
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		}
+		if(confirm("您确定删除选中的 "+dsum+" 条记录吗？")) {
+			delDataInfo(gdid,delinterface,None,rl);
+		}
+	}
+	 
+
+	});
+function getInfo_comm_treeCitypolicy(cityrequestData, level){
+	var payload = {
+	          data: cityrequestData,
+	          level: level,
+	      };
+	      data = encrypt(payload.level, payload.data);
+	      console.log(data);
+	         $.ajax({
+	             type : "GET",
+	             url : pubsources.pub_getlink,
+	             crossDomain : true,
+	             dataType : "json",
+	             xhrFields : {
+	                     withCredentials:true
+	             },
+	             data : serialize(data),
+	             success : function(result) {
+	               //给修改页面的input框赋值
+	                data = result.content["0"].value;
+	              //  alert(data[0].id)
+	                var _arr=[];
+	    			_arr.push('<ul>');/**/
+	    			for(var o in data){
+	    				var data2=data[o].list;
+	    				if(data2!=""){
+	    					_arr.push('<li class="pnodes jqTreepnode sshows" style="background:none;border:0;padding:0;">');/**/
+			    			_arr.push('<a class="cityTrees" snames="'+data[0].cityName+'" href="javascript:void(0)" onclick="showPolicy(this)" sid="'+data[0].id+'" gdid="1" fun="1603" value="'+data[0].id+'" gid="1" ><div class="treeLevel"><div class="treebackground" style="padding-left:0;">'+data[0].cityName+'</div></div></a>');
+			    			
+	    				}else{
+	    					_arr.push('<li class=" sshows">');
+  						_arr.push('<a class="cityTrees" snames="'+data[0].cityName+'" href="javascript:void(0)" onclick="showPolicy(this)" sid="'+data[0].id+'" gdid="1" fun="1603" value="'+data[0].id+'" gid="1" ><div class="pnodestates"><div class="treebackground" style="">'+data[0].cityName+'</div></div></a>');
+	    				}
+		    			_arr.push('<ul class="jqTree child" >');
+		    			for(var i in data2){
+		    				var data3=data2[i].list;
+		    				if(data3!=""){
+		    					_arr.push('<li class="sshows">');
+			    				_arr.push('<a  href="javascript:void(0)" class="cityTrees"   snames="'+data2[i].cityName+'" fun="1395" value="'+data2[i].id+'" sid="'+data2[i].id+'" gid="1" gdid="1" onclick="showPolicy(this)"><div class="treeLevel"><div class="treebackground">'+data2[i].cityName+'</div></div></a>');
+		    				}else{
+		    					_arr.push('<li class=" sshows">');
+	    						_arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'+data2[i].cityName+'" onclick="showPolicy(this)" gid="1" sid="'+data2[i].id+'" value="'+data2[i].id+'" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'+data2[i].cityName+'</div></div></a>');
+		    				}
+		    			
+		    				_arr.push('<ul class="jqTree child" >');
+		    				
+		    				if(data3!=""){
+		    					for(var j in data3){
+		    						var data4=data3[j].list;
+		    						if(data4!=""){
+		    							_arr.push('<li class="sshows"  >');
+				    					_arr.push('<a  href="javascript:void(0)" class="cityTrees"  snames="'+data3[j].cityName+'"  fun="1429" value="'+data3[j].id+'" sid="'+data3[j].id+'" gid="1" gid="1603" onclick="showPolicy(this)"  ><div class="treeLevel"><div class="treebackground" style="">'+data3[j].cityName+'</div></div></a>');
+				    					
+		    						}else{
+		    							_arr.push('<li class=" sshows">');
+			    						_arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'+data3[j].cityName+'" onclick="showPolicy(this)" gid="1" sid="'+data3[j].id+'" value="'+data3[j].id+'" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'+data3[j].cityName+'</div></div></a>');
+		    						}
+			    					_arr.push('<ul class="jqTree child" >');
+			    					
+			    					if(data3!=""){
+			    						for(var k in data4){
+				    						_arr.push('<li class=" sshows">');
+				    						_arr.push('<a  href="javascript:void(0)" class="" fun="1765" snames="'+data4[k].cityName+'" onclick="showPolicy(this)" gid="1" sid="'+data4[k].id+'" value="'+data4[k].id+'" gid="1395"><div class="pnodestates"><div class="treebackground" style="">'+data4[k].cityName+'</div></div></a>');
+				    						_arr.push('</li>');
+				    					}
+			    					}
+			    					_arr.push('</ul>');
+			    					_arr.push('</li>');
+			    				}
+		    				}
+		    				
+		    				_arr.push('</ul>');
+		    				_arr.push('</li>');
+		    			}
+		    			_arr.push('</ul>');
+		    			_arr.push('</li>');
+		    			
+		             }
+	    			_arr.push('</ul>');
+	              
+	                $("#city_ssec_policy").html(_arr.join(""));
+	                treeListPolicy();
+	             },
+	             error : function() {
+	                     alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+	             }
+	     });
+}
+
+function showPolicy(e){
+	var cityId=$(e).attr("value");
+	var cityName=$(e).attr("snames");
+	$('.treebackground').each(function() {
+		$(this).removeClass("sclick");
+	});
+	$(e).children("div").children("div").addClass("sclick");
+	$("#ssec_policy_city").val(cityId);
+	$("#ssec_policy_citydis").val(cityName);
+	//清空jqgrid中的数据
+	$("#"+gdid_ssesplo).jqGrid('clearGridData');
+	var colmRequestDatas = {_mt:"socialSsecpolicy.selectDataSsecpolicy",policyCity:cityId};
+    var payload = {
+       data: colmRequestDatas,
+       level: None,
+    };
+    var data = encrypt(payload.level, payload.data);
+     
+    $("#"+gdid_ssesplo).jqGrid('setGridParam',{  
+        datatype:'json',  
+        postData: data,
+        mylevel : None,
+        prmNames : {
+			page : "page",
+			rows : "rows",
+			sort : null,
+			order : null,
+			search : null,
+			nd : null,
+			npage : null
+		},
+		jsonReader : {
+			/*content中的响应*/
+			root : "rows",//表格中的数据
+			page : "page",//当前页码
+			total : "total",//总页数
+			records : "records"//总行数
+		},
+	   	pager : pageid_ssesplo,
+    }).trigger("reloadGrid"); 
+ 
+}
+
+function treeListPolicy(){
+	$("#city_ssec_policy ul li").children("ul").hide();
+	$("#city_ssec_policy").find("li").not(":has(ul)").children("a").css(
+		{
+			textDecoration : "none",
+			color : "#333",
+			background : "none"
+		}).click(
+		function() {
+			$(this).get(0).location.href = "'"
+					+ $(this).attr("href") + "'";
+			});
+	$("#city_ssec_policy")
+		.find("li:has(ul)")
+		.children("a")
+		.addClass("pnode_closes").removeClass("pnode_opens")
+		.click(
+				function() {
+					//alert($(this).css("background"))
+					if ($(this).next("ul")
+							.is(":hidden")) {
+						$(this).next("ul").show();//slideDown("fast");
+						if ($(this).parent("li")
+								.siblings("li")
+								.children("ul").is(
+										":visible")) {
+							$(this).parent("li")
+									.siblings("li")
+									.find("ul")
+									.hide();//slideUp("fast");
+							$(this)
+									.parent("li")
+									.siblings(
+											"li:has(ul)")
+									.children("a")
+									.addClass("pnode_closes")
+									.removeClass("pnode_opens")
+									.end()
+									.find("li:has(ul)")
+									.children("a")
+									.addClass("pnode_closes")
+									.removeClass("pnode_opens");
+									
+						}
+						$(this).addClass("pnode_opens").removeClass("pnode_closes");
+						return false;
+					} else {
+						$(this).next("ul").hide();//slideUp("fast");
+						//不用toggle()的原因是为了在收缩菜单的时候同时也将该菜单的下级菜单以后的所有元素都隐藏
+						$(this).addClass("pnode_closes").removeClass("pnode_opens");
+						$(this).next("ul").children(
+								"li").find("ul")
+								.hide();//fadeOut("10");
+						$(this)
+								.next("ul")
+								.find("li:has(ul)")
+								.children("a").addClass("pnode_closes").removeClass("pnode_opens");
+						return false;
+					}
+				});
+	
+}
+</script>
+<style>
+</style>
+
+<div class="rPane_d" class="jq_top_div">
+	<div style="display: none;">
+		<input type="hidden" id="ssec_policy_adduppk" value=""/>
+		<input type="hidden" id="ssec_policy_city" value=""/>
+		<input type="hidden" id="ssec_policy_citydis" value=""/>
+		<input type="hidden" id="tg_policy_funid" value="">
+		<input type="hidden" id="tg_policy_funcode" value="">
+	</div>
+	<div style="width: 100%">
+		<div class="ctleft">
+			<div>
+				<input id="city_refresh_policy" class="btclasscs" value="刷新" type="button">
+			</div>
+			<div id="city_ssec_policy"  style="overflow-x:hidden;overflow-y:scroll; border-bottom: 1px solid #C7DEEC;">
+			</div> 
+		</div>
+		<div class="ctright">
+			<div id="bn_ssec_policy" class="jq_top_button"></div>
+			<div class="rPane_dt">
+				<table id="jq_ssec_policy" class="jqgridtable"></table> 
+				<div id="page_ssec_policy"></div>
+			</div>
+		</div>
+	</div>
+	
+</div>

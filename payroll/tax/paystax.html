@@ -1,0 +1,283 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script type="text/javascript" src="../js/payroll_base.js"></script>
+<script>
+$(function(){ 
+	$("#tg_tax_funid").val($("#tg_cur_funid_temp").val());
+	$("#tg_tax_funcode").val($("#tg_cur_funcode_temp").val());
+	
+	var serversname=pubsources.pub_getlink;//网关接口
+	var clmreqData_ptax={_mt:"payrollTax.selectDataByTax"};//获取数据的接口
+	var gdid_ptax="jq_pays_tax";//显示数据的div
+	var addgdid_ptax="form_jq_pays_tax";//新增 修改 显示数据的div
+	//var addtb_div="pays_tax_addinfoarea";//新增 修改 显示字段的div
+	var updinterface_ptax="payrollTax.selectDataByIds";//修改时根据id获取数据的接口
+	var upinfointerface_ptax="payrollTax.updateData";//修改数据的接口
+	var ininfointerface_ptax="payrollTax.insertData";//新增数据的接口
+	var dlinfointerface_ptax="payrollTax.batchDeleteByid";//批量删除接口
+	var bn_div_ptax="bn_pays_tax";//按钮div的id
+	var None="UserLogin";//安全等级
+	var bnsuffix_ptax="_paystax";//按钮后缀
+	var pageid_ptax="#page_pays_tax";//分页div
+
+	$('#se_pay_tax_code').bind('keypress',function(event){
+        if(event.keyCode == "13"){pay_tax_bseach({data:{refstp:'no'}});}
+    });
+	/*--------加载表格------*/
+	/*获得快捷查询的select选项*/
+	//getQuickSelOption_ptax();
+	function getQuickSelOption_ptax(){
+		//
+		var clnrequestData = {_mt:"payrollTax.getTableSelectvl",selids:"'p_taxtp'"};
+		var payload = {
+			    data: clnrequestData,
+			    level: None,
+			};
+			data = encrypt(payload.level, payload.data);
+			$.ajax({
+				type : "GET",
+				url : serversname,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials:true
+				},
+				data : serialize(data),
+				success : function(result) {
+					var data = result.content["0"].value;
+					var selJson= eval('('+  data+ ')');
+					if(selJson!=undefined)
+					{
+						$("#se_pay_tax_type").empty();
+						$("#se_pay_tax_type").append("<option value='0'>请选择</option>");//为Select追加一个Option(下拉项)
+						for(var j=0;j<selJson.length;j++){
+							$("#se_pay_tax_type").append("<option value='"+selJson[j].vid+"'>"+selJson[j].vstr+"</option>");
+							 
+						}
+						 
+					} 
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+			}
+			});
+	}
+	//获取按钮
+	gettablebninfo_ptax(bn_div_ptax, None);
+	function gettablebninfo_ptax(bndivid, level) {
+		var bnnames = eval("([{code:'bn_add',name:'新增'},{code:'bn_upd',name:'修改'},{code:'bn_del',name:'删除'}])");
+		//获取按钮信息
+		getButtonInfo_ptax(bndivid,bnnames);
+	}
+	/*拼接按钮模块div*/
+	function getButtonInfo_ptax(bndivid,bnnames){
+		var _arr = [];
+		for(var i=0;i<bnnames.length;i++){
+			//此处需要修改  为了区分，按钮后缀改为自己的
+			_arr.push('<input type="button" id="'+bnnames[i].code+bnsuffix_ptax+'" value="&nbsp;'+bnnames[i].name+'&nbsp;">&nbsp;');
+		}
+		$("#"+bndivid).html(_arr.join(""));
+		//获取jqgrid数据
+		gettableHead_ptax();
+	} 
+	/*获得jqgrid表头*/
+	function gettableHead_ptax() {
+		var data=[];
+		data.push("id,税率编码,税率类型,等级上限,等级下限,等级税率,速算扣除数,倒推速算扣除数上限,倒推速算扣除数下限");
+		data.push("[{name:'id'},{name:'taxCode',width:'100'},{name:'taxTypeDis',width:'80'},{name:'taxUpperlimit',width:'80'},{name:'taxLowerlimit',width:'80'},"
+		+ "{name:'taxRate',width:'80'},{name:'taxSpeed',width:'80'},{name:'taxSpuplimit',index:'taxSpuplimit',width:'120'},"
+		+ "{name:'taxSplolimit',width:'120'}]");
+		disjQgridTable_ptax(data[0],data[1]);
+	}
+
+	/*获取jqgrid数据*/
+	function disjQgridTable_ptax(colNames,colModel) {
+		var colnms = colNames.split(",");
+		var colmdsJson= eval('('+  colModel+ ')');
+		  
+		//清空jqgrid中的数据
+		$('#'+gdid_ptax).jqGrid('clearGridData');
+	  var payload = {data: clmreqData_ptax,level: None};
+	  //var data = encrypt(payload.level, payload.data);
+	  
+	  $("#"+gdid_ptax).jqGrid({
+			url:serversname,
+			datatype: "json",
+			mtype: "POST",
+			postData: payload.data,
+			mylevel : None,
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+			colNames: colnms,
+		   	colModel: colmdsJson,
+		   	rowNum : 20, 
+			forceFit : true, 
+			rownumbers : true,
+		   	autowidth: false,
+		   	shrinkToFit:false,
+		   	rowList: [20,50,100],
+		   	pager : pageid_ptax,
+		   	sortname: 'id',
+		    viewrecords: true,
+		    rownumWidth: 20,
+		    gridview: true, 
+		    multiselect: true, 
+		    multiselectWidth:20,
+		    sortorder: "desc",
+		    height: pgoH,
+		    width: pgoW,
+	 	 	ondblClickRow: function(id) {
+			}
+		}).navGrid("#page_pays_tax",{refresh: false, edit: false, add: false, del: false, search: false})
+		.navButtonAdd("#page_pays_tax",{title:"refresh",caption:"",buttonicon:"ui-icon-refresh",
+		onClickButton:function(){
+			var colmRequestDatas = {_mt:"payrollTax.selectDataByTax",taxCode:""};
+			reloadGridData(colmRequestDatas,gdid_ptax,pageid_ptax);
+			//pay_tax_bseach({data:{refstp:'clear'}});
+		},position:"last"});
+
+	  jQuery("#"+gdid_ptax).setGridParam().hideCol("id").trigger("reloadGrid");
+		//此处需要修改 此处注意 因为无法动态拼接方法，所以只能这样绑定 
+		$("#bn_add"+bnsuffix_ptax).bind("click",{bntype:"add",addgdid:addgdid_ptax,gdid:gdid_ptax,ininfointerface:ininfointerface_ptax,bn_div:bn_div_ptax},addinfo_Generatedivts_ptax);//新增方法名请改成自己的
+		//此处需要修改 修改按钮 参数说明：jqgrid的id，修改标识，获取修改数据的接口，修改的div拼接页面的div，修改的div的外层id（用于显示隐藏界面）
+		$("#bn_upd"+bnsuffix_ptax).bind("click",{bntype:"upd",addgdid:addgdid_ptax,gdid:gdid_ptax,upinfointerface:upinfointerface_ptax,updinterface:updinterface_ptax,bn_div:bn_div_ptax},addinfo_Generatedivts_ptax);//新增方法名请改成自己的
+		
+		//此处需要修改 删除按钮  参数说明：jqgrid的id，删除数据接口
+		$("#bn_del"+bnsuffix_ptax).bind("click",{gdid:gdid_ptax,delinterface:dlinfointerface_ptax},bn_del_pub_ptax);
+		$("#pay_tax_bseach").bind("click",{refstp:"no"},pay_tax_bseach);
+	}
+	/*--------加载表格 end------*/
+
+	/*
+	 * 新增方法
+	 * */
+	function addinfo_Generatedivts_ptax(e){
+		var pkid="0";
+		if(e.data.bntype=="upd"){
+			if(getSledRowsNumber(e.data.gdid)){return;}
+			var r = $("#"+e.data.gdid).getGridParam('selrow');
+			pkid=$("#"+e.data.gdid).getCell(r,2);
+			if(pkid==null){
+				comAlert(pubprompt.pub_nochoice);
+				return;
+			}
+		}
+		$("#pay_tax_adduppk").val(pkid);
+		var tilStr=getAddOrUp(pkid,"税率信息");
+		//setaddupDivVlues(addgdid_ptax);
+		var s = $("<DIV ID='"+gdid_ptax+"_addinfoarea_dlg'></DIV>");
+		var btns = {
+				'保存':function() {bn_addupSave(gdid_ptax+"_addinfoarea",e,pkid,s);},
+				'取消':function() {$(this).dialog('close');$("#touming").hide();}
+			};
+		$(s).load("../payroll/tax/paystaxadd.html?tsid="+ new Date().getTime()).dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			title : tilStr,
+			height : dipgoHo,
+			width : dipgoWo,
+			resizable : false,
+			modal : true,
+			buttons :btns,
+			close : function(event, ui) {
+				$(this).remove();
+			}
+		});
+		//gettableSelectval(e,pkid);
+		//$("#"+e.data.addgdid).show();
+		//显示透明层
+		$("#touming").show();
+	}
+	function bn_del_pub_ptax(e){
+		var gdid=e.data.gdid,delinterface=e.data.delinterface;
+		var rows = $("#"+gdid).getGridParam('selarrrow'),rl="";
+		var dsum=0;
+		$.each(rows, function(i,n){
+			rl += $("#"+gdid).getCell(n,2) + ",";
+			dsum=dsum+1;
+		});
+		if(rows.length >= 1) {rl=rl.substring(0,rl.length-1);}
+		if(rl==""){
+			comAlert(pubprompt.pub_nochoice);
+			return;
+		}
+		if(confirm("您确定删除选中的 "+dsum+" 条记录吗？")) {
+			delDataInfo(gdid,delinterface,None,rl);
+		}
+	}
+	/*快速查询按钮事件*/
+	function pay_tax_bseach(e){
+		var taxCode=Trim($("#se_pay_tax_code").val());
+		//var taxType=$("#se_pay_tax_type").val();
+		//清空jqgrid中的数据
+		$("#"+gdid_ptax).jqGrid('clearGridData');
+		if(e.data.refstp=="clear"){
+			taxCode="";
+		}
+		var colmRequestDatas = {_mt:"payrollTax.selectDataByTax",taxCode:taxCode};
+	    var payload = {
+	       data: colmRequestDatas,
+	       level: None,
+	    };
+	   var data = encrypt(payload.level, payload.data);
+	    $("#"+gdid_ptax).jqGrid('setGridParam',{  
+	        datatype:'json',  
+	        postData: data,
+	        mylevel : None,
+	        prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+		   	pager : pageid_ptax,
+		   	 
+	    }).trigger("reloadGrid"); 
+	     
+	}
+
+	});
+</script>
+
+<div class="rPane_d" class="jq_top_div">
+	<div id="bn_pays_tax" class="jq_top_button">
+	</div>
+	<div style="display: none;">
+		<input type="hidden" value="" id="pay_tax_adduppk"/>
+		<input type="hidden" id="tg_tax_funid" value="">
+		<input type="hidden" id="tg_tax_funcode" value="">
+	</div>
+	<div id="se_pays_tax" class="jq_top_quick">
+		<input type="text" class="" placeholder="请输入税率编码" id="se_pay_tax_code"/>
+		<input type="button" value="查询" id="pay_tax_bseach" class="margin_left8"/>
+	</div>
+	<div class="rPane_dt">
+		<table id="jq_pays_tax" class="jqgridtable"></table> 
+		<div id="page_pays_tax"></div>
+	</div>
+</div>

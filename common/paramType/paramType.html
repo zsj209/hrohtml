@@ -1,0 +1,385 @@
+<script type="text/javascript">
+	$(function() {
+		$("#tg_paramType_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_paramType_funcode").val($("#tg_cur_funcode_temp").val());
+		var oH = $("#rPane").height() - 175;
+		var oW = $("#rPane").width() - 40;
+		var ss = {
+			_mt : "commparmtype.selectParamTypeByColumn"
+		};
+		getParamTypeData(ss);
+		function getParamTypeData(requestData) {
+			jQuery("#list_comm_paramType").jqGrid({
+				url : pubsources.pub_getlink,
+				datatype : "json",
+				mtype : "POST",//向后台请求数据的ajax的类型。可选post,get
+				postData : requestData,
+				mylevel : "UserLogin",//自定义字段表示访问方法的安全等级"UserLogin","None"
+				prmNames : {
+					page : "page",
+					rows : "rows",
+					sort : null,
+					order : null,
+					search : null,
+					nd : null,
+					npage : null
+				},//去除多余的参数
+				colNames : [ '编号', '编码', '参数类型名称' ],
+				colModel : [ {
+					name : 'id',
+					index : 'id',
+					width : 100,
+					align : "left",
+					sorttype : "text",
+					hidden : true
+				}, {
+					name : 'typeCode',
+					index : 'typeCode',
+					width : 80,
+					align : "left",
+					sorttype : "text"
+				}, {
+					name : 'typeName',
+					index : 'typeName',
+					width : 120,
+					align : "left",
+					sorttype : "text"
+				} ],
+				loadComplete : function(xhr) {
+					console.log(xhr);
+					//TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+					return true;
+				},
+				jsonReader : {
+					/*content中的响应*/
+					root : "rows",//表格中的数据
+					page : "page",//当前页码
+					total : "total",//总页数
+					records : "records"//总行数
+				},
+				rowNum : 20,
+				rowList : [ 20, 50, 100 ],
+				pager : '#pager_comm_paramType',
+				height : oH,
+				width : oW,
+				shrinkToFit : false,
+				forceFit : true,
+
+				sortorder : "desc",
+				viewrecords : true,
+				multiselect : true,
+				rownumbers : true,
+
+			}).navGrid("#pager_comm_paramType", {
+				refresh : false,
+				edit : false,
+				add : false,
+				del : false,
+				search : false
+			}).navButtonAdd("#pager_comm_paramType", {
+				title : "refresh",
+				caption : "",
+				buttonicon : "ui-icon-refresh",
+				onClickButton : function() {
+					refCashData_parmType()
+				},
+				position : "last"
+			});
+			// jQuery("#list_comm_paramType").jqGrid('navGrid','#pager_comm_paramType',{edit:false,add:false,del:false,search:false});
+
+		}
+
+		/*--------加载表格 end------*/
+		/*----------新增 保存-----------*/
+		//新增点击事件
+		$("#add_comm_paramType").click(
+				function() {
+					addOrUpdateParamType("新增参数类型信息",
+							"commparmtype.insertParamType", "add");
+				});
+
+		/*---------新增保存 end --------*/
+		/*---------修改 ---------*/
+		//1.点击修改按钮加载选中的行的数据到修改页面
+		//点击修改第一层
+		$("#upd_comm_paramType").click(
+				function() {
+					var ids = $('#list_comm_paramType').jqGrid('getGridParam',
+							'selarrrow');
+					if (ids.length == 0) {
+						comAlert(pubprompt.pub_nochoice);
+						return;
+					} else if (ids.length > 1) {
+						comAlert(pubprompt.upd_onedata);
+						return;
+					}
+					//加载修改页面
+					addOrUpdateParamType("修改参数类型信息",
+							"commparmtype.updateParamTypeByPrimaryKey", "upd");
+					//2.加载要修改的数据
+					var updateParamTypeInfo = {
+						_mt : "commparmtype.selectParamTypeById",
+						id : ids
+					};
+					getUpdateParamType(updateParamTypeInfo, "UserLogin");
+				});
+
+		/*---------修改保存 end---------*/
+		/*----------删除--------*/
+		$("#del_comm_paramType").click(
+				function() {
+					var ids = $('#list_comm_paramType').jqGrid('getGridParam',
+							'selarrrow');
+					if (ids.length == 0) {
+						comAlert("请选择要删除的信息");
+						return;
+					} else {
+						if (confirm("您确定要删除选中的" + ids.length + "条记录吗？")) {
+							var del = {
+								_mt : "commparmtype.delete",
+								idList : ids
+							};
+							deleteParamType(del, "UserLogin");
+						}
+					}
+				})
+
+		$('#paramNames').bind('keypress', function(event) {
+			if (event.keyCode == "13") {
+				paramType_name_bseach();
+			}
+		});
+		//模糊查询
+		$("#search_comm_paramType").bind("click", paramType_name_bseach);
+
+	})
+	//模糊查询
+	function paramType_name_bseach() {
+		var paramNames = $("#paramNames").val();
+		//if(paramNames!=""){
+		var ss = {
+			_mt : "commparmtype.selectParamTypeByColumn",
+			typeName : paramNames
+		};
+		$("#list_comm_paramType").setGridParam({
+			postData : ss
+		}).trigger("reloadGrid", [ {
+			page : 1
+		} ]);
+		//}
+	}
+	//获取新增或者修改界面
+
+	function addOrUpdateParamType(pagetitle, mt, stype) {
+		var s = $("<DIV ID=\"add_upd_button\"></DIV>");
+		$(s).load(
+				"../common/paramType/addParamType.html?tsid="
+						+ new Date().getTime()).dialog({
+			autoOpen : true,
+			closeOnEscape : true,
+			bgiframe : true,
+			title : pagetitle,
+			height : 500,
+			width : 900,
+			resizable : false,
+			modal : true,
+			buttons : {
+				"保存" : function() {
+					//获取参数
+					requestData = saveParamType(mt);
+					//调用方法
+					if (requestData) {
+						addParamTypes(requestData, "UserLogin", stype);
+					}
+				},
+				"取消" : function() {
+					$(this).dialog("close");
+				},
+			},
+			close : function(event, ui) {
+				$(this).remove();
+			}
+		});
+	}
+
+	//获取参数类型信息
+	function saveParamType(mt) {
+		var typeCode = $("#typeCode").val();
+		var typeName = $("#typeName").val();
+		var comment = $("#comment").val();
+		var companyId = $("#companyId").val();
+		var id = $("#id").val();
+		var typeIsupdate = 0;
+		if (val_isnull(typeCode)) {
+			comAlert("编码不能为空！");
+			return;
+		} else if (val_isnull(typeName)) {
+			comAlert("参数名称不能为空！");
+			return;
+		} else if (val_isnull(companyId)|| companyId == 0) {
+			comAlert("所属公司不能为空！");
+			return;
+		}
+
+		var params = {
+			"id" : id,
+			"typeCode" : typeCode,
+			"typeName" : typeName,
+			"companyId" : companyId,
+			"comment" : comment
+		};
+		var data = JSON.stringify(params);
+		var requestData = {};
+		requestData = {
+			"_mt" : mt,
+			"data" : data
+		};
+		return requestData;
+
+	}
+	//添加或修改
+	function addParamTypes(requestData, level, stype) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				if (commonStatus(result, "common_code_desc")) {
+					//网关和dubbo服务都没有问题时
+					if (stype == "add") {
+						comAlert(pubprompt.ins_succ);
+					} else if (stype == "upd") {
+						comAlert(pubprompt.upd_succ);
+					} else {
+						comAlert(pubprompt.save_succ);
+					}
+				}
+				$("#add_upd_button").dialog("close");
+				jQuery("#list_comm_paramType").trigger("reloadGrid");
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+
+	//获取要修改的参数类型的信息
+	function getUpdateParamType(requestData, level) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//给修改页面的input框赋值
+				data = result.content["0"];
+				selectTypeInfoById(data);
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+
+	/*---------修改保存 end---------*/
+	function selectTypeInfoById(updateData) {
+		$("#typeCode").val(updateData.typeCode);
+		$("#typeName").val(updateData.typeName);
+		$("#companyId").val(updateData.companyId);
+		$("#companyIdDis").val(updateData.companyIdDis);
+		$("#comment").val(updateData.comment);
+		$("#id").val(updateData.id);
+		//$("#typeCode").attr("readonly","readonly");
+	}
+	//删除参数类型信息
+
+	function deleteParamType(requestData, level) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				if (result.content["0"].value > 0) {
+					comAlert(pubprompt.del_succ);
+				} else {
+					comAlert(pubprompt.del_failure);
+				}
+				jQuery("#list_comm_paramType").trigger("reloadGrid");
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+
+	function refCashData_parmType() {
+		var requestData = {
+			_mt : "commparmtype.selectParamTypeByColumn",
+			typeName : ""
+		};
+		$("#list_comm_paramType").setGridParam({
+			postData : requestData
+		}).trigger("reloadGrid", [ {
+			page : 1
+		} ]);
+	}
+</script>
+<style type="text/css">
+.searchInput {
+	height: 25px;
+	line-height: 25px;
+}
+</style>
+
+
+<!-- 12 -->
+<div class="rPane_d_menu">
+	 <input type="button" id="add_comm_paramType"
+		value="&nbsp;新增&nbsp;"><input type="button"
+		id="upd_comm_paramType" value="&nbsp;修改&nbsp;"><input
+		type="button" id="del_comm_paramType" value="&nbsp;删除&nbsp;">
+	
+</div>
+<div class="rpane_search">
+		<input type="text" id="paramNames" placeholder="请输入参数类型"><input
+		type="button" id="search_comm_paramType" value="&nbsp;查询&nbsp;">
+</div>
+<div class="rPane_dt">
+	<table id="list_comm_paramType"></table>
+	<div id="pager_comm_paramType"></div>
+</div>
+<!-- 12 -->
+<input type="hidden" id="tg_paramType_funid" value="">
+<input type="hidden" id="tg_paramType_funcode" value="">

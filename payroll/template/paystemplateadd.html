@@ -1,0 +1,236 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script type="text/javascript">
+var pkid=$("#pay_template_adduppk").val();//updateTag
+var _mt="payrollPaysTemplate.selectDataByIds";//updateTag
+var gdid="form_jq_pays_template";//updateTag
+var level="UserLogin";//updateTag
+
+$(document).ready(function(){
+	$("#templateCity_sel").click(function() {
+		var selpara = {seltype:"selcity", seltitle:"选择城市", rtnvalobj:"templateCity", rtndisobj:"templateCityDis", discol:1, flparams:"", flparamvs:""};
+		comsel(selpara);
+	});
+	$("#templatePid_sel").click(function() {
+		var selpara = {seltype:"selpaytp", seltitle:"选择报税格式", rtnvalobj:"templatePid", rtndisobj:"templatePidDis", discol:1, flparams:"", flparamvs:""};
+		comsel(selpara);
+	});
+	$("#templateCityDis").dblclick(function() {
+		if(confirm("确定要清除地区名称吗")){
+			$("#templateCity").val("");
+			$("#templateCityDis").val("");
+		}
+		 
+	});
+	$("#templatePidDis").dblclick(function() {
+		if(confirm("确定要清除报税格式吗")){
+			$("#templatePid").val("");
+			$("#templatePidDis").val("");
+		}
+		 
+	});
+	var cityId=$("#pays_template_city").val();
+	var cityName=$("#pays_template_citydis").val();
+	if(cityId!="" && cityId!=1000){
+		$("#templateCity").val(cityId);
+		$("#templateCityDis").val(cityName);
+	}
+	
+	var selids=[],selcode=[];
+	$('#'+gdid).find('.add_select').each(function(){
+        var obj = $(this);
+        var id =obj.attr('id'); 
+        var name =obj.attr('name'); 
+        selids.push(id);
+        selcode.push(name);
+    });
+	$('#'+gdid).find('.add_radio').each(function(){
+		 var obj = $(this);
+     var name =obj.attr('name'); 
+		$(":radio[name='"+name+"'][value='0']").prop("checked", "checked");
+	});
+	if((selids==null || selids=="") && pkid=="0"){
+		return;
+	}else if((selids==null || selids=="") && pkid!="0"){
+		updatePosrSetval_paystemplate(pkid);//updateTag
+		return;
+	}else{
+		var secodejs=JSON.stringify(selcode);
+		var clnrequestData = {_mt:getSeltOption,paramtypelist:secodejs};
+		var payload = {
+			    data: clnrequestData,
+			    level: level,
+			};
+			data = encrypt(payload.level, payload.data);
+			$.ajax({
+				type : "GET",
+				url : serversname,
+				crossDomain : true,
+				dataType : "json",
+				xhrFields : {
+					withCredentials:true
+				},
+				data : serialize(data),
+				success : function(result) {
+					var data = result.content["0"].value;
+					
+					//var selJson= eval('('+  data+ ')');
+					
+					if(data!=undefined)
+					{
+						for (var i = 0; i < selids.length; i++) {
+							var vname=$("#"+selids[i]).attr("name");
+							//清空select
+							$("#"+selids[i]).empty();
+							$("#"+selids[i]).append("<option value='0'>请选择</option>");//为Select追加一个Option(下拉项)
+							for(var j=0;j<data.length;j++){
+								for (var k = 0; k < data[j].paramList.length; k++) {
+									if(vname==data[j].typeCode){
+										 $("#"+selids[i]).append("<option value='"+data[j].paramList[k].code+"'>"+data[j].paramList[k].desc+"</option>");
+									}
+								}
+							}
+						}
+					}
+					if(pkid!="0"){
+						updatePosrSetval_paystemplate(pkid);//updateTag
+					}
+				},
+				error : function() {
+					comAlert(pubprompt.network_error);
+			}
+			});
+	}  
+});
+//updateTag
+function updatePosrSetval_paystemplate(){
+	var clnrequestData = {_mt:_mt,selIds:pkid};
+	var payload = {
+		    data: clnrequestData,
+		    level: level,
+		};
+		data = encrypt(payload.level, payload.data);
+		$.ajax({
+			type : "GET",
+			url : serversname,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials:true
+			},
+			data : serialize(data),
+			success : function(result) {
+				var data = result.content["0"].value;
+				lineJson = JSON.stringify(data[0]);
+                updateJson = eval('(' + lineJson + ')'); //Json
+                //获得key
+                var updateKey=new Array();
+                for (var o in updateJson){
+                        updateKey.push(o);
+                };
+                $('#'+gdid).find('.add_input').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_inputdis').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_texa').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id');
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                            obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_check').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$("#"+id).attr("checked", true);
+                        	}else{
+                        		$("#"+id).attr("checked", false);
+                        	}
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_select').each(function(){
+                    var obj = $(this);
+                    var id =obj.attr('id'); 
+                    for(var i=0;i<updateKey.length;i++){
+                        if(id == updateKey[i]){
+                        	obj.val(updateJson[updateKey[i]]);
+                            return;
+                        }
+                     }
+                });
+                $('#'+gdid).find('.add_radio').each(function(){
+                    var obj = $(this);
+                    var name =obj.attr('name'); 
+                    for(var i=0;i<updateKey.length;i++){
+                    	if(name == updateKey[i]){
+                        	if(updateJson[updateKey[i]]==1){
+                        		$(":radio[name='"+name+"'][value='1']").prop("checked", "checked");
+                        	}else{
+                        		$(":radio[name='"+name+"'][value='0']").prop("checked", "checked");
+                        	}
+                    	}
+                     }
+                });
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+		}
+		});
+}
+function ckpayTemvl(stvl){
+	$(":radio[name='templateValid'][value='" + stvl + "']").prop("checked", "checked");
+}
+</script>
+<DIV ID="form_jq_pays_template" STYLE="overflow:auto;position:relative;left:0px;top:0px;" CLASS="jqForm" TITLE="信息维护">
+	<div id="jq_pays_template_addinfoarea">
+		<table id='jq_pays_template_addinfoarea' class='ui-form-table'  border='0' style='width: 100%;'>
+			<tr>
+				<td class="add_lfspan"><label>模版名称<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan"><input class="add_input" type="text" value="" id="templateName" isck="1" titl="模版名称"></td>
+				<td class="add_lfspan"><label>地区名称<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan">
+					<input class="add_input" id="templateCity" type="hidden" isck="1" titl="地区名称">
+					<input class="add_inputdis" id="templateCityDis" type="text" name="" readonly="readonly"><span id="templateCity_sel" class="add_fwid">...</span>
+					
+				</td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>报税格式<em class='add_fwid_rd'>*</em></label></td><td class="add_rtspan">
+					<input class="add_input" id="templatePid" type="hidden" isck="1" titl="报税格式">
+					<input class="add_inputdis" id="templatePidDis" type="text" name="" readonly="readonly"><span id="templatePid_sel" class="add_fwid">...</span>
+				</td>
+				<td class="add_lfspan"><label>是否有效</label></td>
+				<td class="add_rtspan">
+						<div onclick="ckpayTemvl(1)" class="add_radiolf"><input type="radio" class="add_radio ui-form-radio" name="templateValid" value="1" id="templateValidy" checked="checked"/><span class="ui-form-radiospan" style="float: right;"> 是</span></div>
+						<div onclick="ckpayTemvl(0)" class="add_radiort" ><input type="radio" class="add_radio ui-form-radio" name="templateValid" value="0" id="templateValidn" /><span class="ui-form-radiospan" style="float: right;"> 否</span></div>
+					</td>
+			</tr>
+			<tr>
+				<td class="add_lfspan"><label>备注</label></td>
+				<td class="add_rtspan_texa" colspan="3"><textarea class="add_texa" id="templateNote"></textarea></td>
+			</tr>
+		</table>
+	</div>
+</DIV>
+ 

@@ -1,0 +1,163 @@
+<script type="text/javascript">
+	$("#orgStarttime").datepicker();
+	$("#orgSuperior_Name").click(function() {
+		var selpara = {
+			seltype : "selorg",
+			seltitle : "上级组织",
+			rtnvalobj : "orgSuperior",
+			rtndisobj : "orgSuperiorName",
+			discol : 0
+		};
+		comsel(selpara);
+
+	})
+
+	$("#orgSuperiorName").dblclick(function() {
+		if (confirm("确定要清除上级组织吗")) {
+			$("#orgSuperiorName").val("");
+			$("#orgSuperior").val("");
+		}
+	});
+
+	/* 新增或修改 */
+	function addOrupdate(requestData, level, meth) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encryptNew(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//TODO 根据条件刷新
+				if(com_error(result)){
+				if (meth == "upd") {
+					comAlert(pubprompt.upd_succ);
+				} else {
+					comAlert(pubprompt.ins_succ);
+				}
+
+				$("#add_menu_organization").dialog("close");
+				//刷新grid
+				jQuery("#tab_organization").trigger("reloadGrid");
+				}else{
+					alertMsg(result,"company_code_desc");
+				}
+
+			},
+			error : function() {
+				comAlert(pubprompt.network_error);
+			}
+		});
+	}
+</script>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addOrganization" class="ui-form-table" cellpadding="5"
+		border='0' style="width: 100%;">
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>组织名称:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="orgName" name="orgName" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+
+
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>上级组织:</label><span
+				class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="orgSuperiorName" name="orgSuperiorName" type="text"
+					class="ui-form-value" layout="1" maxlength="50" onfocus="this.blur()"></span>
+				<span id="orgSuperior_Name" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+				<span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>创建日期:</label>
+				<span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="orgStarttime" name="orgStarttime" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>终止日期:</label>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="orgEndtime" name="orgEndtime" type="text" class="ui-form-value"
+					layout="1" maxlength="50" onfocus="this.blur()"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+
+
+
+
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>岗位编制:</label>
+				</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input
+					id="orgPostcompile" name="orgPostcompile" type="text"
+					class="ui-form-value" layout="1" maxlength="50"></span> <span
+				class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="serp_svc_code"><label>部门状态:</label></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<select id="orgDepartmentstate" name="orgDepartmentstate"
+					disabled="true" type="text" class="ui-form-value" layout="1"
+					maxlength="50">
+						<option value="">--select--</option>
+				</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+
+
+
+		</tr>
+
+
+
+
+
+
+
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="compNote"><label>备注:</label></td>
+			<td colspan="3"
+				style="width: 85%; background: #FFFFFF; padding-top: 3px;"><span
+				class="ui-form-spc">&nbsp;</span> <span style="float: left">
+					<textarea style="height: 60px; width: 604px;" id="orgNote"
+						name="orgNote" ismust="0" class="ui-form-value"></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+		<input id="companyId" name="companyId" value="0" type="hidden">
+		<input id="id" name="id" value="0" type="hidden">
+		<input id="orgSuperior" name="orgSuperior" type="hidden">
+	</table>
+</div>

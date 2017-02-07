@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>仁云天弓平台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../css/jquery-ui.css">
+<script type="text/javascript" src="../js/jquery-3.1.1.js"></script>
+
+	<script type="text/javascript" src="../js/md5.js"></script>
+	<script type="text/javascript" src="../js/common.js"></script>
+	<script type="text/javascript" src="../js/pub_source.js"></script>
+	<script type="text/javascript" src="../js/base-none.js"></script>
+	<script type="text/javascript" src="../js/jquery-ui.js"></script>
+	<script type="text/javascript" src="../js/com_validate.js"></script>
+	<script type="text/javascript" src="../js/com_base.js"></script>
+	<!-- 系统通用错误码定义 -->
+	<script type="text/javascript" src="../js/errordefine/com_error.js"></script>
+	<script type="text/javascript" src="../js/errordefine/usermgmt.js"></script>
+
+
+<style type="text/css">
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, input, textarea, p, th, td, span ,#back span{
+    margin: 0;
+    padding: 0;
+}
+
+span,i,p,input{
+font-size: 12px;
+	font-family: "微软雅黑";
+	color:#767676;
+}
+
+li{list-style:none;}
+
+body, html {
+	width: 100%;
+	height: 100%;
+}
+
+
+
+#center {
+	width: 100% px;
+	height: 683px;
+	background-color: #f5f5f5;
+	margin: 0 auto;
+	position: relative;
+}
+
+#bottom {
+	width: 100%;
+	height: 33px;
+	line-height: 33px;
+	text-align: center;
+	background-color: #f5f5f5;
+}
+
+#centerall {
+	width: 1000px;
+	height: 338px;
+	clear: both;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -500px;
+	margin-top: -200px;
+}
+
+#bottom span {
+	font-size: 12px;
+	font-family: "微软雅黑";
+	color: #6d6d6d
+}
+
+#registerBody {
+	width: 100%;
+	height: 100%;
+}
+
+#cecter-left {
+	float: left;
+	margin: 1px 27px 1px 0;
+}
+
+#center-register {
+	width: 1000px;
+	height: 600px;
+	background-color: #ffffff;
+	position: absolute;
+	top:60px;
+	left:50%;
+	margin-left: -500px;
+}
+#submit {
+	background: #0089dd;
+	width: 45px;
+	height: 25px;
+	font-size: 14px;
+	color: #fff;
+	border: none;
+	margin-left:100px; 
+}
+#cancle {
+	background: #0089dd;
+	width: 45px;
+	height: 25px;
+	font-size: 14px;
+	color: #fff;
+	border: none;
+	margin-left:20px; 
+}
+
+
+
+#forgotPwd {color: #767676;
+    font-size: 12px;
+    position: absolute;
+    text-decoration: none;
+    top:12px;
+    right: 0;}
+
+.ui-register-div{
+	clear: both;
+	width: 650px;
+	height: 36px;
+	margin-top: 18px;
+	margin-right: 24px;
+	margin-left: 23px;
+	text-align: left;
+}
+
+.ui-register-explain{
+	width: 800px;
+	height: 15px;
+	margin-top: 10px;
+	margin-button: 10px;
+	margin-right: 24px;
+	margin-left: 23px;
+}
+
+.register-checkbox{
+vertical-align: middle;
+	margin-right: 5px;
+	margin-left:133px; 
+}
+.checkout-text{
+	font-size: 10px;
+	font-family: "微软雅黑";
+	color:#767676;
+	text-decoration: none;
+}
+.ui-register-btn{
+	width: 600px;
+	height: 46px;
+	margin-top: 15px;
+	margin-right: 24px;
+	margin-left: 23px;
+}
+
+.register-input{
+	border: none;
+	border: 1px solid #ccc;
+	height: 34px;
+	width: 259px;
+	margin: 0;
+	padding-left: 7px;
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+}
+.register-comment{
+	border: none;
+	border: 1px solid #ccc;
+	height: 34px;
+	width: 259px;
+	margin: 0;
+	padding-left: 7px;
+	vertical-align: middle;
+	resize: none;
+	max-width: 259px;
+	max-height: 34px;
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+}
+.register-input-readonly{
+	border: none;
+	border: 1px solid #ccc;
+	height: 34px;
+	width: 259px;
+	margin: 0;
+	padding-left: 7px;
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+}
+
+
+.register-valid {
+	border: none;
+	border: 1px solid #ccc;
+	height: 34px;
+	width: 157px;
+	margin: 0;
+	padding-left: 10px;
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+}
+
+.change-mobile,
+.change-pwd {
+	background: #0089dd;
+	color: #fff;
+	border: none;
+	width: 94px;
+	height: 36px;
+	margin-left: 5px;
+}
+
+.ui-register-div > span {
+	font-size: 12px;
+	font-family: "微软雅黑";
+	display: inline-block;
+	height: 36px;
+	width: 100px;
+	line-height: 36px;
+	text-align: right;
+}
+
+
+i {
+	display: inline-block;
+	height: 8px;
+	width: 8px;
+	background: url(../css/images/asterisk.png) no-repeat;
+	margin: 2px 4px;
+}
+
+em {
+	display: inline-block;
+	margin: 0 4px 0 4px;
+	font-style: normal;
+}
+
+.top-text{padding-top: 28px;font-size: 16px;font-family: "微软雅黑";color:#0089dd;}
+.register-other{position: relative;}
+#register:HOVER {
+	color: #0089dd;
+	text-decoration: underline;
+}
+
+#registerbtn {
+	background: #0089dd;
+	width: 266px;
+	height: 46px;
+	font-size: 16px;
+	color: #fff;
+	border: none;
+	margin-left:133px; 
+}
+
+#registerbtn:HOVER {
+	background:  ##049eff;
+}
+#forgotPwd:HOVER {
+	color: #0089dd;
+	text-decoration: underline;
+}
+.ui-register{width:600px;margin: 0 auto;}
+#tips{float: right;width: 250px;height: 15px;margin-top: 11px;}
+#tips p{
+	font-size: 12px;
+	font-family: "微软雅黑";
+	height: 15px;
+	width: 80%;
+	line-height: 15px;
+	text-align: left;
+    padding-left: 10px;
+	}
+#tips .icon_succ, 
+#tips .icon_del{
+    background-image: url("../css/images/reg_ico.png");
+    background-repeat: no-repeat;
+    float: left;
+    height: 15px;
+    margin-left: -10px;
+    margin-right: 8px;
+    width: 15px;
+}
+
+
+#tips .icon_del {
+    background-position: -60px 0;
+}
+#tips .icon_succ {
+    background-position: -30px 0;
+}
+/*head*/
+#head{width:100%;height:44px;background:#0089dd;margin:0 auto;}
+#headleft{color:#fff;font-size:28px;line-height:44px;text-align:left;padding-left:10px;float:left;}
+#headleft span{color: #ffffff;
+	font-size: 28px;
+	line-height: 44px;
+	text-align: center;
+	}
+#headright{float:right;padding-right:30px;}
+#headright li{float:left;height:44px;margin-right:16px;}
+#headright li img{margin-top:6px;}
+#headright #headrightone{margin-right:28px;}
+#headrightone img{float:left;margin-right:8px;}
+#headrightone span{float:right;font-size:16px;line-height:44px;text-align:center;color:#fff;}
+/*modify-mobile*/
+.ui-mobile-div > span {
+	font-size: 12px;
+	font-family: "微软雅黑";
+	display: inline-block;
+	height: 36px;
+	width: 100px;
+	line-height: 36px;
+	text-align: right;
+	margin: 0;
+}
+
+.ui-mobile-div{
+	width: 305px;
+	height: 57px;
+	margin-top: 3px;
+	text-align: left;
+}
+.mobile-input{
+	border: none;
+	border: 1px solid #ccc;
+	height: 34px;
+	width: 191px;
+	margin: 0;
+	padding-left: 7px;
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+}
+.mobile-valid {
+	border: none;
+	border: 1px solid #ccc;
+	height: 34px;
+	width: 93px;
+	margin: 0;
+	padding-left: 10px;
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+}
+.ui-mobile-btn{
+	width: 305px;
+	height: 46px;
+	margin-top: 5px;
+}
+#pwdbtn,
+#mobilebtn {
+	background: #0089dd;
+	width: 200px;
+	height: 40px;
+	font-size: 16px;
+	color: #fff;
+	border: none;
+	margin-left:100px; 
+}
+.mobile-validImg {
+	border: 0;
+	width: 86px;
+	height: 34px;
+	margin-left: 5px;
+	vertical-align: middle;
+}
+
+.mobile-ver-code {
+	border: none;
+	width: 87px;
+	height: 36px;
+	margin-left: 5px;
+	background: #0089dd;
+	font-size: 14px;
+	color: #fff;
+	
+}
+#mobile-tips{width: 250px;height: 15px;margin-top: 3px;margin-left: 100px;}
+#mobile-tips p{
+	font-size: 10px;
+	font-family: "微软雅黑";
+	color:#ff6749;
+	height: 15px;
+	width: 80%;
+	line-height: 15px;
+	text-align: left;
+	}
+#mobile-tips .icon_succ, 
+#mobile-tips .icon_del{
+    background-image: url("../css/images/reg_ico.png");
+    background-repeat: no-repeat;
+    float: left;
+    height: 15px;
+    margin-left: -10px;
+    margin-right: 8px;
+    width: 15px;
+}
+.ui-noflag{
+margin: 0 20px 0 4px; 
+}
+
+#mobile-tips .icon_del {
+    background-position: -60px 0;
+}
+#mobile-tips .icon_succ {
+    background-position: -30px 0;
+}
+/*modify-mobile end */
+.change-mobile:HOVER,
+.change-pwd:HOVER,
+#submit:HOVER,
+#cancle:HOVER,
+#pwdbtn:HOVER,
+#mobilebtn:HOVER,
+.mobile-ver-code:HOVER {
+	background: #049eff;
+}
+label {
+	font-size: 12px;font-family: "微软雅黑";color:#767676;
+	
+}
+
+.register-radio{
+	border: none;
+	border: 1px solid #ccc;
+	margin-top:2px;
+	margin-left:6px;
+	margin-right:5px;
+	
+
+}
+
+
+.ui-back{height:36px;width: auto;position:relative;}
+.ui-back-one{width: 55px;height: 17px;position: absolute;right: 0;bottom: 0;}
+.ui-back-one span{margin-right: 8px;color: #0089dd}
+a{text-decoration: none;}
+
+</style>
+</head>
+<body>
+
+	<div id="head" class="ui-layout-north">
+					<p id="headleft"><span>HROCloud</span></p>			
+					<ul id="headright">
+						<li id="headrightone"><a href="javascript:;" title="当前用户"><img src="../css/images/13.png" alt=""/><span id="thisname"></span></a></li>
+						<li id="headrightthree"><a href="javascript:;" title="退出"><img src="../css/images/15.png" alt=""/></a></li>
+					</ul>				
+			</div>
+	<div id="center">
+	
+			<div id="center-register">
+				<div class="ui-back">
+					<div class="ui-back-one"><a href="#" id="back"><span>返回</span><img src="../css/images/reback.png"></img></a></div>
+				</div>
+				<div class="ui-register" id="ui-register">
+					<div class="ui-register-div">
+						<span>手机号码<em>:</em></span><input readonly="readonly" class="register-input" type="text" id="mobileNo" name="mobileNo" placeholder="请输入手机号"><button id="change-mobile" class="change-mobile">更换手机号</button><button id="change-pwd" class="change-pwd">重置密码</button>
+					</div>
+					<form id="user-data">
+				
+						<div class="ui-register-div ">
+							<span>真实姓名<em>:</em></span><input  class="register-input" type="text" id="name" name="name" placeholder="请输入真实姓名"><div id="tips " ></div>
+						</div>
+						<div class="ui-register-div ">
+							<span>身份证号码<em>:</em></span><input class="register-input" type="text" id="idNo" name="idNo" placeholder="请输入身份证号码"><div id="tips" class="idNo" ></div>
+						</div>
+						<div class="ui-register-div ">
+							<span>性别<em>:</em></span><label>
+							<!-- <input class="register-radio" name="gender" id="radioman" value="1"  type="radio" >男</label><label>
+							<input class="register-radio" name="gender" id="radiowoman" value="0"  type="radio" >女</label> -->
+							<select class="register-input" name="gender" id="gender" class="ui-form-value" layout="1" maxlength="50" typeCode="gender"></select>
+						</div>
+						<div class="ui-register-div ">
+							<span>出生年月<em>:</em></span><input readonly="readonly" class="register-input-readonly" type="text" id="birthDate" name="birthDate" placeholder="">
+						</div>
+						<div class="ui-register-div ">
+							<span>邮箱<em>:</em></span><input class="register-input" type="text" id="email" name="email" placeholder="请输入邮箱"><div id="tips" class="email"></div>
+						</div>
+						<div class="ui-register-div ">
+							<span>备注<em>:</em></span><textarea class="register-comment" id="memo" name="memo" rows="" cols="" placeholder="请输入备注信息"></textarea>
+						</div>
+					</form>
+					<div class="ui-register-btn ">
+						<button id="submit" >确&nbsp;定</button>
+						<button id="cancle" >取&nbsp;消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	<div id="bottom">
+		<span>Powered&nbsp;&nbsp;&nbsp;&nbsp;By&nbsp;&nbsp;&nbsp;&nbsp;HROCloud.com</span>
+	</div>
+	
+	<!-- 修改手机号 -->
+				<input type="hidden" name="captchaCodeValue" id="captchaCodeValue" value=""/> 
+	<div id="modify-mobile" title="修改手机号">
+				<input type="hidden" name="captid" id="captid" /> 
+				<input type="hidden" name="verifyid" id="verifyid" > 
+				<div class="ui-mobile-div">
+					<span>原手机号码<em class="ui-noflag">:</em></span></span><input value="" readonly="readonly" class="mobile-input" type="text" id="mobileno" name="mobileno" placeholder="请输入手机号"><div id="mobile-tips" ></div>
+				</div>
+				<div class="ui-mobile-div">
+					<span>新手机号码<em>:</em><i></i></span><input  class="mobile-input" type="text" id="newMobileNo" name="newMobileNo" placeholder="请输入新手机号"><div id="mobile-tips" class="newMobileNo"></div>
+				</div>
+				<div class="ui-mobile-div ">
+					<span>图形验证码<em>:</em><i></i></span><input autocomplete="off" class="mobile-valid" type="text" id="captchaCode" name="captchaCode" placeholder="图形验证码"><img class="mobile-validImg"  id="validImg" alt="点击刷新"/><div id="mobile-tips"  class="captchaCode"></div>
+				</div>
+				<div class="ui-mobile-div ">
+					<span>手机验证码<em>:</em><i></i></span><input autocomplete="off" class="mobile-valid" type="text" id="verifyCode" name="verifyCode"><button class="mobile-ver-code" id="mobile-ver-code">获取验证码</button><div id="mobile-tips" class="verifyCode"></div>
+				</div>
+				<div class="ui-mobile-div ">
+					<span>密码<em>:</em><i></i></span><input autocomplete="off" class="mobile-input" type="password" id="password" name="password" placeholder="请输入密码"><div id="mobile-tips" class="password" ></div>
+				</div>	
+				<div class="ui-mobile-btn ">
+					<button id="mobilebtn" >更换手机号</button>
+				</div>	
+	</div>
+	<!-- 修改手机号  end-->
+	<!-- 重置密码 -->
+	<div id="modify-pwd" title="重置密码">
+				<div class="ui-mobile-div">
+					<span>原密码<em>:</em><i></i></span><input autocomplete="off" class="mobile-input" type="password" id="password" name="password" placeholder="请输入密码"><div id="mobile-tips" ></div>
+				</div>
+				<div class="ui-mobile-div">
+					<span>新密码<em>:</em><i></i></span><input class="mobile-input" type="password" id="newpwd1" name="newpwd1" placeholder="请输入密码"><div id="mobile-tips" ></div>
+				</div>
+				<div class="ui-mobile-div">
+					<span>确认新密码<em>:</em><i></i></span><input class="mobile-input" type="password" id="newpwd2" name="newpwd2" placeholder="请再次输入新密码"><div id="mobile-tips" ></div>
+				</div>
+				
+				<div class="ui-mobile-btn ">
+					<button id="pwdbtn" >重置密码</button>
+				</div>	
+	</div>
+	<!-- 重置密码   end-->
+	
+	
+	
+</body>
+<script type="text/javascript">
+//input框聚焦和失焦的颜色变化
+
+	$("input").focus(function() {
+
+	    $(this).css('border-color', '#0089dd');
+
+	  }).focusout(function() {
+
+	    $(this).css('border-color', '#ccc');
+
+	  })
+
+	var a = document.body.clientHeight;
+	console.log(a);
+</script>
+</html>

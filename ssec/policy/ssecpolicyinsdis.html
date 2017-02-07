@@ -1,0 +1,215 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script>
+$(function(){ 
+	var serversname=pubsources.pub_getlink;//网关接口
+	var gdid_oderins="jq_ssec_oderins";//显示数据的div
+	var addgdid_oderins="form_jq_ssec_oderins";//新增 修改 显示数据的div
+	var updinterface_oderins="socialSsecInsurance.selectDataByIds";//修改时根据id获取数据的接口
+	var upinfointerface_oderins="socialSsecInsurance.updateData";//修改数据的接口
+	var ininfointerface_oderins="socialSsecInsurance.insertData";//新增数据的接口
+	var dlinfointerface_oderins="socialSsecInsurance.batchDeleteByid";//批量删除接口
+	var bn_div_oderins="bn_ssec_oderins";//按钮div的id
+	var None="UserLogin";//安全等级
+	var bnsuffix_oderins="_ssec_oderins";//按钮后缀
+	var pageid_oderins="#page_ssec_oderins";//分页div
+	
+	var bahg=$("#ssec_polcid_hg").height()-50;
+	/*--------加载表格------*/
+	//获取按钮
+	gettablebninfo_oderins(bn_div_oderins, None);
+	function gettablebninfo_oderins(bndivid, level) {
+		//$("#jq_pays_fmatpro_addinfoarea").html("<input class='add_input' type='text' id='fmatproDataitem' isck='1' titl='数据项' isck='1'>");
+		var bnnames = eval("([])");
+		//获取按钮信息
+		getButtonInfo_oderins(bndivid,bnnames);
+	}
+	/*拼接按钮模块div*/
+	function getButtonInfo_oderins(bndivid,bnnames){
+		var _arr = [];
+		for(var i=0;i<bnnames.length;i++){
+			//此处需要修改  为了区分，按钮后缀改为自己的
+			_arr.push('<input type="button" id="'+bnnames[i].code+bnsuffix_oderins+'" value="&nbsp;'+bnnames[i].name+'&nbsp;">&nbsp;');
+		}
+		$("#"+bndivid).html(_arr.join(""));
+		//获取jqgrid数据
+		gettableHead_oderins();
+	} 
+	/*获得jqgrid表头*/
+	function gettableHead_oderins() {
+		var data=[];
+		data.push("id,险种名称,险种归属,起始时间,终止时间,社保最高基数,社保最低基数,企缴比例,企缴小数位规则,个缴比例,个缴小数位规则,企业附加金额,个人附加金额,是否补缴,支付频率,企业支付比例,个人支付比例");
+		data.push("[{name:'id'},{name:'insceName',width:'100'},{name:'insceInsDis',width:'100'},{name:'insceBdate',width:'100'},"+
+		"{name:'insceEdate',width:'100'},{name:'insceHbase',width:'100'},{name:'insceLbase',width:'100'},"+
+		"{name:'insceCprop',width:'100'},{name:'insceCruleDis',width:'100'},{name:'inscePprop',width:'100'},"+
+		"{name:'inscePruleDis',width:'100'},{name:'insceCamount',width:'100'},{name:'inscePamount',width:'100'},"+
+		"{name:'insceIstDis',width:'100'},{name:'insceFrequencyDis',width:'100'},{name:'insceCpayprop',width:'100'},"+
+		"{name:'inscePpayprop',width:'100'}]");
+		disjQgridTable_oderins(data[0],data[1]);
+	}
+
+	/*获取jqgrid数据*/
+	function disjQgridTable_oderins(colNames,colModel) {
+		var colnms = colNames.split(",");
+		var colmdsJson= eval('('+  colModel+ ')');
+		  
+		//清空jqgrid中的数据
+	  $('#'+gdid_oderins).jqGrid('clearGridData');
+	  var pidvl=$("#jq_lf_policy_pid").val();
+	  var payload = {data: {_mt:"socialSsecInsurance.selectDataSsecInsurance",inscePid:pidvl,insceState:"1"},level: None};
+	  //var data = encrypt(payload.level, payload.data);
+	  
+	  $("#"+gdid_oderins).jqGrid({
+			url:serversname,
+			datatype: "json",
+			mtype: "POST",
+			postData: payload.data,
+			mylevel : None,
+			prmNames : {
+				page : "page",
+				rows : "rows",
+				sort : null,
+				order : null,
+				search : null,
+				nd : null,
+				npage : null
+			},
+			jsonReader : {
+				/*content中的响应*/
+				root : "rows",//表格中的数据
+				page : "page",//当前页码
+				total : "total",//总页数
+				records : "records"//总行数
+			},
+			colNames: colnms,
+		   	colModel: colmdsJson,
+		   	rowNum : 10, 
+			forceFit : true, 
+			rownumbers : true,
+		   	autowidth: false,
+		   	shrinkToFit:false,
+		   	rowList: [10,50,100],
+		   	pager : pageid_oderins,
+		   	sortname: 'id',
+		    viewrecords: true,
+		    rownumbers: true,
+		    rownumWidth: "30",
+		    gridview: true, 
+		    multiselect: true, 
+		    sortorder: "desc",
+		    height: bahg,
+		    width: dipgoWo-96,
+	 	 	ondblClickRow: function(id) {
+	 	 		doubleclick_pocins({data:{bntype:"upd",addgdid:addgdid_oderins,gdid:gdid_oderins,upinfointerface:upinfointerface_oderins,updinterface:updinterface_oderins,bn_div:bn_div_oderins}},id);
+			}
+		}).navGrid("#pg_",{refresh: false, edit: false, add: false, del: false, search: false})
+		.navButtonAdd("#pg_",{title:"refresh",caption:"",buttonicon:"ui-icon-refresh",
+			onClickButton:function(){
+				
+			},position:"last"});
+	  jQuery("#"+gdid_oderins).setGridParam().hideCol("id").trigger("reloadGrid");
+		 
+	}
+	/*--------加载表格 end------*/
+
+	/*
+	 * 新增方法
+	 * */
+	function doubleclick_pocins(e,id){
+		var pkid=id;
+		setaddupDivVlues(addgdid_oderins);
+		var pidvl=$("#jq_lf_policy_pid").val();
+		 
+		var btns = {
+				'取消':function() {$(this).dialog('close');$("#touming").hide();}
+			};
+		$("#"+addgdid_oderins).dialog({
+			autoOpen: true,
+			bgiframe: true,
+			height: 500,
+			width: 800,
+			modal: true,
+			resizable : false,
+			buttons: btns,
+			close: function(event, ui) {
+				$(this).dialog('close');
+				$("#touming").hide();
+			}
+		}); 
+		gettableSelectval(e,pkid);
+		setElementEeadonly(addgdid_oderins); 
+		//显示透明层
+		$("#touming").show();
+	}
+
+ 
+
+});
+</script>
+<style> 
+</style>
+
+<div class="rPane_d" class="jq_top_div">
+	<DIV ID="form_jq_ssec_oderins" STYLE="overflow:auto;position:relative;left:0px;top:0px;display: none;" CLASS="" TITLE="历史险种查看">
+		<div id="jq_ssec_oderins_addinfoarea">
+			<table id='jq_ssec_oderins_addinfoarea' class='ui-form-table'  border='0' style='width: 100%;'>
+				<tr>
+					<td class="add_lfspan"><span>险种名称<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceName" isck="1" titl="险种名称" isck="1"></td>
+					<td class="add_lfspan"><span>险种归属<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><select class="add_select" id="insceIns" name="scbinstype" isck="1" titl="险种归属"><option value="0">请选择</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><span>起始时间<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceBdate" isck="1" titl="起始时间" isck="1"></td>
+					<td class="add_lfspan"><span>终止时间<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceEdate" isck="1" titl="终止时间" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><span>社保最高基数<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceHbase" isck="1" titl="社保最高基数" isck="1"></td>
+					<td class="add_lfspan"><span>社保最低基数<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceLbase" isck="1" titl="社保最低基数" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><span>企缴比例<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceCprop" isck="1" titl="企缴比例" isck="1"></td>
+					<td class="add_lfspan"><span>企缴小数位规则<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><select class="add_select" id="insceCrule" name="decimalRule" isck="1" titl="企缴小数位规则"><option value="0">请选择</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><span>个缴比例<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="inscePprop" isck="1" titl="个缴比例" isck="1"></td>
+					<td class="add_lfspan"><span>个缴小数位规则<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><select class="add_select" id="inscePrule" name="decimalRule" isck="1" titl="个缴小数位规则"><option value="0">请选择</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><span>企业附加金额<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceCamount" isck="1" titl="企业附加金额" isck="1"></td>
+					<td class="add_lfspan"><span>个人附加金额<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="inscePamount" isck="1" titl="个人附加金额" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><span>是否补缴</span></td><td class="add_rtspan"><input class="add_check" type="checkbox" value="" id="insceIst" titl="是否补缴"></td>
+					<td class="add_lfspan"><span>支付频率<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><select class="add_select" id="insceFrequency" name="szfrequency" isck="1" titl="支付频率"><option value="0">请选择</option></select></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><span>企业支付比例<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="insceCpayprop" isck="1" titl="企业支付比例" isck="1"></td>
+					<td class="add_lfspan"><span>个人支付比例<em class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text" value="" id="inscePpayprop" isck="1" titl="个人支付比例" isck="1"></td>
+				</tr>
+				<tr>
+					<td class="add_lfspan"><span>备注</span></td>
+					<td class="add_rtspan_texa" colspan="3"><textarea class="add_texa" id="insceNote"></textarea></td>
+					<td><input class="add_input" type="hidden" value="" id="inscePid" isck="1" titl="政策id" isck="1"></td><td></td>
+				</tr>
+			</table>  
+		</div>
+	</DIV>
+	<div class="margin_left16">
+		<table id="jq_ssec_oderins" class="jqgridtable"></table> 
+		<div id="page_ssec_oderins"></div>
+	</div>
+</div>

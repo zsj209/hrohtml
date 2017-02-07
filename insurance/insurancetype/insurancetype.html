@@ -1,0 +1,597 @@
+<script type="text/javascript" src="../js/com_fun.js"></script>
+<script type="text/javascript" src="../js/errordefine/insurance.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var oH = $(window).height() - 240;
+        var oW = $(window).width() - 240;
+        var ss = {
+            _mt: "insurance.getinsurancetype",
+            queryname:'status=\'02valid\'',
+            method: 1
+        };
+        getData(ss);
+        function getData(requestData) {
+            jQuery("#tab_insurancetype").jqGrid({
+                url: pubsources.pub_getlink,
+                datatype: "json",
+                mtype: "POST",//向后台请求数据的ajax的类型。可选post,get
+                postData: requestData,
+                mylevel: "UserLogin",//自定义字段表示访问方法的安全等级"UserLogin","None"
+                prmNames: {
+                    page: "page",
+                    rows: "rows",
+                    sort: null,
+                    order: null,
+                    search: null,
+                    nd: null,
+                    npage: null
+                },//去除多余的参数
+                colNames: ['险种名称', '商保公司', '险种类型', '计价方式', '付费单价', '付费频率', '收费单价', '收费频率', '年收费月份',
+                    '允许替保？', '生效时间', '终止时间', '状态'],
+                colModel: [{
+                    name: 'name',
+                    index: 'name',
+                    width: 120,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'companyName',
+                    index: 'companyName',
+                    width: 100,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'insuranceTypeDesc',
+                    index: 'insuranceTypeDesc',
+                    width: 80,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'chargeTypeDesc',
+                    index: 'chargeTypeDesc',
+                    width: 80,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'payPrice',
+                    index: 'payPrice',
+                    width: 80,
+                    align: "left",
+                    sorttype: "text",
+                    formatter: "currency",
+                    formatoptions: {thousandsSeparator: ",", decimalPlaces: 2, decimalSeparator: "."}
+                }, {
+                    name: 'payFrequencyDesc',
+                    index: 'payFrequencyDesc',
+                    width: 80,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'chargePrice',
+                    index: 'chargePrice',
+                    width: 80,
+                    align: "left",
+                    sorttype: "text",
+                    formatter: "currency",
+                    formatoptions: {thousandsSeparator: ",", decimalPlaces: 2, decimalSeparator: "."}
+                }, {
+                    name: 'chargeFrequencyDesc',
+                    index: 'chargeFrequencyDesc',
+                    width: 80,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'chargeMonthDesc',
+                    index: 'chargeMonthDesc',
+                    width: 80,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'replaceAllowedDesc',
+                    index: 'replaceAllowedDesc',
+                    width: 80,
+                    align: "left",
+                    sorttype: "text"
+                }, {
+                    name: 'fromTime',
+                    index: 'fromTime',
+                    width: 75,
+                    align: "left",
+                    sorttype: "text",
+                    formatter: function (cellvalue) {
+                        if (cellvalue != null)
+                            return dateFormat(new Date(cellvalue));
+                        return "";
+                    }
+                }, {
+                    name: 'toTime',
+                    index: 'toTime',
+                    width: 75,
+                    align: "left",
+                    sorttype: "text",
+                    formatter: function (cellvalue) {
+                        if (cellvalue != null)
+                            return dateFormat(new Date(cellvalue));
+                        return "";
+                    }
+                }, {
+                    name: 'statusDesc',
+                    index: 'statusDesc',
+                    width: 70,
+                    align: "left",
+                    sorttype: "text"
+                }],
+                loadComplete: function (xhr) {
+                    console.log(xhr);
+                    //TODO 判断请求是否成功，成功返回true允许加载表格，失败或其他返回false阻止加载表格
+                    if (com_error(xhr)) {
+                        return true;
+                    } else {
+                        alertMsg(xhr, "insurance_error_define");
+                        return false;
+                    }
+                },
+                jsonReader: {
+                    /*content中的响应*/
+                    root: "rows",//表格中的数据
+                    page: "page",//当前页码
+                    total: "total",//总页数
+                    records: "records"//总行数
+                },
+                rowNum: 20,
+                rowList: [20, 50, 100],
+                pager: '#pager_insurancetype',
+                height: oH,
+                width: oW,
+                shrinkToFit: false,
+                forceFit: true,
+                sortname: 'id',
+                sortorder: "desc",
+                viewrecords: true,
+                multiselect: true,
+                rownumbers: true,
+
+            });
+            jQuery("#tab_insurancetype").jqGrid('navGrid', '#pager_insurancetype', {
+                edit: false,
+                add: false,
+                del: false,
+                search: false
+            });
+
+        }
+
+        /*--------加载表格 end------*/
+        /*----------新增 保存-----------*/
+        //新增点击事件
+        $("#add_insurancetype").click(function () {
+            //加载新增页面
+            addOrUpdate(1, "新增险种");
+        })
+
+        function addOrUpdate(method, pageTitle) {
+
+            var updateInfo;
+            if (method == 2) {
+                var ids = $('#tab_insurancetype').jqGrid('getGridParam', 'selarrrow');
+                if (ids.length == 0) {
+                    comAlert("请选择要修改的信息");
+                    return;
+                } else if (ids.length > 1) {
+                    comAlert("一次只能修改一条数据");
+                    return;
+                }
+                updateInfo = {
+                    _mt: "insurance.insurancetype",
+                    withCompName: true,
+                    id: ids
+                };
+            }
+            var s = $("<DIV ID=\"add_upd_insurancetype\"></DIV>");
+            $(s).load("../insurance/insurancetype/addinsurancetype.html?tsid=" + new Date().getTime(),
+                function () {
+                    //加载下拉框
+
+                    getSelectDataTypeList({
+                        "insuranceType": "cominstype",
+                        "chargeType": "chargeunit",
+                        "payFrequency": "szfrequency",
+                        "chargeFrequency": "szfrequency",
+                        "chargeMonth": "selmonths",
+                        "replaceAllowed": "yesno",
+                        "status": "pubstatus"
+                    }, method == 2 ? true : false, getUpdateinsurancetype(method, updateInfo, "UserLogin"));
+
+
+                    //	getSelectDataTypeList("type","bustype");
+
+
+                });
+
+            $(s).dialog({
+                autoOpen: true,
+                closeOnEscape: true,
+                bgiframe: true,
+                height: 500,
+                title: pageTitle,
+                width: 900,
+                resizable: false,
+                modal: true,
+                buttons: {
+                    "保存": function () {
+                        //获取参数
+                        requestData = addinsurancetypePar(method);
+                        //调用方法
+                        if (requestData) {
+                            addOrUpdateinsurancetype(requestData, "UserLogin", method);
+                        }
+                    },
+                    "取消": function () {
+
+                        $(this).dialog("close");
+                    },
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                }
+            })
+
+        }
+
+        //获取新增的参数，并验证
+        function addinsurancetypePar(method) {
+
+            var id = $.trim($("#id").val());
+            var name = $.trim($("#name").val());
+            if (name == '') {
+                comAlert("险种名称不能为空");
+                return false;
+            }
+            var companyId = $.trim($("#companyId").val());
+            if (companyId == '') {
+                comAlert("商保公司不能为空");
+                return false;
+            }
+
+            var insuranceType = $.trim($("#insuranceType").val());
+            if (insuranceType == '') {
+                comAlert("险种类型不能为空");
+                return false;
+            }
+
+            var chargeType = $.trim($("#chargeType").val());
+            if (chargeType == '') {
+                comAlert("计价方式不能为空");
+                return false;
+            }
+            var payPrice = $.trim($("#payPrice").val());
+            if (payPrice == '') {
+                comAlert("付费单价不能为空");
+                return false;
+            }
+            var payFrequency = $.trim($("#payFrequency").val());
+            if (payFrequency == '') {
+                comAlert("付费频率不能为空");
+                return false;
+            }
+            var chargePrice = $.trim($("#chargePrice").val());
+            if (chargePrice == '') {
+                comAlert("收费单价不能为空");
+                return false;
+            }
+            var chargeFrequency = $.trim($("#chargeFrequency").val());
+            if (chargeFrequency == '') {
+                comAlert("收费频率不能为空");
+                return false;
+            }
+
+            var replaceAllowed = $.trim($("#replaceAllowed").val());
+            if (replaceAllowed == '') {
+                comAlert("是否允许替保不能为空");
+                return false;
+            }
+
+            var fromTime = $.trim($("#fromTime").val());
+            if (fromTime == '') {
+                comAlert("生效时间不能为空");
+                return false;
+            }
+            var toTime = $.trim($("#toTime").val());
+
+            var status = $.trim($("#status").val());
+            if (status == '') {
+                comAlert("状态不能为空");
+                return false;
+            }
+            var chargeMonth = $.trim($("#chargeMonth").val());
+            var remark = $.trim($("#remark").val());
+            var params = {
+                "id": id,
+                "name": name,
+                "companyId": companyId,
+                "insuranceType": insuranceType,
+                "chargeType": chargeType,
+                "payPrice": payPrice,
+                "payFrequency": payFrequency,
+                "chargePrice": chargePrice,
+                "chargeFrequency": chargeFrequency,
+                "chargeMonth": chargeMonth,
+                "replaceAllowed": replaceAllowed,
+                "fromTime": new Date(Date.parse(fromTime.replace(/-/g, "/"))).getTime(),
+                "toTime": new Date(Date.parse(toTime.replace(/-/g, "/"))).getTime(),
+                "status": status,
+                "remark": remark
+            };
+            var data = JSON.stringify(params);
+            //comAlert(data);
+
+            var requestData;
+            if (method == 1) {
+                requestData = {
+                    "_mt": "insurance.addtype",
+                    "data": data
+                }
+            } else if (method == 2) {
+                requestData = {
+                    "_mt": "insurance.updatetype",
+                    "id": id,
+                    "data": data
+                }
+            }
+
+            return requestData;
+        }
+
+        function addOrUpdateinsurancetype(requestData, level, method) {
+            var params = {
+                data: requestData,
+                level: level
+            };
+            data = encrypt(params.level, params.data);
+            console.log(data);
+            $.ajax({
+                type: "POST",
+                url: pubsources.pub_getlink,
+                crossDomain: true,
+                dataType: "json",
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: serialize(data),
+                success: function (result) {
+                    if (getStatus(result)) {
+                        if (method == 1) {
+                            comAlert("商保险种新增成功");
+                        } else if (method == 2) {
+                            comAlert("商保险种修改成功");
+                        } else {
+                            comAlert("没有此操作");
+                        }
+                        //关闭dialog
+                        $("#add_upd_insurancetype").dialog("close");
+                        //刷新grid
+                        jQuery("#tab_insurancetype").trigger("reloadGrid");
+
+                    }
+                },
+                error: function () {
+                    comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+                }
+            });
+        }
+
+        /*---------新增保存 end --------*/
+        /*---------修改 ---------*/
+        //1.点击修改按钮加载选中的行的数据到修改页面
+        //点击修改第一层
+        $("#upd_insurancetype").click(function () {
+
+            //加载修改页面
+
+            addOrUpdate(2, "修改险种");
+
+            //2.加载要修改的数据
+
+        })
+
+        //获取要修改的用户的信息
+        function getUpdateinsurancetype(method, requestData, level) {
+            if (method != 2)
+                return;
+            var payload = {
+                data: requestData,
+                level: level
+            };
+            data = encrypt(payload.level, payload.data);
+            console.log(data);
+            $.ajax({
+                type: "POST",
+                url: pubsources.pub_getlink,
+                crossDomain: true,
+                dataType: "json",
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: serialize(data),
+                success: function (result) {
+                    //给修改页面的input框赋值
+                    content = result.content["0"];
+                    console.log(content);
+//                    setData(content,);
+                    setData(content, "addInsuranceType");
+                },
+                error: function () {
+                    comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+                }
+            });
+        }
+
+
+        /*---------修改保存 end---------*/
+        /*----------删除--------*/
+        $("#del_insurancetype").click(function () {
+            var ids = $('#tab_insurancetype').jqGrid('getGridParam', 'selarrrow');
+            if (ids.length == 0) {
+                comAlert("请选择要删除的信息");
+                return;
+            } else {
+                if (confirm("您确定要删除选中的信息？")) {
+                    var del = {
+                        _mt: "insurance.deletebyids",
+                        ids: ids
+                    };
+                    deleteinsurancetype(del, "UserLogin");
+                }
+            }
+        })
+
+        function deleteinsurancetype(requestData, level) {
+            var payload = {
+                data: requestData,
+                level: level
+            };
+            data = encrypt(payload.level, payload.data);
+            console.log(data);
+            $
+                .ajax({
+                    type: "POST",
+                    url: pubsources.pub_getlink,
+                    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                    crossDomain: true,
+                    dataType: "json",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: serialize(data),
+                    success: function (result) {
+                        //TODO　判断删除是否成功
+                        console.log(result);
+                        jQuery("#tab_insurancetype").trigger("reloadGrid");
+                    },
+                    error: function () {
+                        comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+                    }
+                });
+        }
+
+        /*---------修改保存 end---------*/
+        /*-----------生效-------*/
+        $("#enable_insurancetype").click(function () {
+            var ids = $('#tab_insurancetype').jqGrid('getGridParam', 'selarrrow');
+            if (ids.length == 0) {
+                comAlert("请选择要生效的信息");
+                return;
+            } else {
+                if (confirm("您确定要使选中的信息生效？")) {
+                    var paramData = {
+                        _mt: "insurance.changeitstatus",
+                        ids: ids,
+                        newstatus: "02valid"
+                    };
+                    changeitstatus(paramData, "UserLogin");
+                }
+            }
+        })
+
+
+        /*---------修改保存 end---------*/
+        /*-----------失效-------*/
+        $("#disable_insurancetype").click(function () {
+            var ids = $('#tab_insurancetype').jqGrid('getGridParam', 'selarrrow');
+            if (ids.length == 0) {
+                comAlert("请选择要失效的信息");
+                return;
+            } else {
+                if (confirm("您确定要使选中的信息失效？")) {
+                    var paramData = {
+                        _mt: "insurance.changeitstatus",
+                        ids: ids,
+                        newstatus: "03invalid"
+                    };
+                    changeitstatus(paramData, "UserLogin");
+                }
+            }
+        })
+
+        function changeitstatus(requestData, level) {
+            var payload = {
+                data: requestData,
+                level: level
+            };
+            data = encrypt(payload.level, payload.data);
+            console.log(data);
+            $
+                .ajax({
+                    type: "POST",
+                    url: pubsources.pub_getlink,
+                    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                    crossDomain: true,
+                    dataType: "json",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: serialize(data),
+                    success: function (result) {
+                        //TODO　判断是否修改成功
+                        console.log(result);
+                        jQuery("#tab_insurancetype").trigger("reloadGrid");
+                    },
+                    error: function () {
+                        comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+                    }
+                });
+        }
+
+        /*-----------删除 end----------*/
+        //主页面的查询
+        $("#insurancetype_search_btn").bind('click', function () {
+            queryStr = $.trim($("#insurancetype_search").val());
+            requestData = {
+                _mt: "insurance.getinsurancetype",
+                queryname: (queryStr == "" || queryStr == undefined || queryStr == null) ? "" : "name like '%" + queryStr + "%'",
+                method: 1
+            };
+            $("#tab_insurancetype").jqGrid('setGridParam', {
+                postData: requestData, //发送数据
+                page: 1
+            }).trigger("reloadGrid");
+        })
+
+    })
+
+    function queryIt(condition) {
+        requestData = {
+            _mt: "insurance.getinsurancetype",
+            queryname: condition,
+            method: 1
+        };
+        $("#tab_insurancetype").jqGrid('setGridParam', {
+            postData: requestData, //发送数据
+            page: 1
+        }).trigger("reloadGrid");
+    }
+</script>
+
+<!-- grid -->
+<div class="rPane_d_menu">
+            <input type="button" id="add_insurancetype" value="&nbsp;新增&nbsp;"><input type="button" id="upd_insurancetype" value="&nbsp;修改&nbsp;"><input type="button" id="del_insurancetype" value="&nbsp;删除&nbsp;"><input type="button" id="enable_insurancetype" value="&nbsp;生效&nbsp;"><input type="button" id="disable_insurancetype" value="&nbsp;失效&nbsp;"><input type="hidden" id='loadcomplete_flag' name="loadcomplete_flag" value="false"/>
+</div>
+<div class="rpane_status">
+	<label><input type="radio" id="editing" name="status_type" value="01draft"
+                  onclick="javascript:queryIt('status=\'01draft\'')"/>编辑中</label><label><input type="radio" id="enabled" name="status_type" value="02valid" checked="checked"
+                  onclick="javascript:queryIt('status=\'02valid\'')"/>生效</label><label><input type="radio" id="diabled" name="status_type" value="03invalid"
+                  onclick="javascript:queryIt('status=\'03invalid\'')"/>失效</label><label><input type="radio" id="allstatus" name="status_type" value="" 
+                  onclick="javascript:queryIt('')"/>全部</label>
+</div>
+<div class="rpane_search jqForm">
+	<input type="text"
+		id="insurancetype_search" style="float: left;" name="insurancetype_search"
+		 placeholder="请输入险种名称"><input type="button" id="insurancetype_search_btn"
+		value="&nbsp;查询&nbsp;">
+</div>
+<div class=rPane_dt>
+    <table id="tab_insurancetype"></table>
+    <div id="pager_insurancetype"></div>
+</div>
+
+

@@ -1,0 +1,50 @@
+<style type="text/css">
+	.ui-form-bspcs{
+		color: red;
+		padding-right:10px;
+		float: right;
+		font-weight: bold;
+	}
+</style>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addParamType" class="ui-form-table" cellpadding="5" border='0'
+		style="width: 100%;">
+		
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="bankName"><label>银行名称</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="bankName" name="bankName" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+			</td>
+
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="bankCname"><label>银行简称</label>
+				<span class="ui-form-bspcs">*</span>
+			</td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input ismust="1"
+					id="bankCname" name="bankCname" type="text" class="ui-form-value"
+					layout="1" maxlength="50"></span> 
+			</td>
+
+		</tr>
+			
+		
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);"
+				class="ui-form_tddisp" name="comment"><label>备注:</label>
+			</td>
+			<td colspan="3" style="width:85%; background: #FFFFFF; padding-top: 3px;">
+				<span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+				<textarea  class="ui-form-textarea ui-form-value" id="comment" name="comment"  ismust="0"
+					></textarea>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+		
+	</table>
+	<input id="id" type="hidden">

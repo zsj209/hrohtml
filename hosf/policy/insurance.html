@@ -1,0 +1,156 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="../css/payroll.css">
+<script type="text/javascript" src="../js/insurance.js"></script>
+<script type="text/javascript" src="../js/policy_base.js"></script>
+<style>
+</style>
+
+<div id="rPane_d" class="jq_top_div">
+	<div id="bn_hosf_insurance" class="jq_top_bs_button"></div>
+	<DIV ID="form_jq_hosf_insurance"
+		STYLE="overflow: auto; position: relative; left: 0px; top: 0px; display: none;"
+		CLASS="jqForm" TITLE="新增信息">
+		<div id="jq_hosf_insurance_addinfoarea">
+			<table id='jq_hosf_insurance_addinfoarea' class='ui-form-table'
+				border='0' style='width: 100%;'>
+				<input class="add_input" type="hidden" id="insPolicyid" />
+				<tr>
+					<!-- <td class="add_lfspan"><span>公司ID</span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="1" id="companyId" titl="公司ID"></td> -->
+
+					<td class="add_lfspan"><span>险种归属<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><select class="add_select"
+						id="insBelongid" name="insBelongid" isck="1" titl="险种归属"><option
+								value="0">请选择</option></select></td>
+
+					<td class="add_lfspan"><span>险种名称<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insName" isck="1" titl="险种名称" isck="1"></td>
+
+				</tr>
+
+
+				<tr>
+					<td class="add_lfspan"><span>起始时间<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insStarttime" isck="1" titl="起始时间" isck="1"></td>
+
+					<td class="add_lfspan"><span>终止时间<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insEndtime" isck="1" titl="终止时间" isck="1"></td>
+				</tr>
+
+
+
+				<tr>
+					<td class="add_lfspan"><span>公积金最高基数<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insMaxbase" isck="1" titl="公积金最高基数" isck="1"></td>
+
+					<td class="add_lfspan"><span>公积金最低基数<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insMinbase" isck="1" titl="公积金最低基数" isck="1"></td>
+				</tr>
+
+				<tr>
+					<td class="add_lfspan"><span>企业比缴<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insCompratio" isck="1" titl="企业比缴" isck="1"></td>
+
+					<td class="add_lfspan"><span>企缴小数规则<em
+							class='add_fwid_rd'>*</em></span></td>
+
+					<td class="add_rtspan"><select class="add_select"
+						id="insComprule" name="insComprule" isck="1" titl="企缴小数规则"><option
+								value="0">请选择</option></select></td>
+
+
+				</tr>
+
+
+				<tr>
+					<td class="add_lfspan"><span>个缴比例<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insPerratio" isck="1" titl="个缴比例" isck="1"></td>
+
+					<td class="add_lfspan"><span>个缴小数规则<em
+							class='add_fwid_rd'>*</em></span></td>
+
+					<td class="add_rtspan"><select class="add_select"
+						id="insPerule" name="insPerule" isck="1" titl="个缴小数规则"><option
+								value="0">请选择</option></select></td>
+				</tr>
+
+
+				<tr>
+					<td class="add_lfspan"><span>企业附加金额<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insCompatt" isck="1" titl="企业附加金额" isck="1"></td>
+
+					<td class="add_lfspan"><span>个人附加金额<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insPeratt" isck="1" titl="个人附加金额" isck="1"></td>
+				</tr>
+
+
+
+				<tr>
+					<td class="add_lfspan"><span>是否补缴<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_check"
+						type="checkbox" value="" id="insIspay" titl="是否有效"></td>
+
+					<td class="add_lfspan"><span>支付频率<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><select class="add_select" id="insRate"
+						name="insRate" isck="1" titl="个缴小数规则"><option value="0">请选择</option></select></td>
+
+
+
+
+				</tr>
+
+
+				<tr>
+					<td class="add_lfspan"><span>企业支付比例<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insComppayratio" isck="1" titl="企业支付比例" isck="1"></td>
+
+					<td class="add_lfspan"><span>个人支付比例<em
+							class='add_fwid_rd'>*</em></span></td>
+					<td class="add_rtspan"><input class="add_input" type="text"
+						value="" id="insPerpayratio" isck="1" titl="个人支付比例" isck="1"></td>
+				</tr>
+
+
+
+
+
+				<tr>
+					<td class="add_lfspan"><span>备注</span></td>
+					<td class="add_rtspan_texa" colspan="3"><textarea
+							class="add_texa" id="insNote"></textarea></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+		<!--  -->
+	</DIV>
+	<div id="rPane_dt">
+		<table id="jq_hosf_insurance" class="jqgridtable"></table>
+		<div id="page_hosf_insurance"></div>
+	</div>
+</div>

@@ -1,0 +1,101 @@
+<script type="text/javascript">
+
+	function addNode(requestData, level) {
+		var payload = {
+			data : requestData,
+			level : level
+		};
+		data = encrypt(payload.level, payload.data);
+		console.log(data);
+		$.ajax({
+			type : "POST",
+			url : pubsources.pub_getlink,
+			crossDomain : true,
+			dataType : "json",
+			xhrFields : {
+				withCredentials : true
+			},
+			data : serialize(data),
+			success : function(result) {
+				//TODO 根据条件刷新
+				if(com_error(result)){
+					jQuery("#tab_node").trigger("reloadGrid");
+				}else{
+					alertMsg(result,"usermgmt_code_desc");
+				}
+			},
+			error : function() {
+				comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+			}
+		});
+	}
+
+	/*----------上级节点-----------*/
+
+	//新增点击事件
+	$("#add_t").click(function() {
+		//comsel("selnode", "上级节点", "parentId", "parentName", 0);
+		var selpara = {seltype:"selnode", seltitle:"上级节点", rtnvalobj:"parentId", rtndisobj:"parentName", discol:0};
+		comsel(selpara);
+	})
+	/*---------上级节点 end --------*/
+
+	<!--查找nodeType-->
+
+	//清除内容
+	$("#parentName").bind('dblclick', function() {
+		if (confirm("您确定要清除该字段吗？")) {
+			$(this).val("");
+			$("#parentId").val(0);
+		}
+
+	});
+</script>
+<div class="jqForm ui-dialog-content ui-widget-content">
+	<table id="addNode" class="ui-form-table" cellpadding="5" border='0' style="width: 100%;">
+		<!--上级节点id-->
+		<input type="hidden" id='parentId' />
+		<!--上级节点id-->
+		<input type="hidden" id='nodeId' name="nodeId" />
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>节点编码:</label><span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="nodeCode" name="nodeCode" type="text" class="ui-form-value" layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>节点名称:</label><span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="nodeNames" name="nodeNames" type="text" class="ui-form-value" layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>上级节点:</label></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="parentName" name="parentName" type="text" class="ui-form-value" layout="1" maxlength="50" readonly=""></span> 
+			<span id="add_t"
+				class="ui-form-sbtnew ui-form-sel">&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>节点类型:</label><span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"> <select id="type" name="type" type="text" class="ui-form-value" layout="1" maxlength="50">
+		
+			</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+		</tr>
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>图片编码:</label></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="pictureCode" name="pictureCode" type="text" class="ui-form-value" layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>链接:</label></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="methodName" name="methodName" type="text" class="ui-form-value" layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>节点标识:</label><span class="ui-form-bspcs">*</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left">
+			<select id="funstyle" name="funstyle" type="text" class="ui-form-value" layout="1" maxlength="50">
+		
+			</select>
+			</span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>备注:</label></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;" colspan="3"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"> <textarea style="width: 608px; height: 72px; max-width: 608px; max-height: 72px;" id="memo" name="memo" type="text" class="ui-form-value"
+						layout="1" maxlength="50"></textarea></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+		</tr>
+	</table>
+</div>
