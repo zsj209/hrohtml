@@ -8,7 +8,8 @@
 
 		var ss = {
 			_mt : "company.selectByColuPage",
-			compType : "06insu"
+			compType : "06insu",
+			companyId : $("#tg_cur_company").val()
 
 		};
 		getData(ss);
@@ -145,11 +146,13 @@
 			//加载新增页面
 			$(s).load(
 					"../company/business/companybasebus.html?tsid="
-							+ new Date().getTime(), function() {
+							+ new Date().getTime(),
+					function() {
 						if (pagetitle == "修改商保机构信息") {
 							$("#companyidid").val(ids);
-							$("#businesscompanyId").val($("#tg_cur_company").val());
-						}else{
+							$("#businesscompanyId").val(
+									$("#tg_cur_company").val());
+						} else {
 							$("#companyId").val($("#tg_cur_company").val());
 						}
 
@@ -326,7 +329,7 @@
 				var updatestate = {
 					_mt : "company.updateStateBatchById",
 					ids : ids,
-					state : state
+					state : state 
 				};
 				updatestates(updatestate, "UserLogin", type);
 			}
@@ -375,7 +378,7 @@ input[type=radio] {
 }
 /* 按钮样式 */
 .buttonz {
-	height:20px;
+	height: 20px;
 	background: #ccc;
 	border: none;
 	color: #0089db;
@@ -410,10 +413,15 @@ input[type=radio] {
 
 
 		<div class="rpane_status">
-			<label><input type="radio" id="editing" name="status" value="01draft" onclick="javascript:queryCompanybus('01draft')" /> 编辑中</label>
-		    <label><input type="radio" id="enabled" name="status" value="02valid" onclick="javascript:queryCompanybus('02valid')" /> 生效</label>
-			<label><input type="radio" id="diabled" name="status" value="03invalid" onclick="javascript:queryCompanybus('03invalid')" /> 失效/终止</label>
-			<label><input type="radio" id="allstatus" name="status" value="" checked="checked" onclick="javascript:queryCompanybus('')" /> 全部</label><br>
+			<label><input type="radio" id="editing" name="status"
+				value="01draft" onclick="javascript:queryCompanybus('01draft')" />
+				编辑中</label> <label><input type="radio" id="enabled" name="status"
+				value="02valid" onclick="javascript:queryCompanybus('02valid')" />
+				生效</label> <label><input type="radio" id="diabled" name="status"
+				value="03invalid" onclick="javascript:queryCompanybus('03invalid')" />
+				失效/终止</label> <label><input type="radio" id="allstatus"
+				name="status" value="" checked="checked"
+				onclick="javascript:queryCompanybus('')" /> 全部</label><br>
 		</div>
 
 

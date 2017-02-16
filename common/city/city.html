@@ -280,7 +280,7 @@
 					}
 				}
 				$("#add_upd_button").dialog("close");
-				jQuery("#jq_comm_city").trigger("reloadGrid");
+				jQuery("#jq_comm_city").trigger("reloadGrid", [{page:1}]);
 			},
 			error : function() {
 				comAlert(pubprompt.network_error);

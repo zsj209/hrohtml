@@ -1,6 +1,9 @@
 var pubsources = {
 
-	pub_getlink : "http://servers2.hrocloud.com:8099/api/v1"
+	pub_getlink : "http://servers2.hrocloud.com:8099/api/v1",
+		pub_getCaptcha : "http://tiangong61:8099/api/v1",
+			clientId : "1000",
+				clientPass : "6cc1c430aed64d3bb8516011195a5b56"
 	// pub_getlink : "http://server5.hrocloud.com:8099/api/v6"
 };
 var pubprompt = {

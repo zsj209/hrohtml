@@ -1,22 +1,22 @@
 <script type="text/javascript">
 	$("#Org_Name").click(function() {
 		var selpara = {
-			seltype : "selorg",
+			seltype : "selorgs",
 			seltitle : "所属组织",
 			rtnvalobj : "postOrgid",
 			rtndisobj : "postOrgidName",
-			discol : 0
+			discol : 1
 		};
 		comsel(selpara);
 	})
 
 	$("#postUser_Bind").click(function() {
 		var selpara = {
-			seltype : "seluser",
+			seltype : "selbindusers",
 			seltitle : "用户",
 			rtnvalobj : "postUser",
 			rtndisobj : "postUserName",
-			discol : 0
+			discol : 1
 		};
 		comsel(selpara);
 
@@ -24,11 +24,11 @@
 
 	$("#postRole_Name").click(function() {
 		var selpara = {
-			seltype : "selrole",
+			seltype : "selroles",
 			seltitle : "角色",
 			rtnvalobj : "postRole",
 			rtndisobj : "postRoleName",
-			discol : 0
+			discol : 1
 		};
 		comsel(selpara);
 	})
@@ -104,7 +104,7 @@
 					layout="1" maxlength="50" ></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span>
 			</td>
 
-			<td style="width: 15%; background: rgb(231, 245, 254);"
+		<!-- 	<td style="width: 15%; background: rgb(231, 245, 254);"
 				class="ui-form_tddisp" name="serp_svc_code"><label>所属组织:</label><span
 				class="ui-form-bspcs">*</span></td>
 			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
@@ -113,14 +113,9 @@
 					class="ui-form-value" layout="1" maxlength="50" onfocus="this.blur()"></span>
 				<span id="Org_Name" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 				<span class="ui-form-bspc">&nbsp;&nbsp;</span>
-			</td>
+			</td> -->
 
-		</tr>
-		
-
-
-		<tr>
-			<td style="width: 15%; background: rgb(231, 245, 254);"
+		<td style="width: 15%; background: rgb(231, 245, 254);"
 				class="ui-form_tddisp" name="serp_svc_code"><label>创建日期:</label>
 				<span class="ui-form-bspcs">*</span></td>
 			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;">
@@ -129,7 +124,11 @@
 					class="ui-form-value" layout="1" maxlength="50" onfocus="this.blur()"></span> <span
 				class="ui-form-bspc">&nbsp;&nbsp;</span>
 			</td>
+		</tr>
+		
 
+
+		<tr>
 			<td style="width: 15%; background: rgb(231, 245, 254);"
 				class="ui-form_tddisp" name="serp_svc_code"><label>终止日期:</label>
 			</td>
@@ -139,13 +138,7 @@
 					class="ui-form-value" layout="1" maxlength="50" onfocus="this.blur()"></span> <span
 				class="ui-form-bspc">&nbsp;&nbsp;</span>
 			</td>
-		</tr>
-
-
-
-
-
-		<tr>
+			
 			<td style="width: 15%; background: rgb(231, 245, 254);"
 				class="ui-form_tddisp" name="serp_svc_code"><label>操作角色:</label>
 				<span class="ui-form-bspcs">*</span></td>
@@ -156,6 +149,14 @@
 				<span id="postRole_Name" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 				<span class="ui-form-bspc">&nbsp;&nbsp;</span>
 			</td>
+			
+		</tr>
+
+
+
+
+
+		<tr>
 
 			<td style="width: 15%; background: rgb(231, 245, 254);"
 				class="ui-form_tddisp" name="serp_svc_code"><label>用户绑定:</label><span
@@ -167,14 +168,8 @@
 				<span id="postUser_Bind" class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 				<span class="ui-form-bspc">&nbsp;&nbsp;</span>
 			</td>
-		</tr>
-
-
-
-
-		<tr>
-
-
+			
+			
 			<td style="width: 15%; background: rgb(231, 245, 254);"
 				class="ui-form_tddisp" name="serp_svc_code"><label>岗位状态:</label></td>
 			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
@@ -184,7 +179,15 @@
 						<option value="">--select--</option>
 				</select>
 			</span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+		</tr>
 
+
+
+
+		<tr>
+
+
+			
 
 			<td style="width: 15%; background: rgb(231, 245, 254);"
 				class="ui-form_tddisp" name="serp_svc_code"><label>是否全数据:</label>
@@ -213,7 +216,7 @@
 						name="postNote" ismust="0" class="ui-form-value"></textarea>
 			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
 		</tr>
-		<input id="companyId" name="companyId" value="0" type="hidden">
+		<input id="companyId" name="companyId"  type="hidden">
 		<input type="hidden" id='postOrgid' />
 		<input type="hidden" id='postUser' />
 		<input type="hidden" id='postRole' />

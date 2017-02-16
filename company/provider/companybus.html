@@ -8,7 +8,8 @@
 
 		var ss = {
 			_mt : "company.selectByColuPage",
-			compType : "05hrovend"
+			compType : "05hrovend",
+			companyId : $("#tg_cur_company").val()
 
 		};
 		getData(ss);
@@ -138,11 +139,13 @@
 			//加载新增页面
 			$(s).load(
 					"../company/provider/companybasebus.html?tsid="
-							+ new Date().getTime(), function() {
+							+ new Date().getTime(),
+					function() {
 						if (pagetitle == "修改供应商信息") {
 							$("#companyidid").val(ids);
-							$("#providercompanyId").val($("#tg_cur_company").val());
-						}else{
+							$("#providercompanyId").val(
+									$("#tg_cur_company").val());
+						} else {
 							$("#companyId").val($("#tg_cur_company").val());
 						}
 
@@ -409,10 +412,15 @@ input[type=radio] {
 
 
 		<div class="rpane_status">
-			<label><input type="radio" id="editing" name="status"value="01draft" onclick="javascript:queryCompanypro('01draft')" /> 编辑中&nbsp; </label> 
-			<label><input type="radio" id="enabled"name="status" value="02valid"onclick="javascript:queryCompanypro('02valid')" /> 生效&nbsp; </label>
-		    <label><input type="radio" id="diabled" name="status" value="03invalid" onclick="javascript:queryCompanypro('03invalid')" /> 失效/终止&nbsp; </label>
-		    <label><input type="radio" id="allstatus" name="status" value="" checked="checked" onclick="javascript:queryCompanypro('')" /> 全部 </label> <br>
+			<label><input type="radio" id="editing" name="status"
+				value="01draft" onclick="javascript:queryCompanypro('01draft')" />
+				编辑中&nbsp; </label> <label><input type="radio" id="enabled"
+				name="status" value="02valid"
+				onclick="javascript:queryCompanypro('02valid')" /> 生效&nbsp; </label> <label><input
+				type="radio" id="diabled" name="status" value="03invalid"
+				onclick="javascript:queryCompanypro('03invalid')" /> 失效/终止&nbsp; </label> <label><input
+				type="radio" id="allstatus" name="status" value="" checked="checked"
+				onclick="javascript:queryCompanypro('')" /> 全部 </label> <br>
 		</div>
 
 

@@ -327,7 +327,7 @@
 				} else {
 					comAlert(pubprompt.del_failure);
 				}
-				jQuery("#list_comm_bank").trigger("reloadGrid");
+				jQuery("#list_comm_bank").trigger("reloadGrid", [{page:1}]);
 			},
 			error : function() {
 				comAlert(pubprompt.network_error);

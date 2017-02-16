@@ -2,11 +2,11 @@
 	$("#orgStarttime").datepicker();
 	$("#orgSuperior_Name").click(function() {
 		var selpara = {
-			seltype : "selorg",
+			seltype : "selorgs",
 			seltitle : "上级组织",
 			rtnvalobj : "orgSuperior",
 			rtndisobj : "orgSuperiorName",
-			discol : 0
+			discol : 1
 		};
 		comsel(selpara);
 
@@ -156,8 +156,8 @@
 						name="orgNote" ismust="0" class="ui-form-value"></textarea>
 			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
 		</tr>
-		<input id="companyId" name="companyId" value="0" type="hidden">
-		<input id="id" name="id" value="0" type="hidden">
+		<input id="companyId" name="companyId"  type="hidden">
+		<input id="id" name="id"  type="hidden">
 		<input id="orgSuperior" name="orgSuperior" type="hidden">
 	</table>
 </div>

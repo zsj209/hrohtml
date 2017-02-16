@@ -6,10 +6,12 @@
 		$("#tg_hosfpolicy_funid").val($("#tg_cur_funid_temp").val());
 		$("#tg_hosfpolicy_funcode").val($("#tg_cur_funcode_temp").val());
 
-		var hosfpolicycompanyId=$("#tg_cur_company").val();
+		var hosfpolicycompanyId = $("#tg_cur_company").val();
 		// 省市区获取树结构
 		var treeparams = {
-			_mt : "commoncity.queryTreeCityList"
+				/* _mt : "commoncity.queryTreeCityListValid",
+				companyId:$("#tg_cur_company").val() */
+				_mt : "commoncity.queryTreeCityList"
 		};
 		getInfo_comm_treegjjPolicy(treeparams, "UserLogin");
 
@@ -19,7 +21,8 @@
 		$("#tree_hosfpolicy_list").css("height",
 				($("#rPane").height() - 82) + "px");
 		var ss = {
-			_mt : "hosfPolicy.getPolicyByPage"
+			_mt : "hosfPolicy.getPolicyByColumPage",
+			companyId : $("#tg_cur_company").val()
 		};
 
 		getData(ss);
@@ -157,15 +160,17 @@
 			//加载新增页面
 			$(s).load(
 					"../hosf/hosfpolicytree/base.html?tsid="
-							+ new Date().getTime(), function() {
+							+ new Date().getTime(),
+					function() {
 						//修改时将id保存在页面
 						if (pagetitle == "修改公积金政策信息") {
 							$("#policyidid").val(ids);
-							$("#hosfpolicycompanyid").val($("#tg_cur_company").val());
-						}else{
+							$("#hosfpolicycompanyid").val(
+									$("#tg_cur_company").val());
+						} else {
 							$("#companyId").val($("#tg_cur_company").val());
 						}
-						
+
 					}).dialog({
 				autoOpen : true,
 				closeOnEscape : true,
@@ -568,7 +573,9 @@
 		$("#tp_policy_refresh").bind('click', function() {
 			//省市区获取树结构
 			var treeparams = {
-				_mt : "commoncity.queryTreeCityList"
+					_mt : "commoncity.queryTreeCityList"
+					/* _mt : "commoncity.queryTreeCityListValid",
+					companyId:$("#tg_cur_company").val() */
 			};
 			getInfo_comm_treegjjPolicy(treeparams, "UserLogin");
 		});

@@ -3,11 +3,11 @@
 
 	$("#compController_Name").click(function() {
 		var selpara = {
-				seltype : "seluser",
+				seltype : "selbindusers",
 				seltitle : "管理员",
 				rtnvalobj : "compController",
 				rtndisobj : "compControllerName",
-				discol : 0
+				discol : 1
 			};
 			comsel(selpara);
 	})
@@ -151,11 +151,7 @@
 		
 	
 		
-		if(compAddr == ""){
-			comAlert("请选择详细地址");
-			flag = false;
-			return
-		}
+		
 		
 		
 		return flag;

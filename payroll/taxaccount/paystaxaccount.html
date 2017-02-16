@@ -3,7 +3,7 @@
 <script type="text/javascript" src="../js/payroll_base.js"></script>
 <script type="text/javascript">
 var serversname=pubsources.pub_getlink;//网关接口
-var clmreqData_ptaxacc={_mt:"payrollTaxAccount.selectDataByTaxAccount"};//获取数据的接口
+var clmreqData_ptaxacc={_mt:"payrollTaxAccount.selectDataByTaxAccount",companyId:companyId};//获取数据的接口
 var gdid_ptaxacc="jq_pays_taxaccount";//显示数据的div
 var addgdid_ptaxacc="form_jq_pays_taxaccount";//新增 修改 显示数据的div
 var updinterface_ptaxacc="payrollTaxAccount.selectDataByIds";//修改时根据id获取数据的接口

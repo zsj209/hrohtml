@@ -2,6 +2,11 @@
 	$(function() {
 		$("#tg_user_funid").val($("#tg_cur_funid_temp").val());
 		$("#tg_user_funcode").val($("#tg_cur_funcode_temp").val());
+		$("#tg_user_roleId").val($("#tg_cur_roleId").val());
+		
+		//获取按钮
+		getPageButtonInfo("user_page_button",$("#tg_user_roleId").val(),$("#tg_user_funid").val());
+		
 		//单选框的chenge事件
 		$('input:radio[name="user_status"]').change(function() {
 
@@ -320,14 +325,15 @@
 
 		/*----------批量改变用户状态--------*/
 		//生效
-		$("#modify_status_valid").bind('click', function() {
+		$("#modify_status_valid").click(function() {
 			msv("02valid", true)
 		});
 		//失效
-		$("#modify_status_invalid").bind('click', function() {
+		$("#modify_status_invalid").click(function() {
 			msv("03invalid", false)
 		});
 
+		
 		function msv(status, flag) {
 			//comAlert(status);
 			var ids = $('#list1_user').jqGrid('getGridParam', 'selarrrow');
@@ -434,11 +440,13 @@
 
 <!-- 12 -->
 
-<div class="rPane_d_menu">
+ <div class="rPane_d_menu">
 	<input type="button" id="add_user" value="&nbsp;新增&nbsp;"><input type="button" id="upd_user" value="&nbsp;修改&nbsp;"><input type="button" id="modify_status_valid" value="&nbsp;生效&nbsp;"><input type="button" id="modify_status_invalid" value="&nbsp;失效&nbsp;"><input
-		type="button" id="" value="&nbsp;重置密码&nbsp;">
+		type="button" id="repassword" value="&nbsp;重置密码&nbsp;">
 
-</div>
+</div> 
+<!-- <div class="rPane_d_menu" id="user_page_button">
+</div> -->
 <div class="rpane_status">
 	<input style="vertical-align: middle;" type="radio" id="user_status_1" name="user_status" value="01draft" /><label for="user_status_1" style="vertical-align: middle;">编辑中</label><input style="vertical-align: middle;" type="radio" id="user_status_2" name="user_status" value="02valid" checked="checked" /><label
 		style="vertical-align: middle;" for="user_status_2">生效</label><input style="vertical-align: middle;" type="radio" id="user_status_3" name="user_status" value="03invalid" /><label for="user_status_3" style="vertical-align: middle;">失效</label><input style="vertical-align: middle;" type="radio" id="user_status_4" name="user_status" value=""
@@ -456,6 +464,7 @@
 </div>
 <input type="hidden" id="tg_user_funid" value="">
 <input type="hidden" id="tg_user_funcode" value="">
+<input type="hidden" id="tg_user_roleId"  value="">
 
 <!-- 12 -->
 

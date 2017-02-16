@@ -1,0 +1,60 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test upload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="../js/jquery1.7.2.js"></script>
+</head>
+<body>
+<script>
+    var postUrl = 'http://tiangong61:9709/upload?groupId=0&_tk=hkeOgl05AxUafO9K4fnSsc2CVNnwUM9EDuTU72mK0iykFgFl3KSuHxfjbg1F3%2Bu5NOe0OTFG2fZ8fTaTnMuV8g%3D%3D';
+    function setUrl(groupId) {
+        switch (groupId) {
+            case 0:
+                postUrl = 'http://tiangong61:9709/upload?groupId=0&_tk=hkeOgl05AxUafO9K4fnSsc2CVNnwUM9EDuTU72mK0iykFgFl3KSuHxfjbg1F3%2Bu5NOe0OTFG2fZ8fTaTnMuV8g%3D%3D';
+                break;
+            case 1:
+                postUrl = 'http://tiangong61:9709/upload?groupId=1&_tk=hkeOgl05AxUafO9K4fnSsc2CVNnwUM9EDuTU72mK0iykFgFl3KSuHxfjbg1F3%2Bu5NOe0OTFG2fZ8fTaTnMuV8g%3D%3D';
+                break;
+            default:
+                break;
+        }
+    }
+
+    function doUpload() {
+        var formData = new FormData($("#uploadForm")[0]);
+        $.ajax({
+            url: postUrl,
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
+            processData: false,
+            success: function (returndata) {
+                console.log(returndata);
+//                alert(returndata.toString());
+                $('#filename').val(JSON.stringify(returndata));
+            },
+            error: function (returndata) {
+                console.log(returndata);
+            }
+        });
+    }
+</script>
+<form id="uploadForm">
+    <p>文件key： <input id="filename" type="text" name="filename" value="" size="50"/></p>
+    <p><label><input id="public" name="urlType" type="radio" value="0" checked="checked"
+                     onclick="javascript:setUrl(0)"/>公有云</label>
+        <label><input id="private" name="urlType" type="radio" value="1" onclick="javascript:setUrl(1)"/>私有云</label>
+    </p>
+    <p>上传文件： <input type="file" name="file"/></p>
+    <input type="button" value="上传" onclick="doUpload()"/>
+</form>
+
+</body>
+</html>

@@ -7,7 +7,8 @@
 		var oW = $("#rPane").width() - 40;
 
 		var ss = {
-			_mt : "post.getPostByPage"
+				_mt : "post.selectByColuPage",
+				companyId:$("#tg_cur_company").val()
 		};
 		getData(ss);
 		function getData(requestData) {
@@ -28,7 +29,7 @@
 							nd : null,
 							npage : null
 						},//去除多余的参数
-						colNames : [ '编号', '公司ID', '岗位名称', '所属组织','创建日期',
+						colNames : [ '编号', '公司ID', '岗位名称','创建日期',
 								'终止日期', '操作角色', '用户绑定', '岗位状态', '是否全数据' ],
 						colModel : [ {
 							name : 'id',
@@ -48,12 +49,6 @@
 							name : 'postName',
 							index : 'postName',
 							width : 100,
-							align : "left",
-							sorttype : "text"
-						}, {
-							name : 'postOrgidName',
-							index : 'postOrgidName',
-							width : 80,
 							align : "left",
 							sorttype : "text"
 						},{
@@ -153,6 +148,7 @@
 			var url = "../company/manager/addPost.html";
 			var s = $("<DIV ID=\"add_menu_" + type + "\"></DIV>");
 			$(s).load(url + "?tsid=" + new Date().getTime(), function() {
+				$("#companyId").val($("#tg_cur_company").val());
 			}).dialog({
 
 				autoOpen : true,
@@ -246,6 +242,8 @@
 					//给修改页面的input框赋值
 					data = result.content["0"];
 					setData(data, "addPost");
+					var companyId=$("#tg_cur_company").val();
+					$("#companyId").val(companyId);
 					}else{
 						alertMsg(xhr,"company_code_desc");
 					}
@@ -363,12 +361,12 @@ function validataPost(){
 		flag = false;
 		return;
 	}
-	
+/* 	
 	if(postOrgid == ""){
 		comAlert("请选择所属组织");
 		flag = false;
 		return
-	}
+	} */
 	
 	if(postStarttime == ""){
 		comAlert("请选择开始时间");
@@ -479,7 +477,7 @@ function updatestates(requestData, level, type) {
 
 /* 按钮样式 */
 .buttonz {
-	height:20px;
+	height: 20px;
 	background: #ccc;
 	border: none;
 	color: #0089db;

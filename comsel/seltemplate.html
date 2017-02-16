@@ -22,7 +22,7 @@ update History:
 		//alert(sel_flparamvs);
 		var cityvl=$("#taxaccCity").val();
 		var pd = {
-				_mt : "payrollPaysTemplate.selectDataByPaysTemplate",templateCity:cityvl
+				_mt : "payrollPaysTemplate.selectDataByPaysTemplate",templateCity:cityvl,companyId:companyId
 		};
 		$.each(sel_flparams,function(i,v){
 			pd[v] = sel_flparamvs[i];

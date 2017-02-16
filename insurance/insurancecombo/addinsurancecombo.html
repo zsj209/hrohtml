@@ -9,11 +9,11 @@
             var selpara = {
                 seltype: "selcompany",
                 seltitle: "选择商保公司",
-                rtnvalobj: "companyId",
-                rtndisobj: "companyName",
-                discol: 0,
-                flparams: "0",
-                flparamvs: "0"
+                rtnvalobj: "insuranceComId",
+                rtndisobj: "insuranceComName",
+                discol: 1,
+                flparams: "companyId,compType,compState",
+                flparamvs: $("#tg_insucombo_company").val()+",06insu,02valid"
             };
             comsel(selpara);
         });
@@ -140,6 +140,8 @@
             <table id="addInsuranceCombo" class="rPane_dt" cellpadding="5" border='0' style="width: 100%;">
                 <!--公司id-->
                 <input type="hidden" id='companyId' name="companyId"/>
+                <!-- 商保机构id -->
+        		<input type="hidden" id='insuranceComId' name="insuranceComId"/>
                 <input type="hidden" id='id' name="id"/>
                 <tr>
                     <td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code">
@@ -158,7 +160,7 @@
                     <td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span
                             class="ui-form-spc">&nbsp;</span>
                         <span
-                                style="float: left"><input id="companyName" name="companyName" type="text"
+                                style="float: left"><input id="insuranceComName" name="insuranceComName" type="text"
                                                            class="ui-form-value"
                                                            layout="1" size="25" maxlength="50" readonly=""></span> <span
                                 id="company_Name"
@@ -186,7 +188,6 @@
                                                              class="ui-form-value"
                                                              layout="1"
                                                              maxlength="50">
-
 			</select>
 			</span> <span class="ui-form-bspc">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
                 </tr>

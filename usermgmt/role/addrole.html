@@ -38,11 +38,11 @@
 		});
 	})
 	//所属公司
-	$("#company_Name").click(function() {
+/* 	$("#company_Name").click(function() {
 		//comsel("selcompany", "所属公司", "companyId", "companyName", 0);
 		var selpara = {seltype:"selcompany", seltitle:"所属公司", rtnvalobj:"companyId", rtndisobj:"companyName", discol:1};
 		comsel(selpara);
-	})
+	}) */
 	
 	
 	/* 新增或修改 */
@@ -90,7 +90,7 @@
 			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>角色名称:</label><span class="ui-form-bspcs">*</span></td>
 			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="roleName" name="roleName" type="text" class="ui-form-value" layout="1" maxlength="50"></span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
 			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>角色类型:</label><span class="ui-form-bspcs">*</span></td>
-			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"> <select name="type" id="type" class="ui-form-value" layout="1" maxlength="50" typeCode="gender">
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"> <select name="type" id="type" class="ui-form-value" layout="1" maxlength="50" >
 				</select>
 			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
 		</tr>
@@ -105,8 +105,9 @@
 		</tr>
 		<tr>
 			<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>所属公司:</label><span class="ui-form-bspcs">*</span></td>
-			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="companyName" name="companyName" type="text" value="天弓平台" class="ui-form-value" layout="1" maxlength="50" readonly=""></span> <span id="company_Name"
-				class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
+			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"><input id="companyName" name="companyName" type="text" value="天弓平台" class="ui-form-value" layout="1" maxlength="50" readonly=""></span>
+			 <!-- <span id="company_Name"
+				class="ui-form-picbtn">&nbsp;&nbsp;&nbsp;&nbsp;</span> --><span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
 				<td style="width: 15%; background: rgb(231, 245, 254);" class="ui-form_tddisp" name="serp_svc_code"><label>是否有效:</label><span class="ui-form-bspcs">*</span></td>
 			<td style="width: 35%; background: #FFFFFF; padding-top: 3px;"><span class="ui-form-spc">&nbsp;</span> <span style="float: left"> <select name="enabled" id="enabled" class="ui-form-value" layout="1" maxlength="50" typeCode="pubstatus">
 				</select>

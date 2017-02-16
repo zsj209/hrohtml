@@ -1,22 +1,22 @@
 <script type="text/javascript">
 	$("#Org_Name").click(function() {
 		var selpara = {
-			seltype : "selorg",
+			seltype : "selorgs",
 			seltitle : "所属组织",
 			rtnvalobj : "postOrgid",
 			rtndisobj : "postOrgidName",
-			discol : 0
+			discol : 1
 		};
 		comsel(selpara);
 	})
 
 	$("#postUser_Bind").click(function() {
 		var selpara = {
-			seltype : "seluser",
+			seltype : "selbindusers",
 			seltitle : "用户",
 			rtnvalobj : "postUser",
 			rtndisobj : "postUserName",
-			discol : 0
+			discol : 1
 		};
 		comsel(selpara);
 	})
@@ -27,7 +27,7 @@
 			seltitle : "角色",
 			rtnvalobj : "postRole",
 			rtndisobj : "postRoleName",
-			discol : 0
+			discol : 1
 		};
 		comsel(selpara);
 	})
@@ -222,7 +222,7 @@
 						name="postNote" ismust="0" class="ui-form-value"></textarea>
 			</span> <span class="ui-form-bspc">&nbsp;&nbsp;</span></td>
 		</tr>
-		<input id="companyId" name="companyId" value="0" type="hidden">
+		<input id="companyId" name="companyId"  type="hidden">
 		<input type="hidden" id='postOrgid' />
 		<input type="hidden" id='postUser' />
 		<input type="hidden" id='postRole' />

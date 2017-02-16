@@ -1,5 +1,15 @@
 <script type="text/javascript">
 	$(function() {
+		
+		$("#tg_role_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_role_funcode").val($("#tg_cur_funcode_temp").val());
+		$("#tg_role_company").val($("#tg_cur_company").val());
+		$("#tg_role_companyName").val($("#tg_cur_companyName").val());
+		$("#tg_role_roleId").val($("#tg_cur_roleId").val());
+		
+		//获取按钮
+		getPageButtonInfo("role_page_button",$("#tg_role_roleId").val(),$("#tg_role_funid").val());
+		
 		//单选框的chenge事件
 		$('input:radio[name="role_status"]').change( function(){
 			//TODO 查询
@@ -16,11 +26,24 @@
 		
 		var oH = $("#rPane").height() - 200;
 		var oW = $("#rPane").width() - 40;
-		var ss = {
-			_mt : "role.rolepage",
-			roleName : $("#role_search").val(),
-			enabled : $("input[name='role_status']:checked").val()
-		};
+		if($("#tg_role_funcode").val() == "100107"){//后台角色设置
+			var ss = {
+					_mt : "role.rolepage",
+					roleName : $("#role_search").val(),
+					flag : "true",
+					companyId : $("#tg_role_company").val(),
+					enabled : $("input[name='role_status']:checked").val()
+				};
+		}else{//管理员角色设置
+			
+			var ss = {
+				_mt : "role.rolepage",
+				roleName : $("#role_search").val(),
+				flag : "false",
+				companyId : $("#tg_role_company").val(),
+				enabled : $("input[name='role_status']:checked").val()
+			};
+		}
 		getRoleData(ss);
 		function getRoleData(requestData) {
 			jQuery("#tab_role").jqGrid(
@@ -116,9 +139,26 @@
 		$("#add_role").click(function() {
 			roleDialog("新增角色信息");
 			//加载下拉框
-			getSelectDataTypeList({"type":"bustype","enabled":"pubstatus"});
+			getSelectDataTypeList({"type":"bustype","enabled":"pubstatus"},false,function (){
+				//节点后台角色管理
+				if($("#tg_role_funcode").val() == "100107"){
+					$("#type option[value='3user']").remove();
+					$("#type option[value='4ess']").remove();
+					$("#type option[value='5mss']").remove();
+					$("#companyName").val("天弓平台");
+					$("#companyId").val(1);
+				}else{//角色权限设置
+					
+					$("#type option[value='0root']").remove();
+					$("#type option[value='1admin']").remove();
+					$("#type option[value='2hroadmin']").remove();
+					$("#companyName").val($("#tg_role_companyName").val());
+					$("#companyId").val($("#tg_role_company").val());
+				}
+				 
+			});
 		})
-
+		
 		function roleDialog(pagetitle) {
 			var s = $("<DIV ID=\"add_upd_role\"></DIV>");
 			//加载新增页面
@@ -426,9 +466,11 @@
 		});
 	};
 </script>
-<div class="rPane_d_menu">
+ <div class="rPane_d_menu">
 	<input type="button" id="add_role" value="&nbsp;新增&nbsp;"><input type="button" id="upd_role" value="&nbsp;修改&nbsp;"><input type="button" id="del_role" value="&nbsp;删除&nbsp;"><input type="button" id="modify_status_valid" value="&nbsp;生效&nbsp;"><input type="button" id="modify_status_invalid" value="&nbsp;失效&nbsp;"><input type="button" id="permission_assignment" value="&nbsp;权限分配&nbsp;">
-</div>
+</div> 
+<!-- <div class="rPane_d_menu" id="role_page_button">
+</div> -->
 <div class="rpane_status">
 		<input style="vertical-align:middle;" type="radio" id="role_status_1" name="role_status" value="01draft" /><label for ="role_status_1" style="vertical-align:middle;">编辑中</label><input style="vertical-align:middle;" type="radio" id="role_status_2" name="role_status" value="02valid" checked="checked" /><label for="role_status_2" style="vertical-align:middle;">生效</label><input style="vertical-align:middle;" type="radio" id="role_status_3" name="role_status" value="03invalid" /><label for="role_status_3" style="vertical-align:middle;">失效</label><input style="vertical-align:middle;" type="radio" id="role_status_4" name="role_status" value="" /><label for="role_status_4" style="vertical-align:middle;">全部</label></br>
 </div>
@@ -444,3 +486,10 @@
 </div>
 <input type="hidden" id="permiss_roleId">
 <input type="hidden" id="permiss_roleName">
+<!-- 角色页面的节点id,节点code,当前用户所属公司 -->
+<input type="hidden" id="tg_role_funid" value="">
+<input type="hidden" id="tg_role_funcode" value="">
+<input type="hidden" id="tg_role_company" value="">
+<input type="hidden" id="tg_role_companyName" value="">
+<input type="hidden" id="tg_role_roleId"  value="">
+

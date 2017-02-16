@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test file token</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="../js/jquery1.7.2.js"></script>
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <script type="text/javascript" src="../js/com_base.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <script type="text/javascript" src="../js/pub_source.js"></script>
+</head>
+<body>
+<script>
+
+    function getToken() {
+
+        var formDataInfo = {
+            _mt: "usrmgmt.getfiletoken",
+            isprivate: $("input[name='urlType'][checked]").val() == "1" ? true : false,
+            filekey: $("#filekey").val(),
+            expiresecs: $("#expiresecs").val()
+        };
+
+        var requestData = encrypt("UserLogin", formDataInfo);
+
+        console.log(requestData);
+
+
+        $.ajax({
+            type: "POST",
+            url: pubsources.pub_getlink,
+            crossDomain: true,
+            dataType: "json",
+            xhrFields: {
+                withCredentials: true
+            },
+            data: serialize(requestData),
+            success: function (result) {
+                console.log(result);
+                $('#filetoken').val(JSON.stringify(result));
+            },
+            error: function () {
+                alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。" + "png");
+            }
+        });
+
+
+    }
+
+
+</script>
+<form id="tokenform">
+    <p>文件key： <input id="filekey" type="text" name="filekey" value="" size="50"/></p>
+    <p><label><input id="public" name="urlType" type="radio" value="0"/>公有云</label>
+        <label><input id="private" name="urlType" type="radio" value="1" checked="checked"/>私有云</label>
+    </p>
+    <p>过期时间： <input id="expiresecs" type="text" name="expiresecs" value="" size="20"/>秒</p>
+
+    <input type="button" value="获取文件token" onclick="getToken()"/>
+
+    <p>文件token： <textarea id="filetoken" type="textarea" name="filetoken" value="" rows="10" cols="100"></textarea><p>
+
+</form>
+
+</body>
+</html>

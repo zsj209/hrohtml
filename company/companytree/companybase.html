@@ -6,11 +6,11 @@
 
 	$("#compController_Name").click(function() {
 		var selpara = {
-				seltype : "seluser",
+				seltype : "selbindusers",
 				seltitle : "管理员",
 				rtnvalobj : "compController",
 				rtndisobj : "compControllerName",
-				discol : 0
+				discol : 1
 			};
 			comsel(selpara);
 		
@@ -80,7 +80,7 @@
 					} else {
 						comAlert(pubprompt.upd_failure);
 					}
-					alertMsg(xhr,"company_code_desc");
+					alertMsg(result,"company_code_desc");
 				}
 
 			},

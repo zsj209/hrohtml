@@ -1,6 +1,13 @@
 <script type="text/javascript">
 	$(function() {
 
+		$("#tg_node_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_node_funcode").val($("#tg_cur_funcode_temp").val());
+		$("#tg_node_roleId").val($("#tg_cur_roleId").val());
+		
+		//获取按钮
+		getPageButtonInfo("node_page_button",$("#tg_node_roleId").val(),$("#tg_node_funid").val());
+		
 		var oH = $("#rPane").height() - 175;
 		var oW = $("#rPane").width() - 40;
 		var ss = {
@@ -127,9 +134,15 @@
 					"保存" : function() {
 						//获取参数
 						requestData = addNodePar();
+						
+						var flag = false;
+						if ($("#nodeId").val() == "") {
+							flag = true;
+						}
+
 						//调用方法
 						if (requestData) {
-							addOrUpdateNode(requestData, "UserLogin");
+							addOrUpdateNode(requestData, "UserLogin",flag);
 						}
 					},
 					"取消" : function() {
@@ -191,7 +204,7 @@
 			return requestData;
 		}
 
-		function addOrUpdateNode(requestData, level) {
+		function addOrUpdateNode(requestData, level,flag) {
 			var payload = {
 				data : requestData,
 				level : level
@@ -209,7 +222,11 @@
 				data : serialize(data),
 				success : function(result) {
 					if (getStatus(result)) {
-						comAlert("新增或修改成功");
+						if(flag){//新增成功
+							comAlert(pubprompt.ins_succ);
+						}else{//修改成功
+							comAlert(pubprompt.upd_succ);
+						}
 						//关闭dialog
 						$("#add_upd_node").dialog("close");
 						//刷新grid
@@ -332,9 +349,12 @@
 						},
 						data : serialize(data),
 						success : function(result) {
-							//TODO　判断删除是否成功
-							console.log(result);
-							jQuery("#tab_node").trigger("reloadGrid");
+							if(com_error(result)){
+								comAlert("删除成功");
+								jQuery("#tab_node").trigger("reloadGrid");
+							}else{
+								alertMsg(result,"usermgmt_code_desc");
+							}
 						},
 						error : function() {
 							comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
@@ -363,6 +383,8 @@
 		<input type="button" id="add_node" value="&nbsp;新增&nbsp;"><input type="button" id="upd_node" value="&nbsp;修改&nbsp;"><input type="button" id="del_node" value="&nbsp;删除&nbsp;">
 		
 	</div>
+<!-- 	<div class="rPane_d_menu" id="node_page_button">
+</div -->
 	<div class="rpane_search jqForm">
 		<input type="text"
 			id="node_search" style="float: left;" name="node_search"
@@ -374,4 +396,7 @@
 		<div id="pager_node"></div>
 	</div>
 
+<input type="hidden" id="tg_node_funid" value="">
+<input type="hidden" id="tg_node_funcode" value="">
+<input type="hidden" id="tg_node_roleId"  value="">
 

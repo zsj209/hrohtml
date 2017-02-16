@@ -12,8 +12,8 @@
             comAlert("套餐名称不能为空");
             return false;
         }
-        var companyId = $.trim($("#companyId").val());
-        if (companyId == '') {
+        var insuranceComId = $.trim($("#insuranceComId").val());
+        if (insuranceComId == '') {
             comAlert("商保公司不能为空");
             return false;
         }
@@ -50,11 +50,13 @@
         }
         var customer = $.trim($("#customer").val());
         var chargeMonth = $.trim($("#chargeMonth").val());
+        var companyId = $.trim($("#companyId").val());
         var remark = $.trim($("#remark").val());
         var params = {
             "id": id,
             "name": name,
             "companyId": companyId,
+            "insuranceComId" : insuranceComId,
             "chargeFrequency": chargeFrequency,
             "chargeMonth": chargeMonth,
             "customer": customer,
@@ -127,16 +129,21 @@
     }
 
     $(function () {
+    	
+    	$("#tg_insucombo_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_insucombo_funcode").val($("#tg_cur_funcode_temp").val());
+		$("#tg_insucombo_company").val($("#tg_cur_company").val());
+		$("#tg_insucombo_companyName").val($("#tg_cur_companyName").val());
 
         var oH = $(window).height() - 240;
         var oW = $(window).width() - 240;
         var ss = {
             _mt: "insurance.getinsurancecombo",
-            queryname: 'status=\'02valid\'',
+            queryname:'status=\'02valid\' and company_id = '+$("#tg_insucombo_company").val(),
             method: 1
         };
-        getData(ss);
-        function getData(requestData) {
+        getComBoData(ss);
+        function getComBoData(requestData) {
             jQuery("#tab_insurancecombo").jqGrid({
                 url: pubsources.pub_getlink,
                 datatype: "json",
@@ -161,8 +168,8 @@
                     align: "left",
                     sorttype: "text"
                 }, {
-                    name: 'companyName',
-                    index: 'companyName',
+                    name: 'insuranceComName',
+                    index: 'insuranceComName',
                     width: 100,
                     align: "left",
                     sorttype: "text"
@@ -262,7 +269,6 @@
                 del: false,
                 search: false
             });
-
         }
 
         /*--------加载表格 end------*/
@@ -304,7 +310,7 @@
                     "addDay": "seldays",
                     "detractDay": "seldays",
                     "status": "pubstatus"
-                }, method == 1 ? false : true, getUpdateinsurancecombo(method, updateInfo, "UserLogin"));
+                }, method == 2 ? false : true, getUpdateinsurancecombo(method, updateInfo, "UserLogin"));
 
 
             });
@@ -370,6 +376,9 @@
         //获取要修改的用户的信息
         function getUpdateinsurancecombo(method, requestData, level) {
             if (method != 2) {
+            	//加载商保的默认公司
+        	/* 	$("#companyName").val($("#tg_insucombo_companyName").val());*/
+				$("#companyId").val($("#tg_insucombo_company").val()); 
                 return;
             }
 
@@ -520,10 +529,16 @@
         /*-----------删除 end----------*/
         //主页面的查询
         $("#insurancecombo_search_btn").bind('click', function () {
+        	
+        	var curStatus = $("input[name='status']:checked").val();
+        	var curCondition = 'company_id = '+$("#tg_insucombo_company").val();
+        	if(curStatus != ""){
+        		curCondition = curCondition+' and status = \''+curStatus+'\'';
+        	}  
             queryStr = $.trim($("#insurancecombo_search").val());
             requestData = {
                 _mt: "insurance.getinsurancecombo",
-                queryname: (queryStr == "" || queryStr == undefined || queryStr == null) ? "" : "name like '%" + queryStr + "%'",
+                queryname: (queryStr == "" || queryStr == undefined || queryStr == null) ? curCondition : curCondition+ " and name like '%" + queryStr + "%'",
                 method: 1
             };
             $("#tab_insurancecombo").jqGrid('setGridParam', {
@@ -534,6 +549,18 @@
 
     })
 
+    
+    
+    function insuTypeSearch(par){
+    	if(par != "" ){
+    		condition = par +' and company_id = '+$("#tg_insucombo_company").val();
+    	}else{
+    		condition = ' company_id = '+$("#tg_insucombo_company").val();
+    	}
+    	queryIc(condition);
+    	
+    }
+    
     function queryIc(condition) {
         requestData = {
             _mt: "insurance.getinsurancecombo",
@@ -553,10 +580,10 @@
 </div>
 <div  class="rpane_status">
     <label><input type="radio" id="editing" name="status" value="01draft" 
-                  onclick="javascript:queryIc('status=\'01draft\'')"/>编辑中</label><label><input type="radio" id="enabled" name="status" value="02valid" checked="checked"
-                  onclick="javascript:queryIc('status=\'02valid\'')"/>生效</label><label><input type="radio" id="diabled" name="status" value="03invalid"
-                  onclick="javascript:queryIc('status=\'03invalid\'')"/>失效</label><label><input type="radio" id="allstatus" name="status" value="" 
-                  onclick="javascript:queryIc('')"/>全部</label>
+                  onclick="javascript:insuTypeSearch('status=\'01draft\'')"/>编辑中</label><label><input type="radio" id="enabled" name="status" value="02valid" checked="checked"
+                  onclick="javascript:insuTypeSearch('status=\'02valid\'')"/>生效</label><label><input type="radio" id="diabled" name="status" value="03invalid"
+                  onclick="javascript:insuTypeSearch('status=\'03invalid\'')"/>失效</label><label><input type="radio" id="allstatus" name="status" value="" 
+                  onclick="javascript:insuTypeSearch('')"/>全部</label>
 </div>
 <!-- <div class=rpane_search>
     <input type="text" id="insurancecombo_search" name="insurancecombo_search" placeholder="请输入套餐名称">
@@ -573,3 +600,9 @@
     <table id="tab_insurancecombo"></table>
     <div id="pager_insurancecombo"></div>
 </div>
+
+<!-- 角色页面的节点id,节点code,当前用户所属公司 -->
+<input type="hidden" id="tg_insucombo_funid" value="">
+<input type="hidden" id="tg_insucombo_funcode" value="">
+<input type="hidden" id="tg_insucombo_company" value="">
+<input type="hidden" id="tg_insucombo_companyName" value="">

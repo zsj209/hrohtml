@@ -12,7 +12,8 @@
 		
 		//省市区获取树结构
 		var treeparams = {
-			_mt : "commoncity.queryTreeCityList"
+				_mt : "commoncity.queryTreeCityList"
+			    //companyId:$("#tg_cur_company").val()
 		};
 		getInfo_comm_treeAccount(treeparams, "UserLogin");
 
@@ -22,7 +23,8 @@
 				($("#rPane").height() - 82) + "px");
 
 		var ss = {
-			_mt : "hosfaccount.getAccountByPage"
+				_mt : "hosfaccount.getAccountByColumPage",
+				companyId:$("#tg_cur_company").val()
 		};
 		getData(ss);
 		function getData(requestData) {
@@ -320,17 +322,21 @@
 			      data = encrypt(payload.level, payload.data);
 			      console.log(data);
 			         $.ajax({
-			             type : "GET",
-			             url : pubsources.pub_getlink,
-			             crossDomain : true,
+			             type : "Post",
+			             url : pubsources.pub_getlink,	     
 			             dataType : "json",
 			             xhrFields : {
 			                     withCredentials:true
 			             },
 			             data : serialize(data),
 			             success : function(result) {
+			            	
 			               //给修改页面的input框赋值
 			                data = result.content["0"].value;
+			           /*     if(data==null){
+			            	   alert("请先开通城市");
+			            	   return;
+			               } */
 			              //  alert(data[0].id)
 			                var _arr=[];
 			    			_arr.push('<ul>');/**/
@@ -394,9 +400,12 @@
 			    			$("#tree_hosfaccount_list").html(_arr.join(""));
 							treeListAccounts();
 			             },
-			             error : function() {
-			                     alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
-			             }
+			             error :function(XMLHttpRequest, textStatus, errorThrown) {
+			            	 alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+		                       /*   alert(XMLHttpRequest.status);
+		                        alert(XMLHttpRequest.readyState);
+		                        alert(textStatus);  */
+		                    }
 			     });
 			
 		}
@@ -466,7 +475,8 @@
 		$("#tp_hosfaccount_refresh").bind('click', function() {
 			//省市区获取树结构
 			var treeparams = {
-				_mt : "commoncity.queryTreeCityList"
+					_mt : "commoncity.queryTreeCityList"
+					//companyId:$("#tg_cur_company").val()
 			};
 			getInfo_comm_treeAccount(treeparams, "UserLogin");
 		});
@@ -563,12 +573,12 @@
 			return
 		}
 		
-		if(companyId == ""||companyId ==0){
+		/* if(companyId == ""||companyId ==0){
 			comAlert("请选择所属公司");
 			flag = false;
 			return
 		}
-		
+		 */
 		
 		return flag;
 	
@@ -584,8 +594,8 @@
 	border: none;
 	color: #0089db;
 	cursor: pointer;
-	height:20px;
-	line-hegiht:20px;
+	height: 20px;
+	line-hegiht: 20px;
 }
 
 .buttonz:hover {
@@ -617,8 +627,8 @@
 		</div>
 
 		<div class=rpane_search>
-			<input type="text" id="hosfaccount_search" name="hosfaccount_search" style="height:18px;"
-				placeholder="请输入账户名称">
+			<input type="text" id="hosfaccount_search" name="hosfaccount_search"
+				style="height: 18px;" placeholder="请输入账户名称">
 			<button id="hosfaccounts_search_btn" class="buttonz">查询</button>
 		</div>
 

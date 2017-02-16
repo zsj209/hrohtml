@@ -9,7 +9,7 @@ $(function(){
 	$("#tg_account_funid").val($("#tg_cur_funid_temp").val());
 	$("#tg_account_funcode").val($("#tg_cur_funcode_temp").val());
 	
-	var clmreqData_ssecacc={_mt:"socialSsecaccount.selectDataSsecaccount"};//获取数据的接口
+	var clmreqData_ssecacc={_mt:"socialSsecaccount.selectDataSsecaccount",companyId:companyId};//获取数据的接口
 	var addgdid_ssecacc="form_jq_ssec_account";//新增 修改 显示数据的div
 	var updinterface_ssecacc="socialSsecaccount.selectDataByIds";//修改时根据id获取数据的接口
 	var upinfointerface_ssecacc="socialSsecaccount.updateData";//修改数据的接口

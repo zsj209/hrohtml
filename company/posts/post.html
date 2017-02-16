@@ -23,7 +23,8 @@
 		var oW = $("#rPane").width() - 40 */
 
 		var ss = {
-			_mt : "post.getPostByPage"
+			_mt : "post.selectByColuPage",
+			companyId:$("#tg_cur_company").val()
 		};
 		getData(ss);
 		function getData(requestData) {
@@ -547,7 +548,8 @@
 		$("#tp_post_refresh").bind('click', function() {
 			//省市区获取树结构
 			var treeparams = {
-				_mt : "organization.queryTreeOrgList"
+				_mt : "organization.queryTreeOrgList",
+			    companyId : $("#tg_cur_company").val()
 			};
 			getInfo_comm_treeCity(treeparams, "UserLogin");
 		});
@@ -577,6 +579,7 @@
 		$(e).children("div").children("div").addClass("sclick");
 		var colmRequestDatass = {
 			_mt : "post.getPostByPageTree",
+			companyId : $("#tg_cur_company").val(),
 			orgid : id
 		};
 		var payload = {

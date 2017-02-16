@@ -129,7 +129,60 @@ $(function() {
 	});
 
 	// 默认初始化图形验证码
+
 	function getCaptchaCode() {
+	    var params = {
+	        "_mt": "verifycode.requestCaptcha",
+	        clientId: pubsources.clientId,
+	        clientPass: pubsources.clientPass,
+	        clientIp: "127.0.0.1"
+	    };
+
+	    var requestData = {
+	        data: params,
+	        level: "None"
+	    };
+
+	    data = encrypt(requestData.level, requestData.data);
+
+	    console.log(data);
+	    $.ajax({
+	        type: "POST",
+	        url: pubsources.pub_getCaptcha,
+	        crossDomain: true,
+	        dataType: "json",
+	        xhrFields: {
+	            withCredentials: true
+	        },
+	        data: serialize(data),
+	        success: function (result) {
+	            // 给修改页面的input框赋值
+	            if (com_error(result)) {
+	                // captchaCodeValue = result.content["0"].value;
+	                captid = result.content["0"].key;
+	                imgUrl = result.content["0"].imgUrl;
+	                $("#validImg").prop({
+	                    src: imgUrl,
+	                    cursor: 'hand',
+	                    title: "点击刷新"
+	                });
+	                $("#validImg").css({
+	                    cursor: 'pointer'
+	                });
+	                $("#captid").val(captid);
+	                // $("#captchaCodeValue").val(captchaCodeValue);
+
+	            } else {
+	                alertMsg(result, "usermgmt_code_desc");
+	            }
+	        },
+	        error: function () {
+	            alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。" + "png");
+	        }
+	    });
+	};
+
+/*	function getCaptchaCode() {
 		var payload = {
 			data : serach("usrmgmt.getcaptcha"),
 			level : "None"
@@ -171,8 +224,7 @@ $(function() {
 				comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
 			}
 		});
-	}
-	;
+	};*/
 
 	// 验证身份证号码是否正确，并获得相应的性别和出生日期
 

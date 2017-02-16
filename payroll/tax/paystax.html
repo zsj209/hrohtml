@@ -7,7 +7,7 @@ $(function(){
 	$("#tg_tax_funcode").val($("#tg_cur_funcode_temp").val());
 	
 	var serversname=pubsources.pub_getlink;//网关接口
-	var clmreqData_ptax={_mt:"payrollTax.selectDataByTax"};//获取数据的接口
+	var clmreqData_ptax={_mt:"payrollTax.selectDataByTax",companyId:companyId};//获取数据的接口
 	var gdid_ptax="jq_pays_tax";//显示数据的div
 	var addgdid_ptax="form_jq_pays_tax";//新增 修改 显示数据的div
 	//var addtb_div="pays_tax_addinfoarea";//新增 修改 显示字段的div

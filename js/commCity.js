@@ -3,7 +3,7 @@ var cityPid=1000;
 var cityPidShow="全国省市";
 $(function(){ 
 	//省市区获取树结构
-	var treeparams = {_mt:"commoncity.queryTreeCityList"};
+	var treeparams = {_mt:"commoncity.queryTreeCityList",companyId:$("#tg_cur_company").val()};
 	getInfo_comm_treeCity(treeparams, "UserLogin");
 	$("#tp_city_refresh").bind("click",tp_city_refresh);
 
@@ -11,7 +11,7 @@ $(function(){
 
 function tp_city_refresh(){
 	//省市区获取树结构
-	var treeparams = {_mt:"commoncity.queryTreeCityList"};
+	var treeparams = {_mt:"commoncity.queryTreeCityList",companyId:$("#tg_cur_company").val()};
 	getInfo_comm_treeCity(treeparams, "UserLogin");
 }
 //获取左边树的结构

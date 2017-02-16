@@ -23,15 +23,15 @@ update History:
 		//alert(sel_flparams);
 		//alert(sel_flparamvs);
 		var pd = {
-			_mt : "role.rolepage",
-			flag : '3user',
-			companyId : $("#tg_cur_company").val(),
-			enabled:"02valid"
+				_mt : "role.rolepage",
+				flag : 'rootadmin',
+				companyId:$("#tg_cur_company").val(),
+				enabled:"02valid"
 		};
 		$.each(sel_flparams, function(i, v) {
 			pd[v] = sel_flparamvs[i];
 		});
-		var cn = [ 'id', '角色名称', '类型名称' ];
+		var cn = [ 'id', '角色名称','类型名称' ];
 		var cm = [ {
 			name : 'id',
 			index : 'id',
@@ -39,19 +39,19 @@ update History:
 			align : "left",
 			sorttype : "text",
 			hidden : true
-		}, {
+		},{
 			name : 'roleName',
 			index : 'roleName',
 			width : 200,
 			align : "left",
 			sorttype : "text"
-		}, {
+		} ,{
 			name : 'typeDesc',
 			index : 'typeDesc',
 			width : 200,
 			align : "left",
 			sorttype : "text"
-		} ];
+		}];
 		jQuery("#tb_com_sel_roles").jqGrid(
 				{
 					url : pubsources.pub_getlink,
@@ -81,7 +81,7 @@ update History:
 						records : "records"
 					},
 					rowNum : 10,
-					rowList : [ 2, 5, 10 ],
+					rowList : [ 2, 5, 10],
 					pager : '#pg_com_sel_roles',
 					shrinkToFit : false,
 					forceFit : true,
@@ -119,16 +119,16 @@ update History:
 		$("#com_sel_qksearch").click(function() {
 			var name = $("#com_sel_search_roles").val();
 			if (!val_isnull(name)) {
-
+				
 				requestData = {
-					_mt : "role.rolepage",
-					roleName : name
-				};
-				$("#tb_com_sel_roles").jqGrid('setGridParam', {
-					postData : requestData, //发送数据
-					page : 1
-				}).trigger("reloadGrid");
-
+						_mt : "role.rolepage",
+						roleName : name
+					};
+					$("#tb_com_sel_roles").jqGrid('setGridParam', {
+						postData : requestData, //发送数据
+						page : 1
+					}).trigger("reloadGrid");
+					
 			} else {
 				comAlert(pubprompt.pub_sel_plsintqrycond);
 			}

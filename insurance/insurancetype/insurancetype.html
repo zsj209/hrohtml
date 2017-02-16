@@ -2,15 +2,22 @@
 <script type="text/javascript" src="../js/errordefine/insurance.js"></script>
 <script type="text/javascript">
     $(function () {
+    	
+		$("#tg_insutype_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_insutype_funcode").val($("#tg_cur_funcode_temp").val());
+		$("#tg_insutype_company").val($("#tg_cur_company").val());
+		$("#tg_insutype_companyName").val($("#tg_cur_companyName").val());
+    	
+    	
         var oH = $(window).height() - 240;
         var oW = $(window).width() - 240;
         var ss = {
             _mt: "insurance.getinsurancetype",
-            queryname:'status=\'02valid\'',
+            queryname:'status=\'02valid\' and company_id = '+$("#tg_insutype_company").val(),
             method: 1
         };
-        getData(ss);
-        function getData(requestData) {
+        getInsTypeData(ss);
+        function getInsTypeData(requestData) {
             jQuery("#tab_insurancetype").jqGrid({
                 url: pubsources.pub_getlink,
                 datatype: "json",
@@ -35,8 +42,8 @@
                     align: "left",
                     sorttype: "text"
                 }, {
-                    name: 'companyName',
-                    index: 'companyName',
+                    name: 'insuranceComName',
+                    index: 'insuranceComName',
                     width: 100,
                     align: "left",
                     sorttype: "text"
@@ -158,7 +165,6 @@
                 del: false,
                 search: false
             });
-
         }
 
         /*--------加载表格 end------*/
@@ -166,7 +172,7 @@
         //新增点击事件
         $("#add_insurancetype").click(function () {
             //加载新增页面
-            addOrUpdate(1, "新增险种");
+            addOrUpdate(1, "新增商保险种");
         })
 
         function addOrUpdate(method, pageTitle) {
@@ -200,9 +206,9 @@
                         "chargeMonth": "selmonths",
                         "replaceAllowed": "yesno",
                         "status": "pubstatus"
-                    }, method == 2 ? true : false, getUpdateinsurancetype(method, updateInfo, "UserLogin"));
+                    }, method == 2 ? false : true, getUpdateinsurancetype(method, updateInfo, "UserLogin"));
 
-
+                 
                     //	getSelectDataTypeList("type","bustype");
 
 
@@ -247,8 +253,8 @@
                 comAlert("险种名称不能为空");
                 return false;
             }
-            var companyId = $.trim($("#companyId").val());
-            if (companyId == '') {
+            var insuranceComId = $.trim($("#insuranceComId").val());
+            if (insuranceComId == '') {
                 comAlert("商保公司不能为空");
                 return false;
             }
@@ -304,11 +310,13 @@
                 return false;
             }
             var chargeMonth = $.trim($("#chargeMonth").val());
+            var companyId = $.trim($("#companyId").val());
             var remark = $.trim($("#remark").val());
             var params = {
                 "id": id,
                 "name": name,
                 "companyId": companyId,
+                "insuranceComId" : insuranceComId,
                 "insuranceType": insuranceType,
                 "chargeType": chargeType,
                 "payPrice": payPrice,
@@ -396,8 +404,13 @@
 
         //获取要修改的用户的信息
         function getUpdateinsurancetype(method, requestData, level) {
-            if (method != 2)
-                return;
+            if (method != 2){
+            	//加载商保的默认公司
+        	/* 	$("#companyName").val($("#tg_insutype_companyName").val());*/
+				$("#companyId").val($("#tg_insutype_company").val()); 
+			       return;
+            }
+         
             var payload = {
                 data: requestData,
                 level: level
@@ -545,10 +558,17 @@
         /*-----------删除 end----------*/
         //主页面的查询
         $("#insurancetype_search_btn").bind('click', function () {
+        	
+        	var curStatus = $("input[name='status_type']:checked").val();
+        	var curCondition = 'company_id = '+$("#tg_insutype_company").val();
+        	if(curStatus != ""){
+        		curCondition = curCondition+' and status = \''+curStatus+'\'';
+        	}  
+        	
             queryStr = $.trim($("#insurancetype_search").val());
             requestData = {
                 _mt: "insurance.getinsurancetype",
-                queryname: (queryStr == "" || queryStr == undefined || queryStr == null) ? "" : "name like '%" + queryStr + "%'",
+                queryname: (queryStr == "" || queryStr == undefined || queryStr == null) ? curCondition : curCondition+" and name like '%" + queryStr + "%'",
                 method: 1
             };
             $("#tab_insurancetype").jqGrid('setGridParam', {
@@ -556,9 +576,19 @@
                 page: 1
             }).trigger("reloadGrid");
         })
-
     })
 
+     function insuTypeSearch(par){
+    	if(par != "" ){
+    		condition = par +' and company_id = '+$("#tg_insutype_company").val();
+    	}else{
+    		condition = ' company_id = '+$("#tg_insutype_company").val();
+    	}
+    	queryIt(condition);
+    	
+    }
+    	
+    
     function queryIt(condition) {
         requestData = {
             _mt: "insurance.getinsurancetype",
@@ -578,10 +608,10 @@
 </div>
 <div class="rpane_status">
 	<label><input type="radio" id="editing" name="status_type" value="01draft"
-                  onclick="javascript:queryIt('status=\'01draft\'')"/>编辑中</label><label><input type="radio" id="enabled" name="status_type" value="02valid" checked="checked"
-                  onclick="javascript:queryIt('status=\'02valid\'')"/>生效</label><label><input type="radio" id="diabled" name="status_type" value="03invalid"
-                  onclick="javascript:queryIt('status=\'03invalid\'')"/>失效</label><label><input type="radio" id="allstatus" name="status_type" value="" 
-                  onclick="javascript:queryIt('')"/>全部</label>
+                  onclick="javascript:insuTypeSearch('status=\'01draft\'')"/>编辑中</label><label><input type="radio" id="enabled" name="status_type" value="02valid" checked="checked"
+                  onclick="javascript:insuTypeSearch('status=\'02valid\'')"/>生效</label><label><input type="radio" id="diabled" name="status_type" value="03invalid"
+                  onclick="javascript:insuTypeSearch('status=\'03invalid\'')"/>失效</label><label><input type="radio" id="allstatus" name="status_type" value="" 
+                  onclick="javascript:insuTypeSearch('')"/>全部</label>
 </div>
 <div class="rpane_search jqForm">
 	<input type="text"
@@ -594,4 +624,8 @@
     <div id="pager_insurancetype"></div>
 </div>
 
-
+<!-- 角色页面的节点id,节点code,当前用户所属公司 -->
+<input type="hidden" id="tg_insutype_funid" value="">
+<input type="hidden" id="tg_insutype_funcode" value="">
+<input type="hidden" id="tg_insutype_company" value="">
+<input type="hidden" id="tg_insutype_companyName" value="">

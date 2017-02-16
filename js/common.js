@@ -415,3 +415,53 @@ function alertMsg(result, msgJson) {
     }
     eval("comAlert(" + msgJson + "[" + code + "])");
 }
+
+
+
+
+/**
+ * 获取页面按钮
+ */
+
+
+function getPageButtonInfo(divId,roleId,nodeId){
+	
+    var datas = {
+            _mt: "button.getbuttonbynodeid",
+            roleId:roleId,
+            nodeId:nodeId
+        };
+        data = encrypt("UserLogin", datas);
+        console.log(data);
+        $.ajax({
+            type: "POST",
+            url: pubsources.pub_getlink,
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            data: serialize(data),
+            success: function (result) {
+            	var buttonValue = result.content["0"].value;
+                var _arr = [];
+        		for(var o in buttonValue){
+        			//此处需要修改  为了区分，按钮后缀改为自己的
+        			_arr.push('<input type="button" id="'+buttonValue[o].buttonId+'" value="&nbsp;'+buttonValue[o].buttonName+'&nbsp;">');
+        		}
+        		$("#"+divId).html(_arr.join(""));
+
+               /* if (callback != undefined && callback != "" && callback != null)
+                    callback.call();
+*/
+            },
+            error: function () {
+                alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+            }
+        });
+	
+}
+
+
+
+

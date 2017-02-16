@@ -107,6 +107,10 @@ $(function() {
 				$("#tg_cur_roletype").val($(this).attr("value"));
 				$("#tg_cur_company").val(
 						$(this).find("option:selected").attr("company"));
+				$("#tg_cur_roleId").val(
+						$(this).find("option:selected").attr("roleId"));
+				$("#tg_cur_companyName").val(
+						$(this).find("option:selected").attr("companyName"));
 				$("#tg_cur_roletype").trigger("click", [ "nonfirst" ]);
 			});
 	$("#tg_cur_roletype").click(function(e, isfirst) {
@@ -436,7 +440,9 @@ function getuserperm() {
 					if (permlist.length==1) {
 						$("#litg_switch_roletype").hide();
 						$("#tg_cur_roletype").val(permlist[0].roleType);
+						$("#tg_cur_roleId").val(permlist[0].roleId);
 						$("#tg_cur_company").val(permlist[0].companyId);
+						$("#tg_cur_companyName").val(permlist[0].companyName);
 						$("#tg_cur_roletype").trigger("click",["first"]);
 					} else {
 						var tmps = [], tmptoletype = "";
@@ -446,15 +452,19 @@ function getuserperm() {
 								tmptoletype += (this.roleType + ";");
 								if (i==0) {
 									$("#tg_cur_roletype").val(this.roleType);
+									$("#tg_cur_roletId").val(this.roleId);
 									$("#tg_cur_company").val(this.companyId);
+									$("#tg_cur_companyName").val(this.companyName);
 								}
 								//alert($("#tg_user_froletype").val());
 								if ($("#tg_user_froletype").val()==this.roleType) {
-									tmps.push("<option value=\""+this.roleType+"\" company=\""+this.companyId+"\" selected>"+this.roleTypeDesc);
+									tmps.push("<option value=\""+this.roleType+"\" roleId=\""+this.roleId+"\" company=\""+this.companyId+"\"  companyName=\""+this.companyName+"\" selected>"+this.roleTypeDesc);
 									$("#tg_cur_roletype").val(this.roleType);
+									$("#tg_cur_roleId").val(this.roleId);
 									$("#tg_cur_company").val(this.companyId);
+									$("#tg_cur_companyName").val(this.companyName);
 								} else
-									tmps.push("<option value=\""+this.roleType+"\" company=\""+this.companyId+"\">"+this.roleTypeDesc);
+									tmps.push("<option value=\""+this.roleType+"\" roleId=\""+this.roleId+"\" company=\""+this.companyId+"\"  companyName=\""+this.companyName+"\">"+this.roleTypeDesc);
 							}
 						});
 						$("#tg_switch_roletype").html(tmps.join(""));

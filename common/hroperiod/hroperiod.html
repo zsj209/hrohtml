@@ -320,8 +320,9 @@
 						comAlert(pubprompt.save_succ);
 					}
 				}
+				//alert(1)
 				$("#add_upd_button").dialog("close");
-				jQuery("#list_comm_hroperiod").trigger("reloadGrid");
+				jQuery("#list_comm_hroperiod").trigger("reloadGrid", [{page:1}]);
 			},
 			error : function() {
 				comAlert(pubprompt.network_error);

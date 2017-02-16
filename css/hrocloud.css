@@ -86,6 +86,9 @@ a{text-decoration:none;}
 .rpane_status input[type="radio"]{
 	height:11px;width:13px;
 }
+.rpane_status input[type="checkbox"]{
+	height:11px;width:13px;vertical-align: middle;
+}
 
 /*修改密码*/
 #modifypassword ul{padding-top:14px;height:90px;}

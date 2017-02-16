@@ -1,5 +1,13 @@
 <script type="text/javascript">
 	$(function() {
+		
+		$("#tg_button_funid").val($("#tg_cur_funid_temp").val());
+		$("#tg_button_funcode").val($("#tg_cur_funcode_temp").val());
+		$("#tg_button_roleId").val($("#tg_cur_roleId").val());
+		
+		//获取按钮
+		getPageButtonInfo("button_page_button",$("#tg_button_roleId").val(),$("#tg_button_funid").val());
+		
 		var oH = $("#rPane").height() - 175;
 		var oW = $("#rPane").width() - 40;
 		var ss = {
@@ -153,9 +161,13 @@
 				"保存" : function() {
 					//获取参数
 					requestData = addButtonPar();
+					var flag = false;
+					if ($("#id").val() == "") {
+						flag = true;
+					}
 					//调用方法
 					if (requestData) {
-						addOrUpdateButton(requestData, "UserLogin");
+						addOrUpdateButton(requestData, "UserLogin",flag);
 					}
 				},
 				"取消" : function() {
@@ -239,7 +251,7 @@
 		return requestData;
 	};
 
-	function addOrUpdateButton(requestData, level) {
+	function addOrUpdateButton(requestData, level,flag) {
 		var payload = {
 			data : requestData,
 			level : level
@@ -257,7 +269,11 @@
 			data : serialize(data),
 			success : function(result) {
 				if (getStatus(result)) {
-					comAlert("新增或修改成功");
+					if(flag){//新增成功
+						comAlert(pubprompt.ins_succ);
+					}else{//修改成功
+						comAlert(pubprompt.upd_succ);
+					}
 					//关闭dialog
 					$("#add_upd_button").dialog("close");
 					//刷新grid
@@ -288,9 +304,12 @@
 			},
 			data : serialize(data),
 			success : function(result) {
-				//TODO　判断删除是否成功
-				console.log(result);
-				jQuery("#tab_button").trigger("reloadGrid");
+				if(com_error(result)){
+					comAlert(pubprompt.del_succ);
+					jQuery("#tab_button").trigger("reloadGrid");
+				}else{
+					alertMsg(result,"usermgmt_code_desc");
+				}
 			},
 			error : function() {
 				comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
@@ -300,11 +319,10 @@
 </script>
 
 <div class="rPane_d_menu">
-	<span> 
 		<input type=button id="add_button" value="&nbsp;新增&nbsp;"><input type="button" id="upd_button" value="&nbsp;修改&nbsp;"><input type="button" id="del_button" value="&nbsp;删除&nbsp;">
-	</span>
 </div>
-
+	<!-- <div class="rPane_d_menu" id="button_page_button">
+		</div> -->
 <div class="rpane_search jqForm">
 	<input type="text"
 		id="button_search" style="float: left;" name="button_search"
@@ -317,3 +335,8 @@
 	<table id="tab_button"></table>
 	<div id="pager_button"></div>
 </div>
+
+<input type="hidden" id="tg_button_funid" value="">
+<input type="hidden" id="tg_button_funcode" value="">
+<input type="hidden" id="tg_button_roleId"  value="">
+

@@ -20,7 +20,8 @@
 		$("#tree_hosfpolicyb_list").css("height",
 				($("#rPane").height() - 82) + "px");
 		var ss = {
-			_mt : "hosfPolicy.getPolicyByPage"
+			_mt : "hosfPolicy.getPolicyByColumPage",
+			companyId : $("#tg_cur_company").val()
 		};
 
 		getData(ss);

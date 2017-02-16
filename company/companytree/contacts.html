@@ -24,7 +24,7 @@
 							nd : null,
 							npage : null
 						},//去除多余的参数
-						colNames : [ '编号', '公司ID', '联系人姓名', '职位', '电话', '电子邮件',
+						colNames : [ '编号', '公司ID', '联系人姓名', '职位', '电话', '电子邮件','QQ/微信',
 								'地区名称', '地址', '上级领导' ],
 						colModel : [ {
 							name : 'id',
@@ -65,6 +65,12 @@
 							align : "left",
 							sorttype : "text"
 						}, {
+							name : 'contQqorweixin',
+							index : 'contQqorweixin',
+							width : 160,
+							align : "left",
+							sorttype : "text"
+						},{
 							name : 'contDistrictName',
 							index : 'contDistrictName',
 							width : 70,
@@ -227,7 +233,7 @@
 					data = result.content["0"];
 					setData(data, "addContacts");
 					}else{
-						alertMsg(xhr,"company_code_desc");
+						alertMsg(result,"company_code_desc");
 					}
 
 				},
@@ -303,6 +309,7 @@
 		var contPosition = $.trim($("#contPosition").val());
 		var contIphone = $.trim($("#contIphone").val());
 		var contEmail = $.trim($("#contEmail").val());
+		var contQqorweixin = $.trim($("#contQqorweixin").val());
 		var contDistrict = $.trim($("#contDistrict").val());
 		var contAddr = $.trim($("#contAddr").val());
 		var contSuperior = $.trim($("#contSuperior").val());

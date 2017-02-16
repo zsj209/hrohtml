@@ -843,14 +843,14 @@ function comsel(selobject) {
 		url = "../comsel/selcompany.html";
 	} else if (selobject.seltype == "selcity") {
 		url = "../comsel/selcity.html";
-	} else if (selobject.seltype == "seluser") {
-		url = "../comsel/selbinduser.html";
+	} else if (selobject.seltype == "selbindusers") {
+		url = "../comsel/selbindusers.html";
 	} else if (selobject.seltype == "selperiod") {
 		url = "../comsel/selperiod.html";
-	} else if (selobject.seltype == "selorg") {
-		url = "../comsel/selorg.html";
-	} else if (selobject.seltype == "selrole") {
-		url = "../comsel/selrole.html";
+	} else if (selobject.seltype == "selorgs") {
+		url = "../comsel/selorgs.html";
+	} else if (selobject.seltype == "selroles") {
+		url = "../comsel/selroles.html";
 	} else if (selobject.seltype == "selhroperiod") {
 		url = "../comsel/selhroperiod.html";
 	} else if (selobject.seltype == "selopencity") {
@@ -863,6 +863,8 @@ function comsel(selobject) {
 		url = "../comsel/selcitys.html";
 	}else if (selobject.seltype == "selparamtype") {
 		url = "../comsel/selparamtype.html";
+	}else if (selobject.seltype == "selrole") {
+		url = "../comsel/selrole.html";
 	}
 	var s = $("<DIV ID=\"com_sel_" + selobject.seltype + "\" flparams=\""+selobject.flparams+"\" flparamvs=\""+selobject.flparamvs+"\"></DIV>");
 	$(s).load(url + "?tsid=" + new Date().getTime()).dialog({
@@ -914,7 +916,7 @@ function comsel(selobject) {
 
 // 类似js alert, 是异步的, 非阻断式, 内容 不支持嵌入html元素
 // 调用参考：comAlert("aaa");
-function comAlert(ct) {
+function comAlert(ct,callback) {
 	if (ct!=null) {
 		var ctn = ct.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g,
 				"&#39;").replace(/"/g, "&#34;");
@@ -934,6 +936,8 @@ function comAlert(ct) {
 			modal : true,
 			buttons : {
 				"确定" : function() {
+					if (callback != undefined && callback != "" && callback != null)
+		                callback.call();
 					$(this).dialog("close");
 				}
 			},

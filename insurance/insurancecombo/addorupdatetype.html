@@ -3,7 +3,7 @@
 <script type="text/javascript">
 
     $(function () {
-        var baseExpr = "status='02valid' and id not in (select it_id from package_it where ic_id=" + $.trim($("#id").val()) + ")";
+        var baseExpr = "status='02valid' and id not in (select it_id from package_it where ic_id=" + $.trim($("#id").val()) + ") and company_id = "+$("#tg_insucombo_company").val();
         var oH = 220;
         var oW = 730;
         var ss = {
@@ -28,24 +28,23 @@
                     nd: null,
                     npage: null
                 },//去除多余的参数
-                colNames: ['险种名称', '险种类型', '计价方式', '付费单价', '付费频率', '收费单价', '收费频率', '年收费月份',
-                    '生效时间', '终止时间', '状态'],
+                colNames: ['险种名称', '险种类型', '计价方式', '付费单价', '付费频率', '收费单价', '收费频率', '年收费月份'],
                 colModel: [{
                     name: 'name',
                     index: 'name',
-                    width: 80,
+                    width: 90,
                     align: "left",
                     sorttype: "text"
                 }, {
                     name: 'insuranceTypeDesc',
                     index: 'insuranceTypeDesc',
-                    width: 60,
+                    width: 70,
                     align: "left",
                     sorttype: "text"
                 }, {
                     name: 'chargeTypeDesc',
                     index: 'chargeTypeDesc',
-                    width: 40,
+                    width: 60,
                     align: "left",
                     sorttype: "text"
                 }, {
@@ -79,35 +78,7 @@
                 }, {
                     name: 'chargeMonthDesc',
                     index: 'chargeMonthDesc',
-                    width: 40,
-                    align: "left",
-                    sorttype: "text"
-                }, {
-                    name: 'fromTime',
-                    index: 'fromTime',
                     width: 60,
-                    align: "left",
-                    sorttype: "text",
-                    formatter: function (cellvalue) {
-                        if (cellvalue != null)
-                            return dateFormat(new Date(cellvalue));
-                        return "";
-                    }
-                }, {
-                    name: 'toTime',
-                    index: 'toTime',
-                    width: 60,
-                    align: "left",
-                    sorttype: "text",
-                    formatter: function (cellvalue) {
-                        if (cellvalue != null)
-                            return dateFormat(new Date(cellvalue));
-                        return "";
-                    }
-                }, {
-                    name: 'statusDesc',
-                    index: 'statusDesc',
-                    width: 40,
                     align: "left",
                     sorttype: "text"
                 }],
@@ -131,8 +102,8 @@
                 rowNum: 10,
                 rowList: [10, 20, 50],
                 pager: '#pager_insurancetypeselect',
-                height: oH,
-                width: oW,
+                height: 270,
+                width: 650,
                 shrinkToFit: false,
                 forceFit: true,
                 sortname: 'id',
@@ -173,13 +144,18 @@
 </script>
 
 
-<div class=rpane_search>
+<!-- <div class=rpane_search>
     <input type="text" id="insurancetypeselect_search" name="insurancetypeselect_search" placeholder="请输入险种名称">
     <button id="insurancetype_search_btn">查询</button>
+</div> -->
+<div class="ui-grid-qkshdiv" style="width:650">
+	<label>险种名称：</label><input type="text" id="insurancetypeselect_search" name="insurancetypeselect_search" >
+	<span id="insurancetype_search_btn" class="ui-qksh-btsh">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 </div>
-<div class=rPane_dt>
+<!-- <div class=rPane_dt>
     <table id="tab_insurancetypeselect"></table>
     <div id="pager_insurancetypeselect"></div>
-</div>
-
+</div> -->
+<table id="tab_insurancetypeselect" class="scroll"></table>
+<div id="pager_insurancetypeselect" class="scroll" style="height: 30px"></div>
 

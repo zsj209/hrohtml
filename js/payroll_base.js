@@ -9,6 +9,7 @@ var dipgoH = 600;//主子表新增高度
 var dipgoW = 1000;//主子表新增宽度
 var dipgoHo = 500;///普通表新增高度
 var dipgoWo = 900;//普通表新增宽度
+var companyId=$("#tg_cur_company").val();
 
 /*清空数据 新增、修改页面数据*/
 function setaddupDivVlues(id){

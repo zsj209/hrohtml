@@ -23,7 +23,7 @@
 							nd : null,
 							npage : null
 						},//去除多余的参数
-						colNames : [ '编号', '公司ID', '联系人姓名', '职位', '电话', '电子邮件',
+						colNames : [ '编号', '公司ID', '联系人姓名', '职位', '电话', '电子邮件','QQ/微信',
 								'地区名称', '地址', '上级领导' ],
 						colModel : [ {
 							name : 'id',
@@ -63,7 +63,13 @@
 							width : 160,
 							align : "left",
 							sorttype : "text"
-						}, {
+						},{
+							name : 'contQqorweixin',
+							index : 'contQqorweixin',
+							width : 160,
+							align : "left",
+							sorttype : "text"
+						},{
 							name : 'contDistrictName',
 							index : 'contDistrictName',
 							width : 65,

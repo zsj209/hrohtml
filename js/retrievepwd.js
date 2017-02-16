@@ -63,7 +63,59 @@ $("#validImg").bind("click",function(){
 })
 
 /*-----function end----*/
+function getCaptchaCode() {
+    var params = {
+        "_mt": "verifycode.requestCaptcha",
+        clientId: pubsources.clientId,
+        clientPass: pubsources.clientPass,
+        clientIp: "127.0.0.1"
+    };
 
+    var requestData = {
+        data: params,
+        level: "None"
+    };
+
+    data = encrypt(requestData.level, requestData.data);
+
+    console.log(data);
+    $.ajax({
+        type: "POST",
+        url: pubsources.pub_getCaptcha,
+        crossDomain: true,
+        dataType: "json",
+        xhrFields: {
+            withCredentials: true
+        },
+        data: serialize(data),
+        success: function (result) {
+            // 给修改页面的input框赋值
+            if (com_error(result)) {
+                // captchaCodeValue = result.content["0"].value;
+                captid = result.content["0"].key;
+                imgUrl = result.content["0"].imgUrl;
+                $("#validImg").prop({
+                    src: imgUrl,
+                    cursor: 'hand',
+                    title: "点击刷新"
+                });
+                $("#validImg").css({
+                    cursor: 'pointer'
+                });
+                $("#captid").val(captid);
+                // $("#captchaCodeValue").val(captchaCodeValue);
+
+            } else {
+                alertMsg(result, "usermgmt_code_desc");
+            }
+        },
+        error: function () {
+            comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。" + "png");
+        }
+    });
+};
+
+/*
 function getCaptchaCode() {
 		var payload = {
 			data : serach("usrmgmt.getcaptcha"),
@@ -100,7 +152,7 @@ function getCaptchaCode() {
 			}
 		});
 	};
-	
+	*/
 
 
 function getBackPwd() {
@@ -129,22 +181,15 @@ function getBackPwd() {
 			data : serialize(data),
 			success : function(result) {
 				if(com_error(result)){
-					alert("重置密码成功,请重新登录");
-					window.location.href = "index.html";
+					comAlert("重置密码成功,请重新登录",function(){
+						window.location.href = "index.html";
+					});
 				}else{
-					//TODO
 					alertMsg(result,"usermgmt_code_desc");
 				}
-				
-				
-				
-				console.log(result);
-				//TODO 判断修改是否成功，成功跳转至登录页重新登录，错误提示错误信息
-				
-			
 			},
 			error : function() {
-				alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+				comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
 			}
 		});
 	}
@@ -172,7 +217,7 @@ function getveriCode() {
 		success : function(result) {
 			//给修改页面的input框赋值
 			if(com_error(result)){
-				alert("获取手机验证码发送成功");
+				comAlert("获取手机验证码发送成功");
 				value = result.content["0"].value;
 				deliveryId = result.content["0"].deliveryId;
 				$("#verifyid").val(deliveryId);
@@ -180,10 +225,13 @@ function getveriCode() {
 				
 			}else{
 				alertMsg(result,"usermgmt_code_desc");
+				getCaptchaCode();
+				$("#captchaCode").val("");
+				$("#verifyCode").val("");
 			}
 		},
 		error : function() {
-			alert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
+			comAlert("抱歉，网络故障或服务器繁忙，请检查您的网络环境或稍后重试。");
 		}
 	});
 }
